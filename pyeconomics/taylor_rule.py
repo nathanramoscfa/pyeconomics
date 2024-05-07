@@ -9,8 +9,7 @@ def taylor_rule(
         unemployment_rate_series_id: str = 'UNRATE',
         natural_unemployment_series_id: str = 'NROU',
         real_interest_rate_series_id: str = 'DFII10',
-        fed_rate_series: pd.Series = None,
-        current_inflation: float = None,
+        current_inflation_rate: float = None,
         current_unemployment_rate: float = None,
         natural_unemployment_rate: float = None,
         long_term_real_interest_rate: float = None,
@@ -28,18 +27,22 @@ def taylor_rule(
     Computes the Taylor Rule interest rate based on economic indicators.
 
     Args:
-        inflation_series_id (str): Series ID for inflation data.
-        unemployment_rate_series_id (str): Series ID for unemployment rate.
-        natural_unemployment_series_id (str): Series ID for natural
+        inflation_series_id (str): FRED Series ID for inflation data.
+        unemployment_rate_series_id (str): FRED Series ID for unemployment rate.
+        natural_unemployment_series_id (str): FRED Series ID for natural
             unemployment rate.
-        real_interest_rate_series_id (str): Series ID for long-term real
+        real_interest_rate_series_id (str): FRED Series ID for long-term real
             interest rate.
-        fed_rate_series (pd.Series): Series of Federal Funds Target Rate.
-        current_inflation (float): Current inflation rate.
-        current_unemployment_rate (float): Current unemployment rate.
-        natural_unemployment_rate (float): Natural unemployment rate.
-        long_term_real_interest_rate (float): Long-term real interest rate.
-        fed_rate (float): Current Federal Funds Target Rate.
+        current_inflation_rate (float): Current inflation rate. If not provided,
+            the latest value from FRED is fetched.
+        current_unemployment_rate (float): Current unemployment rate. If not
+            provided, the latest value from FRED is fetched.
+        natural_unemployment_rate (float): Natural unemployment rate. If not
+            provided, the latest value from FRED is fetched.
+        long_term_real_interest_rate (float): Long-term real interest rate. If
+            not provided, the latest value from FRED is fetched.
+        fed_rate (float): Current Federal Funds Target Rate. If not provided,
+            the latest value from FRED is fetched.
         inflation_target (float): Target inflation rate.
         alpha (float): Weight for inflation gap.
         beta (float): Weight for unemployment gap.
@@ -57,8 +60,8 @@ def taylor_rule(
         float: Taylor Rule interest rate estimate.
     """
     # Fetch data if not provided
-    current_inflation = fred_client.get_data_or_fetch(
-        current_inflation, inflation_series_id)
+    current_inflation_rate = fred_client.get_data_or_fetch(
+        current_inflation_rate, inflation_series_id)
     current_unemployment_rate = fred_client.get_data_or_fetch(
         current_unemployment_rate, unemployment_rate_series_id)
     natural_unemployment_rate = fred_client.get_data_or_fetch(
@@ -67,20 +70,19 @@ def taylor_rule(
         long_term_real_interest_rate, real_interest_rate_series_id)
 
     if fed_rate is None:
-        fed_rate = (fed_rate_series.iloc[-1] if fed_rate_series is not None
-                    else fred_client.get_latest_value('DFEDTARU'))
+        fed_rate = fred_client.get_latest_value('DFEDTARU')
 
-    if None in (current_inflation, current_unemployment_rate,
+    if None in (current_inflation_rate, current_unemployment_rate,
                 natural_unemployment_rate, long_term_real_interest_rate,
                 fed_rate):
         raise ValueError("Required economic data is missing.")
 
     # Calculate gaps and Taylor Rule estimate
-    inflation_gap = current_inflation - inflation_target
+    inflation_gap = current_inflation_rate - inflation_target
     unemployment_gap = natural_unemployment_rate - current_unemployment_rate
 
     taylor_est = (long_term_real_interest_rate +
-                  current_inflation +
+                  current_inflation_rate +
                   alpha * inflation_gap +
                   beta * okun_factor * unemployment_gap)
 
@@ -88,7 +90,7 @@ def taylor_rule(
         taylor_est = max(taylor_est, elb)
 
     adjusted_taylor_rule_interest_rate = (
-        rho * fed_rate + (1 - rho) * taylor_est
+            rho * fed_rate + (1 - rho) * taylor_est
     )
 
     # Verbose output
@@ -96,7 +98,9 @@ def taylor_rule(
         print(f"\n==== Economic Indicators ===================================="
               f"==")
         print(f"Current Inflation:                        "
-              f"  {current_inflation:.2f}%")
+              f"  {current_inflation_rate:.2f}%")
+        print(f"Target Inflation:                         "
+              f"  {inflation_target:.2f}%")
         print(f"Current Unemployment Rate:                "
               f"  {current_unemployment_rate:.2f}%")
         print(f"Natural Unemployment Rate:                "
@@ -116,7 +120,7 @@ def taylor_rule(
         print(f"  Long-Term Real Interest Rate:           "
               f"  {long_term_real_interest_rate:.2f}%")
         print(f"  Current Inflation:                      "
-              f"+ {current_inflation:.2f}%")
+              f"+ {current_inflation_rate:.2f}%")
         print(f"  Alpha * Inflation Gap:                  "
               f"+ {alpha:.2f} * {inflation_gap:.2f}%")
         print(f"  Beta * Okun Factor * Unemployment Gap:  "
@@ -211,14 +215,14 @@ def historical_taylor_rule(
     data['InflationGap'] = data['Inflation'] - inflation_target
     data['UnemploymentGap'] = (data['NaturalUnemploymentRate'] -
                                data['UnemploymentRate'])
-    data['TaylorEst'] = (data['RealInterestRate'] +
-                         data['Inflation'] +
-                         alpha * data['InflationGap'] +
-                         beta * okun_factor * data['UnemploymentGap'])
+    data['TaylorRule'] = (data['RealInterestRate'] +
+                          data['Inflation'] +
+                          alpha * data['InflationGap'] +
+                          beta * okun_factor * data['UnemploymentGap'])
 
     # Apply effective lower bound constraint
     if apply_elb:
-        data['AdjustedTaylorRule'] = data['TaylorEst'].apply(
+        data['AdjustedTaylorRule'] = data['TaylorRule'].apply(
             lambda x: max(x, elb))
 
     # Apply policy inertia

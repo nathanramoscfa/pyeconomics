@@ -1,10 +1,13 @@
 import datetime
 import logging
 from typing import Optional
+from threading import Lock
 
 import keyring
 import pandas as pd
 from fredapi import Fred
+
+from .cache_manager import save_to_cache, load_from_cache
 
 
 class DataSource:
@@ -43,10 +46,12 @@ class FredClient(DataSource):
     Inherits from DataSource and implements methods to fetch data from FRED.
     """
     _instance = None
+    _lock = Lock()
 
     def __new__(cls, api_key: Optional[str] = None):
         """
-        Ensures a single instance of FredClient.
+        Ensures a single instance of FredClient using a thread-safe singleton
+        pattern.
 
         Args:
             api_key (Optional[str]): The FRED API key, retrieved from
@@ -55,16 +60,20 @@ class FredClient(DataSource):
         Returns:
             FredClient: Singleton instance.
         """
-        if not isinstance(cls._instance, cls):
-            cls._instance = super(FredClient, cls).__new__(cls)
-            api_key = api_key or keyring.get_password(
-                "fred", "api_key")
-            cls._instance.client = Fred(api_key=api_key)
-        return cls._instance
+        with cls._lock:
+            if not isinstance(cls._instance, cls):
+                cls._instance = super(FredClient, cls).__new__(cls)
+                api_key_retrieved = api_key or keyring.get_password(
+                    "fred", "api_key")
+                if not api_key_retrieved:
+                    raise ValueError("API Key for FRED must be provided or "
+                                     "retrievable from keyring.")
+                cls._instance.client = Fred(api_key=api_key_retrieved)
+            return cls._instance
 
     def fetch_data(self, series_id: str) -> pd.Series:
         """
-        Fetches data for a given series ID from FRED.
+        Fetches data for a given series ID from FRED with caching.
 
         Args:
             series_id (str): FRED series ID to fetch data for.
@@ -76,10 +85,17 @@ class FredClient(DataSource):
             ValueError: If no data is found for series ID.
             Exception: For fetch operation errors.
         """
+        cache_key = f"fred_series_{series_id}"
+        data = load_from_cache(cache_key)
+
+        if data is not None:
+            return data
+
         try:
             data = self.client.get_series(series_id)
             if data.empty:
                 raise ValueError(f"No data found for series ID {series_id}")
+            save_to_cache(cache_key, data)
             return data
         except Exception as e:
             logging.error(f"Fetching error for {series_id}: {e}")
@@ -125,11 +141,33 @@ class FredClient(DataSource):
         return series.iloc[periods] \
             if not series.empty and len(series) > -periods else None
 
-    @staticmethod
-    def get_data_or_fetch(default, series_id):
-        """Fetches data if default is None using the given FRED series ID."""
-        return fred_client.get_latest_value(
-            series_id) if default is None else default
+    def get_series_name(self, series_id: str) -> str:
+        """
+        Fetches the name of a FRED series given its ID.
+
+        Args:
+            series_id (str): Identifier for the FRED data series.
+
+        Returns:
+            str: Name of the FRED series.
+        """
+        return self.client.get_series_info(series_id)["title"]
+
+    @classmethod
+    def get_data_or_fetch(cls, default, series_id):
+        """
+        Fetches data if default is None using the given FRED series ID.
+
+        Args:
+            default (any): Default value to return if not None.
+            series_id (str): FRED series ID for fetching data if default is
+                None.
+
+        Returns:
+            any: Latest value or default value.
+        """
+        return cls._instance.get_latest_value(series_id) \
+            if default is None else default
 
 
 # Global instance of the FredClient
