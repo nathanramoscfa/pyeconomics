@@ -1,13 +1,20 @@
 import datetime
 import logging
-from typing import Optional
+import os
 from threading import Lock
+from typing import Optional
 
-import keyring
 import pandas as pd
 from fredapi import Fred
 
 from pyeconomics.cache_manager import save_to_cache, load_from_cache
+
+try:
+    import keyring
+    KEYRING_AVAILABLE = True
+except ImportError:
+    keyring = None
+    KEYRING_AVAILABLE = False
 
 
 class DataSource:
@@ -63,8 +70,10 @@ class FredClient(DataSource):
         with cls._lock:
             if not isinstance(cls._instance, cls):
                 cls._instance = super(FredClient, cls).__new__(cls)
-                api_key_retrieved = api_key or keyring.get_password(
-                    "fred", "api_key")
+                api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
+                if not api_key_retrieved and KEYRING_AVAILABLE:
+                    api_key_retrieved = keyring.get_password(
+                        "fred", "api_key")
                 if not api_key_retrieved:
                     raise ValueError("API Key for FRED must be provided or "
                                      "retrievable from keyring.")
