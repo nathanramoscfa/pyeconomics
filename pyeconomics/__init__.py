@@ -1,6 +1,6 @@
 # pyeconomics/__init__.py
 from .api import FredClient, fred_client, fetch_historical_fed_funds_rate
-from cache_manager import save_to_cache, load_from_cache
+from .cache_manager import save_to_cache, load_from_cache
 from .models.monetary_policy import balanced_approach_rule
 from .models.monetary_policy import first_difference_rule
 from .models.monetary_policy import taylor_rule
