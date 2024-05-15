@@ -1,7 +1,8 @@
+# taylor_rule.py
 import pandas as pd
 
-from .api import fred_client
-from .fred_data import fetch_historical_fed_funds_rate
+from pyeconomics.api import fred_client, fetch_historical_fed_funds_rate
+from pyeconomics.utils import verbose_taylor_rule
 
 
 def taylor_rule(
@@ -81,69 +82,47 @@ def taylor_rule(
     inflation_gap = current_inflation_rate - inflation_target
     unemployment_gap = natural_unemployment_rate - current_unemployment_rate
 
-    taylor_est = (long_term_real_interest_rate +
-                  current_inflation_rate +
-                  alpha * inflation_gap +
-                  beta * okun_factor * unemployment_gap)
+    unadjusted_taylor_rule = (long_term_real_interest_rate +
+                              current_inflation_rate +
+                              alpha * inflation_gap +
+                              beta * okun_factor * unemployment_gap)
 
+    # Apply effective lower bound constraint
     if apply_elb:
-        taylor_est = max(taylor_est, elb)
+        adjusted_taylor_rule_after_elb = max(unadjusted_taylor_rule, elb)
+    else:
+        adjusted_taylor_rule_after_elb = unadjusted_taylor_rule
 
-    adjusted_taylor_rule_interest_rate = (
-            rho * fed_rate + (1 - rho) * taylor_est
+    # Apply policy inertia
+    adjusted_taylor_rule_after_inertia = (
+            rho * fed_rate + (1 - rho) * adjusted_taylor_rule_after_elb
     )
 
     # Verbose output
     if verbose:
-        print(f"\n==== Economic Indicators ===================================="
-              f"==")
-        print(f"Current Inflation:                        "
-              f"  {current_inflation_rate:.2f}%")
-        print(f"Target Inflation:                         "
-              f"  {inflation_target:.2f}%")
-        print(f"Current Unemployment Rate:                "
-              f"  {current_unemployment_rate:.2f}%")
-        print(f"Natural Unemployment Rate:                "
-              f"  {natural_unemployment_rate:.2f}%")
-        print(f"Long-Term Real Interest Rate:             "
-              f"  {long_term_real_interest_rate:.2f}%")
-        print(f"Current Fed Rate:                         "
-              f"  {fed_rate:.2f}%")
-        print(f"\n==== Gaps ==================================================="
-              f"==")
-        print(f"Inflation Gap:                            "
-              f"  {inflation_gap:.2f}%")
-        print(f"Unemployment Gap:                         "
-              f"  {unemployment_gap:.2f}%")
-        print(f"\n==== Taylor Rule ============================================"
-              f"==")
-        print(f"  Long-Term Real Interest Rate:           "
-              f"  {long_term_real_interest_rate:.2f}%")
-        print(f"  Current Inflation:                      "
-              f"+ {current_inflation_rate:.2f}%")
-        print(f"  Alpha * Inflation Gap:                  "
-              f"+ {alpha:.2f} * {inflation_gap:.2f}%")
-        print(f"  Beta * Okun Factor * Unemployment Gap:  "
-              f"+ {beta:.2f} * {okun_factor:.2f} * {unemployment_gap:.2f}%")
-        print("---------------------------------------------------------------")
-        print(f"  Taylor Rule:                            "
-              f"  {taylor_est:.2f}%")
-        print(f"\n==== Adjusted Taylor Rule ==================================="
-              f"==")
-        print("  Adjustment Computation:")
-        print(f"  Policy Inertia Coefficient (rho):       "
-              f"  {rho:.2f}")
-        print(f"  Current Fed Rate:                       "
-              f"* {fed_rate:.2f}%")
-        print(f"  Adjustment Coefficient (1 - rho):       "
-              f"+ (1 - {rho:.2f})")
-        print(f"  Taylor Rule Estimate:                   "
-              f"* {taylor_est:.2f}%")
-        print("---------------------------------------------------------------")
-        print(f"  Adjusted Taylor Rule Estimate:          "
-              f"  {adjusted_taylor_rule_interest_rate:.2f}%")
+        data = {
+            'current_inflation_rate': current_inflation_rate,
+            'inflation_target': inflation_target,
+            'current_unemployment_rate': current_unemployment_rate,
+            'natural_unemployment_rate': natural_unemployment_rate,
+            'long_term_real_interest_rate': long_term_real_interest_rate,
+            'fed_rate': fed_rate,
+            'inflation_gap': inflation_gap,
+            'unemployment_gap': unemployment_gap,
+            'unadjusted_taylor_rule': unadjusted_taylor_rule,
+            'adjusted_taylor_rule_after_elb': adjusted_taylor_rule_after_elb,
+            'adjusted_taylor_rule_after_inertia':
+                adjusted_taylor_rule_after_inertia,
+            'rho': rho,
+            'alpha': alpha,
+            'beta': beta,
+            'okun_factor': okun_factor,
+            'elb': elb,
+            'apply_elb': apply_elb
+        }
+        verbose_taylor_rule(data)
 
-    return round(adjusted_taylor_rule_interest_rate, 2)
+    return round(adjusted_taylor_rule_after_inertia, 2)
 
 
 def historical_taylor_rule(
@@ -194,7 +173,7 @@ def historical_taylor_rule(
     real_interest_rate = fred_client.fetch_data(real_interest_rate_series_id)
     fed_rate = fetch_historical_fed_funds_rate()
 
-    # Combine into a DataFrame and ensure data alignment
+    # Combine into a DataFrame
     data = pd.DataFrame({
         'Inflation': inflation,
         'UnemploymentRate': unemployment_rate,
@@ -224,9 +203,11 @@ def historical_taylor_rule(
     if apply_elb:
         data['AdjustedTaylorRule'] = data['TaylorRule'].apply(
             lambda x: max(x, elb))
+    else:
+        data['AdjustedTaylorRule'] = data['TaylorRule']
 
     # Apply policy inertia
-    data['AdjustedTaylorRule'] = (rho * data['FedRate'] +
-                                  (1 - rho) * data['AdjustedTaylorRule'])
+    data['AdjustedTaylorRule'] = (
+            rho * data['FedRate'] + (1 - rho) * data['AdjustedTaylorRule'])
 
     return round(data, 2)

@@ -7,7 +7,7 @@ import keyring
 import pandas as pd
 from fredapi import Fred
 
-from .cache_manager import save_to_cache, load_from_cache
+from pyeconomics.cache import save_to_cache, load_from_cache
 
 
 class DataSource:
@@ -154,20 +154,29 @@ class FredClient(DataSource):
         return self.client.get_series_info(series_id)["title"]
 
     @classmethod
-    def get_data_or_fetch(cls, default, series_id):
+    def get_data_or_fetch(cls, default, series_id, periods=0):
         """
-        Fetches data if default is None using the given FRED series ID.
+        Fetches data if default is None using the given FRED series ID. Can
+        fetch historical data based on periods.
 
         Args:
             default (any): Default value to return if not None.
-            series_id (str): FRED series ID for fetching data if default is
-                None.
+            series_id (str): FRED series ID for fetching data if
+            default is None.
+            periods (int): Number of periods back to fetch the data.
+                Default is 0 for current data.
 
         Returns:
-            any: Latest value or default value.
+            any: Latest value or historical value or default value.
         """
-        return cls._instance.get_latest_value(series_id) \
-            if default is None else default
+        if default is not None:
+            return default
+        else:
+            # Check if periods parameter is used to fetch historical data
+            if periods == 0:
+                return cls._instance.get_latest_value(series_id)
+            else:
+                return cls._instance.get_historical_value(series_id, periods)
 
 
 # Global instance of the FredClient

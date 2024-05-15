@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .api import fred_client
+from pyeconomics.api.fred_api import fred_client
 
 
 def fetch_historical_fed_funds_rate() -> pd.DataFrame:
@@ -25,4 +25,6 @@ def fetch_historical_fed_funds_rate() -> pd.DataFrame:
         dfedtar[dfedtar.index <= '2008-12-15'],
         dfedtaru[dfedtaru.index > '2008-12-15']
     ])
+    df.index.name = 'FedRate'
+    df.name = 'FedRate'
     return df

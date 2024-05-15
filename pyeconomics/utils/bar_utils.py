@@ -1,11 +1,13 @@
-def verbose_bar_rule(data):
+def verbose_balanced_approach_rule(data):
     # Determine if the shortfalls rule is being used
     rule_suffix = "Shortfalls " \
         if data.get('use_shortfalls_rule', False) else ""
-    rule_name = f"BASR" if rule_suffix else "BAR"
+    rule_acronym = f"BASR" if rule_suffix else "BAR"
+    rule_name = f"Balanced Approach {rule_suffix}Rule (BASR)" \
+        if rule_suffix else "Balanced Approach Rule"
 
     # Calculate the length of the line based on the rule name
-    line_length = 65 + len(rule_name)
+    line_length = 65 + len(rule_acronym)
 
     print("\n==== Economic Indicators " + "=" * (line_length - 25))
     print("Current Inflation:                        {:.2f}%".format(
@@ -40,17 +42,17 @@ def verbose_bar_rule(data):
     print("  Beta * Unemployment Gap:                + {:.2f} * {:.2f}%".format(
         data['beta'], data['unemployment_gap']))
     print("-" * line_length)
-    print("  Unadjusted {} Estimate:".format(rule_name).ljust(42) +
+    print("  Unadjusted {} Estimate:".format(rule_acronym).ljust(42) +
           "{:.2f}%".format(data['unadjusted_bar_rule']))
     print("\n==== Adjusted {} ".format(rule_name) + "=" *
           (line_length - 15 - len(rule_name)))
     if data['apply_elb']:
         print("  Effective Lower Bound (ELB) Adjustment: ")
-        print("  Maximum of {} or ELB:".format(rule_name).ljust(42) +
+        print("  Maximum of {} or ELB:".format(rule_acronym).ljust(42) +
               "max({:.2f}%, {:.2f}%)".format(
                 data['unadjusted_bar_rule'], data['elb']))
         print("-" * line_length)
-        print("  {} Adjusted for ELB:".format(rule_name).ljust(42) +
+        print("  {} Adjusted for ELB:".format(rule_acronym).ljust(42) +
               "{:.2f}%".format(data['adjusted_bar_after_elb']))
     print("\n  Policy Inertia Adjustment:              ")
     print("  Policy Inertia Coefficient (rho):       {:.2f}".format(
@@ -59,10 +61,10 @@ def verbose_bar_rule(data):
         data['fed_rate']))
     print("  Adjustment Coefficient (1 - rho):       + (1 - {:.2f})".format(
         data['rho']))
-    print(f"  {rule_name} Adjusted for ELB:".ljust(42) +
+    print(f"  {rule_acronym} Adjusted for ELB:".ljust(42) +
           f"* {data['adjusted_bar_after_elb']:.2f}%")
     print("-" * line_length)
-    print("  Adjusted {} Estimate:".format(rule_name).ljust(42) +
+    print("  Adjusted {} Estimate:".format(rule_acronym).ljust(42) +
           "{:.2f}%".format(data['adjusted_bar_after_inertia']))
     # Adding a note explaining BAR and BASR
     print("\nNote:")
