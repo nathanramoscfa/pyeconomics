@@ -7,7 +7,7 @@ import keyring
 import pandas as pd
 from fredapi import Fred
 
-from pyeconomics.cache import save_to_cache, load_from_cache
+from cache_manager import save_to_cache, load_from_cache
 
 
 class DataSource:
