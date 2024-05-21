@@ -1,3 +1,7 @@
 fredapi~=0.5.1
 keyring~=25.2.0
+matplotlib~=3.8.4
+openai~=1.30.1
 pandas~=2.2.2
+pytest~=8.2.0
+setuptools~=68.2.2

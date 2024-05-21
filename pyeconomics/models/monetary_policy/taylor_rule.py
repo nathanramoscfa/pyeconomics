@@ -1,4 +1,4 @@
-# taylor_rule.py
+# pyeconomics/models/monetary_policy/taylor_rule.py
 import pandas as pd
 
 from pyeconomics.api import fred_client, fetch_historical_fed_funds_rate
@@ -14,7 +14,7 @@ def taylor_rule(
         current_unemployment_rate: float = None,
         natural_unemployment_rate: float = None,
         long_term_real_interest_rate: float = None,
-        fed_rate: float = None,
+        current_fed_rate: float = None,
         inflation_target: float = 2.0,
         alpha: float = 0.5,
         beta: float = 0.5,
@@ -42,8 +42,8 @@ def taylor_rule(
             provided, the latest value from FRED is fetched.
         long_term_real_interest_rate (float): Long-term real interest rate. If
             not provided, the latest value from FRED is fetched.
-        fed_rate (float): Current Federal Funds Target Rate. If not provided,
-            the latest value from FRED is fetched.
+        current_fed_rate (float): Current Federal Funds Target Rate. If not
+            provided, the latest value from FRED is fetched.
         inflation_target (float): Target inflation rate.
         alpha (float): Weight for inflation gap.
         beta (float): Weight for unemployment gap.
@@ -70,12 +70,12 @@ def taylor_rule(
     long_term_real_interest_rate = fred_client.get_data_or_fetch(
         long_term_real_interest_rate, real_interest_rate_series_id)
 
-    if fed_rate is None:
-        fed_rate = fred_client.get_latest_value('DFEDTARU')
+    if current_fed_rate is None:
+        current_fed_rate = fred_client.get_latest_value('DFEDTARU')
 
     if None in (current_inflation_rate, current_unemployment_rate,
                 natural_unemployment_rate, long_term_real_interest_rate,
-                fed_rate):
+                current_fed_rate):
         raise ValueError("Required economic data is missing.")
 
     # Calculate gaps and Taylor Rule estimate
@@ -95,7 +95,7 @@ def taylor_rule(
 
     # Apply policy inertia
     adjusted_taylor_rule_after_inertia = (
-            rho * fed_rate + (1 - rho) * adjusted_taylor_rule_after_elb
+            rho * current_fed_rate + (1 - rho) * adjusted_taylor_rule_after_elb
     )
 
     # Verbose output
@@ -106,7 +106,7 @@ def taylor_rule(
             'current_unemployment_rate': current_unemployment_rate,
             'natural_unemployment_rate': natural_unemployment_rate,
             'long_term_real_interest_rate': long_term_real_interest_rate,
-            'fed_rate': fed_rate,
+            'fed_rate': current_fed_rate,
             'inflation_gap': inflation_gap,
             'unemployment_gap': unemployment_gap,
             'unadjusted_taylor_rule': unadjusted_taylor_rule,

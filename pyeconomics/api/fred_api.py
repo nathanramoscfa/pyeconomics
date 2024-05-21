@@ -1,3 +1,4 @@
+# pyeconomics/api/fred_api.py
 import datetime
 import logging
 import os
@@ -7,7 +8,7 @@ from typing import Optional
 import pandas as pd
 from fredapi import Fred
 
-from pyeconomics.cache_manager import save_to_cache, load_from_cache
+from pyeconomics.api.cache_manager import save_to_cache, load_from_cache
 
 try:
     import keyring

@@ -1,3 +1,4 @@
+# pyeconomics/api/fred_data.py
 import pandas as pd
 
 from pyeconomics.api.fred_api import fred_client

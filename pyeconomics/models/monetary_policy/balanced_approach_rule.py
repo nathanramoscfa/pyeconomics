@@ -1,3 +1,4 @@
+# pyeconomics/models/monetary_policy/balanced_approach_rule.py
 import pandas as pd
 
 from pyeconomics.api import fred_client, fetch_historical_fed_funds_rate
@@ -13,7 +14,7 @@ def balanced_approach_rule(
         current_unemployment_rate: float = None,
         natural_unemployment_rate: float = None,
         long_term_real_interest_rate: float = None,
-        fed_rate: float = None,
+        current_fed_rate: float = None,
         inflation_target: float = 2.0,
         alpha: float = 0.5,
         beta: float = 2.0,
@@ -42,8 +43,8 @@ def balanced_approach_rule(
             provided, fetched from FRED.
         long_term_real_interest_rate (float): Long-term real interest rate. If
             not provided, fetched from FRED.
-        fed_rate (float): Current Federal Funds Target Rate. If not provided,
-            fetched from FRED.
+        current_fed_rate (float): Current Federal Funds Target Rate. If not
+            provided, fetched from FRED.
         inflation_target (float): Target inflation rate.
         alpha (float): Weight for inflation gap.
         beta (float): Weight for unemployment gap.
@@ -73,12 +74,12 @@ def balanced_approach_rule(
     long_term_real_interest_rate = fred_client.get_data_or_fetch(
         long_term_real_interest_rate, real_interest_rate_series_id)
 
-    if fed_rate is None:
-        fed_rate = fred_client.get_latest_value('DFEDTARU')
+    if current_fed_rate is None:
+        current_fed_rate = fred_client.get_latest_value('DFEDTARU')
 
     if None in (current_inflation_rate, current_unemployment_rate,
                 natural_unemployment_rate, long_term_real_interest_rate,
-                fed_rate):
+                current_fed_rate):
         raise ValueError("Required economic data is missing.")
 
     # Calculate gaps
@@ -103,7 +104,7 @@ def balanced_approach_rule(
 
     # Apply policy inertia
     adjusted_bar_after_inertia = (
-            (1 - rho) * adjusted_bar_after_elb + rho * fed_rate
+            (1 - rho) * adjusted_bar_after_elb + rho * current_fed_rate
     )
 
     # Verbose output
@@ -114,7 +115,7 @@ def balanced_approach_rule(
             'current_unemployment_rate': current_unemployment_rate,
             'natural_unemployment_rate': natural_unemployment_rate,
             'long_term_real_interest_rate': long_term_real_interest_rate,
-            'fed_rate': fed_rate,
+            'fed_rate': current_fed_rate,
             'inflation_gap': inflation_gap,
             'unemployment_gap': unemployment_gap,
             'unadjusted_bar_rule': unadjusted_bar,

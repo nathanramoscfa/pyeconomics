@@ -1,0 +1,82 @@
+# pyeconomics/tests/test_fdr_utils.py
+import pytest
+
+from pyeconomics.utils.fdr_utils import verbose_first_difference_rule
+
+
+@pytest.fixture
+def mock_data():
+    return {
+        'current_inflation_rate': 2.5,
+        'inflation_target': 2.0,
+        'current_unemployment_rate': 4.0,
+        'lagged_unemployment_rate': 4.2,
+        'natural_unemployment_rate': 4.5,
+        'lagged_natural_unemployment_rate': 4.6,
+        'fed_rate': 0.5,
+        'inflation_gap': 0.5,
+        'current_unemployment_gap': 0.5,
+        'lagged_unemployment_gap': 0.4,
+        'alpha': 0.5,
+        'unadjusted_fdr_rule': 1.0,
+        'adjusted_fdr_rule_after_elb': 1.0,
+        'apply_elb': False,
+        'elb': 0.0,
+        'rho': 0.5,
+        'adjusted_fdr_rule_after_inertia': 0.75
+    }
+
+
+def test_verbose_first_difference_rule(capsys, mock_data):
+    verbose_first_difference_rule(mock_data)
+
+    captured = capsys.readouterr()
+    output = captured.out
+
+    expected_output = (
+        "\n==== Economic Indicators "
+        "============================================\n"
+        "Current Inflation:                               2.50%\n"
+        "Target Inflation:                                2.00%\n"
+        "Current Unemployment Rate:                       4.00%\n"
+        "Lagged Unemployment Rate:                        4.20%\n"
+        "Natural Unemployment Rate:                       4.50%\n"
+        "Lagged Natural Unemployment Rate:                4.60%\n"
+        "Last Fed Rate:                                   0.50%\n"
+        "As of Date:                                      May 21, 2024\n"
+        "\n==== Gaps "
+        "===========================================================\n"
+        "Inflation Gap:                                   0.50%\n"
+        "Current Unemployment Gap:                        0.50%\n"
+        "Lagged Unemployment Gap:                         0.40%\n"
+        "\n==== First Difference Rule (FDR) "
+        "====================================\n"
+        "  Last Fed Rate:                                 0.50%\n"
+        "  Alpha * Inflation Gap:                         + 0.50 * 0.50%\n"
+        "  Current Unemployment Gap Adjustment:           + 0.50%\n"
+        "  Last Year Unemployment Gap Adjustment:         - 0.40%\n"
+        "-----------------------------------"
+        "----------------------------------\n"
+        "  Unadjusted FDR Estimate:                       1.00%\n"
+        "\n==== Adjusted First Difference Rule "
+        "=================================\n"
+        "\n  Policy Inertia Adjustment:\n"
+        "  Policy Inertia Coefficient (rho):              0.50\n"
+        "  Last Fed Rate:                                 * 0.50%\n"
+        "  Adjustment Coefficient (1 - rho):              + (1 - 0.50)\n"
+        "  FDR Adjusted for ELB:                          * 1.00%\n"
+        "-----------------------------------"
+        "----------------------------------\n"
+        "  Adjusted FDR Estimate:                         0.75%\n"
+        "\n==== Policy Prescription "
+        "=================================================\n"
+        "  The Adjusted FDR Estimate is 0.25% higher than the Current Fed \n"
+        "  Rate. The Fed should consider raising the interest rate by 0.25%.\n"
+    )
+
+    # Comparing the captured output with the expected output
+    assert output == expected_output
+
+
+if __name__ == '__main__':
+    pytest.main()

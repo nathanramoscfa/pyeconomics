@@ -1,3 +1,4 @@
+# pyeconomics/models/monetary_policy/first_difference_rule.py
 import pandas as pd
 
 from pyeconomics.api import fred_client, fetch_historical_fed_funds_rate
@@ -13,7 +14,7 @@ def first_difference_rule(
         natural_unemployment_rate: float = None,
         lagged_unemployment_rate: float = None,
         lagged_natural_unemployment_rate: float = None,
-        fed_rate: float = None,
+        current_fed_rate: float = None,
         inflation_target: float = 2.0,
         alpha: float = 0.5,
         rho: float = 0.0,
@@ -40,8 +41,8 @@ def first_difference_rule(
             ago.
         lagged_natural_unemployment_rate (float): Natural unemployment rate from
             four periods ago.
-        fed_rate (float): Current Federal Funds Target Rate. If None, the latest
-            value from FRED is fetched.
+        current_fed_rate (float): Current Federal Funds Target Rate. If None,
+            the latest value from FRED is fetched.
         inflation_target (float): Long-term target inflation rate.
         alpha (float): Coefficient for the inflation gap.
         rho (float): Policy inertia coefficient. Defaults to 0.0 which means
@@ -62,7 +63,8 @@ def first_difference_rule(
         current_unemployment_rate, unemployment_rate_series_id)
     natural_unemployment_rate = fred_client.get_data_or_fetch(
         natural_unemployment_rate, natural_unemployment_series_id)
-    fed_rate = fred_client.get_data_or_fetch(fed_rate, 'DFEDTARU')
+    current_fed_rate = fred_client.get_data_or_fetch(
+        current_fed_rate, 'DFEDTARU')
 
     # Fetch historical data from 12 months ago
     lagged_unemployment_rate = fred_client.get_data_or_fetch(
@@ -79,7 +81,7 @@ def first_difference_rule(
     lagged_unemployment_gap = (
             lagged_natural_unemployment_rate - lagged_unemployment_rate)
 
-    unadjusted_fdr_rule = (fed_rate +
+    unadjusted_fdr_rule = (current_fed_rate +
                            (alpha * inflation_gap) +
                            current_unemployment_gap -
                            lagged_unemployment_gap)
@@ -92,7 +94,7 @@ def first_difference_rule(
 
     # Apply policy inertia
     adjusted_fdr_rule_after_inertia = (
-            rho * fed_rate + (1 - rho) * adjusted_fdr_rule_after_elb)
+            rho * current_fed_rate + (1 - rho) * adjusted_fdr_rule_after_elb)
 
     # Verbose output
     if verbose:
@@ -104,7 +106,7 @@ def first_difference_rule(
             'natural_unemployment_rate': natural_unemployment_rate,
             'lagged_natural_unemployment_rate':
                 lagged_natural_unemployment_rate,
-            'fed_rate': fed_rate,
+            'fed_rate': current_fed_rate,
             'inflation_gap': inflation_gap,
             'current_unemployment_gap': current_unemployment_gap,
             'lagged_unemployment_gap': lagged_unemployment_gap,
