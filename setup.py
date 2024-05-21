@@ -39,13 +39,6 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/nathanramoscfa/pyeconomics',
     install_requires=required,
-    extras_require={
-        'dev': [
-            'pytest>=6.2.2',
-            'sphinx>=3.5.1',
-            'sphinx_rtd_theme>=0.5.1'
-        ],
-    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
