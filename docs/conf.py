@@ -1,8 +1,4 @@
 # Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -15,7 +11,7 @@ import sys
 def get_version():
     here = os.path.abspath(os.path.dirname(__file__))
     with open(
-            os.path.join(here, '../../__version__.py'),
+            os.path.join(here, '../__version__.py'),
             encoding='utf-8') as f:
         version_file_contents = f.read()
     # Use regular expression to extract version string
