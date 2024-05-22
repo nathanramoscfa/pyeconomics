@@ -1,5 +1,6 @@
 # pyeconomics/tests/test_fdr_utils.py
 import pytest
+from datetime import datetime
 
 from pyeconomics.utils.fdr_utils import verbose_first_difference_rule
 
@@ -33,6 +34,7 @@ def test_verbose_first_difference_rule(capsys, mock_data):
     captured = capsys.readouterr()
     output = captured.out
 
+    as_of_date = datetime.now().strftime("%B %d, %Y")
     expected_output = (
         "\n==== Economic Indicators "
         "============================================\n"
@@ -43,7 +45,7 @@ def test_verbose_first_difference_rule(capsys, mock_data):
         "Natural Unemployment Rate:                       4.50%\n"
         "Lagged Natural Unemployment Rate:                4.60%\n"
         "Last Fed Rate:                                   0.50%\n"
-        "As of Date:                                      May 21, 2024\n"
+        f"As of Date:                                      {as_of_date}\n"
         "\n==== Gaps "
         "===========================================================\n"
         "Inflation Gap:                                   0.50%\n"

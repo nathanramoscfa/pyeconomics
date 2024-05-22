@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture(autouse=True)
@@ -12,5 +12,7 @@ def mock_keyring():
 @pytest.fixture(autouse=True)
 def mock_fred_client():
     with patch('pyeconomics.api.fred_api.FredClient.__new__') as mock_new:
-        mock_new.return_value = None
-        yield
+        mock_instance = MagicMock()
+        mock_instance.client = MagicMock()
+        mock_new.return_value = mock_instance
+        yield mock_instance
