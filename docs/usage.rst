@@ -151,8 +151,8 @@ Example 4: Calculate and Plot Historical Policy Rule Estimates
 
 .. image:: ../media/plot_historical_policy_rates.png
 
-Example 5: Calculate and Plot the Adjusted Historical Policy Rules Adjusted
----------------------------------------------------------------------------
+Example 5: Calculate and Plot the Adjusted Historical Policy Rules
+------------------------------------------------------------------
 
 .. code-block:: python
 
