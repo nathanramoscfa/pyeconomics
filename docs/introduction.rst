@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. image:: _static/logo.png
-   :width: 200px
+   :width: 800px
    :align: center
 
 .. list-table::
