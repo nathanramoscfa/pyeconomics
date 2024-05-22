@@ -5,6 +5,10 @@ Introduction
    :width: 800px
    :align: center
 
+.. raw:: html
+
+   <br><br>
+
 .. list-table::
    :widths: auto
    :header-rows: 1
