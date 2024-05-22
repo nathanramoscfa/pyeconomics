@@ -6,8 +6,10 @@ from setuptools import setup, find_packages
 # Function to extract the version from __version__.py
 def get_version():
     here = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(here, 'pyeconomics', '__version__.py'),
-              encoding='utf-8') as version_file:
+    with (open(
+        os.path.join(here, '__version__.py'),
+        encoding='utf-8'
+    ) as version_file):
         version_file_contents = version_file.read()
     # Use regular expression to extract version string
     version_match = re.search(
