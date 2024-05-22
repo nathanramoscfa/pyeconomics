@@ -1,0 +1,36 @@
+[run]
+# Paths to include in coverage analysis
+include =
+    pyeconomics/*
+
+# Paths to omit from coverage analysis
+omit =
+    pyeconomics/__init__.py
+    tests/*
+    setup.py
+    */.ipynb_checkpoints/*
+    */__pycache__/*
+
+# Enable branch coverage
+branch = True
+
+[report]
+# Exclude lines that are not meaningful for code coverage
+exclude_lines =
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+# Minimum coverage percentage for the project to pass
+fail_under = 80
+
+# Show line numbers in reports
+show_missing = True

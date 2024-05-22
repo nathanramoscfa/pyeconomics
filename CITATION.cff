@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "PyEconomics"
+version: "0.2.0"
+authors:
+  - family-names: "Ramos"
+    given-names: "Nathan"
+    email: "nathan.ramos.github@gmail.com"
+    affiliation: "Independent Fintech Developer"
+date-released: "2024-05-20"
+url: "https://github.com/nathanramoscfa/pyeconomics"
+repository-code: "https://github.com/nathanramoscfa/pyeconomics"
+license: "MIT"
+abstract: |
+  PyEconomics is a Python library for economic and financial analysis,
+  designed to provide tools and models for analyzing various aspects of economic,
+  financial, and fiscal policy. Whether you're a developer, economist, financial
+  analyst, or researcher, PyEconomics aims to be your go-to resource for
+  sophisticated economic modeling and analysis.
+keywords:
+  - economics
+  - financial analysis
+  - monetary policy
+  - exchange rate models
+  - macroeconomic models
+  - microeconomic models
+  - discounted cash flow
+  - financial models
+  - fiscal policy

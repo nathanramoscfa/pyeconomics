@@ -1,0 +1,61 @@
+# Include the README file
+include README.md
+
+# Include the license file
+include LICENSE
+
+# Include the requirements file
+include requirements.txt
+
+# Include the version file
+include __version__.py
+
+# Include all Python files in the pyeconomics package
+recursive-include pyeconomics *.py
+
+# Include all documentation files
+recursive-include docs *
+
+# Include all markdown files
+recursive-include markdown *
+
+# Include all example files
+recursive-include examples *
+
+# Include all media files
+recursive-include media *
+
+# Include all test files
+recursive-include tests *.py
+
+# Include GitHub workflows
+recursive-include .github *
+
+# Include Dockerfile and .dockerignore
+include Dockerfile
+include .dockerignore
+
+# Include .editorconfig
+include .editorconfig
+
+# Include .gitattributes and .gitignore
+include .gitattributes
+include .gitignore
+
+# Include .readthedocs.yml
+include .readthedocs.yml
+
+# Include pyproject.toml and setup.py
+include pyproject.toml
+include setup.py
+
+# Include pytest.ini
+include pytest.ini
+
+# Exclude any compiled Python files
+global-exclude __pycache__/*
+global-exclude *.py[cod]
+
+# Exclude other unnecessary files
+global-exclude *.log
+global-exclude *.tmp

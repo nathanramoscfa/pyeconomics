@@ -6,8 +6,9 @@ from setuptools import setup, find_packages
 # Function to extract the version from __version__.py
 def get_version():
     here = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(here, '__version__.py'), encoding='utf-8') as f:
-        version_file_contents = f.read()
+    with open(os.path.join(here, 'pyeconomics', '__version__.py'),
+              encoding='utf-8') as version_file:
+        version_file_contents = version_file.read()
     # Use regular expression to extract version string
     version_match = re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]",
@@ -20,12 +21,12 @@ def get_version():
 
 
 # Read the contents of your requirements file
-with open('requirements.txt', encoding='utf-8') as f:
-    required = f.read().splitlines()
+with open('requirements.txt', encoding='utf-8') as req_file:
+    required = req_file.read().splitlines()
 
 # Open and read the README file for the long description
-with open('README.md', encoding='utf-8') as f:
-    long_description = f.read()
+with open('README.md', encoding='utf-8') as readme_file:
+    long_description = readme_file.read()
 
 setup(
     name='pyeconomics',
