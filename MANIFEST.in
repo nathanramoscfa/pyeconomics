@@ -16,6 +16,9 @@ recursive-include pyeconomics *.py
 # Include all documentation files
 recursive-include docs *
 
+# Include static file
+recursive-include docs/_static *
+
 # Include all markdown files
 recursive-include markdown *
 
