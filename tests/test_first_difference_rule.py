@@ -24,8 +24,8 @@ def mock_fred_data():
 @patch('pyeconomics.api.fred_api.FredClient.get_latest_value')
 def test_first_difference_rule(mock_get_latest_value, mock_get_data_or_fetch,
                                mock_fred_data):
-    mock_get_data_or_fetch.side_effect = lambda default, series, periods=0: (
-        mock_fred_data.get(series, default))
+    mock_get_data_or_fetch.side_effect = lambda default, series_id, periods=0: (
+        mock_fred_data.get(series_id, default))
     mock_get_latest_value.return_value = mock_fred_data['DFEDTARU']
 
     result = first_difference_rule(
@@ -54,8 +54,8 @@ def test_first_difference_rule(mock_get_latest_value, mock_get_data_or_fetch,
        '.fetch_historical_fed_funds_rate')
 def test_historical_first_difference_rule(
         mock_fetch_historical_fed_funds_rate, mock_fetch_data, mock_fred_data):
-    mock_fetch_data.side_effect = lambda series: pd.Series(
-        [mock_fred_data.get(series, None)] * 12,
+    mock_fetch_data.side_effect = lambda series_id: pd.Series(
+        [mock_fred_data.get(series_id, None)] * 12,
         index=pd.date_range('2019-01-01', periods=12, freq='M')
     )
     mock_fetch_historical_fed_funds_rate.return_value = pd.Series(
