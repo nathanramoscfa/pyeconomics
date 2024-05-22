@@ -1,5 +1,3 @@
-# Configuration file for the Sphinx documentation builder.
-
 # -- Path setup --------------------------------------------------------------
 
 import os
@@ -25,7 +23,7 @@ def get_version():
     raise RuntimeError("Unable to find version string.")
 
 
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 

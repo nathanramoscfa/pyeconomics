@@ -2,29 +2,24 @@
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
-# Required
 version: 2
 
-# Build documentation with Sphinx
-sphinx:
-  configuration: docs/conf.py
-  fail_on_warning: true
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.12"
 
-# Python settings
 python:
   install:
     - requirements: requirements.txt
     - method: pip
       path: .
 
-# Format of the documentation
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: true
+
 formats:
   - htmlzip
   - pdf
   - epub
-
-# Build documentation in these formats
-build:
-  os: ubuntu-22.04
-  tools:
-    python: "3.12"
