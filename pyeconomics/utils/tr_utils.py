@@ -13,7 +13,7 @@ def verbose_taylor_rule(data: dict):
             - natural_unemployment_rate (float): Natural unemployment rate.
             - long_term_real_interest_rate (float): Long-term real interest
               rate.
-            - fed_rate (float): Current Federal Reserve rate.
+            - current_fed_rate (float): Current Federal Reserve rate.
             - inflation_gap (float): Inflation gap.
             - unemployment_gap (float): Unemployment gap.
             - unadjusted_taylor_rule (float): Unadjusted Taylor Rule estimate.
@@ -46,7 +46,7 @@ def verbose_taylor_rule(data: dict):
     print("Long-Term Real Interest Rate:                    {:.2f}%".format(
         data['long_term_real_interest_rate']))
     print("Current Fed Rate:                                {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("As of Date:                                      {}".format(
         current_date))
     print("\n==== Gaps ========================================================"
@@ -87,7 +87,7 @@ def verbose_taylor_rule(data: dict):
     print("  Policy Inertia Coefficient (rho):              {:.2f}".format(
         data['rho']))
     print("  Current Fed Rate:                              * {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("  Adjustment Coefficient (1 - rho):              "
           "+ (1 - {:.2f})".format(data['rho']))
     print("  Taylor Rule Adjusted for ELB:                  * {:.2f}%".format(
@@ -99,7 +99,7 @@ def verbose_taylor_rule(data: dict):
     print("\n==== Policy Prescription ========================================="
           "========")
     rate_difference = (data['adjusted_taylor_rule_after_inertia'] -
-                       data['fed_rate'])
+                       data['current_fed_rate'])
     rounded_difference = round(rate_difference * 4) / 4
 
     if rounded_difference > 0.125:

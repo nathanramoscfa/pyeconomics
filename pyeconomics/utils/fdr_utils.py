@@ -14,7 +14,7 @@ def verbose_first_difference_rule(data: dict):
             - natural_unemployment_rate (float): Natural unemployment rate.
             - lagged_natural_unemployment_rate (float): Lagged natural
               unemployment rate.
-            - fed_rate (float): Current Federal Reserve rate.
+            - current_fed_rate (float): Current Federal Reserve rate.
             - inflation_gap (float): Inflation gap.
             - current_unemployment_gap (float): Current unemployment gap.
             - lagged_unemployment_gap (float): Lagged unemployment gap.
@@ -49,7 +49,7 @@ def verbose_first_difference_rule(data: dict):
     print("Lagged Natural Unemployment Rate:                {:.2f}%".format(
         data['lagged_natural_unemployment_rate']))
     print("Last Fed Rate:                                   {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("As of Date:                                      {}".format(
         current_date))
 
@@ -67,7 +67,7 @@ def verbose_first_difference_rule(data: dict):
         "\n==== First Difference Rule (FDR) ==================================="
         "=")
     print("  Last Fed Rate:                                 {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("  Alpha * Inflation Gap:                         "
           "+ {:.2f} * {:.2f}%".format(
             data['alpha'], data['inflation_gap']))
@@ -99,7 +99,7 @@ def verbose_first_difference_rule(data: dict):
     print("  Policy Inertia Coefficient (rho):              {:.2f}".format(
         data['rho']))
     print("  Last Fed Rate:                                 * {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("  Adjustment Coefficient (1 - rho):              "
           "+ (1 - {:.2f})".format(data['rho']))
     print(f"  FDR Adjusted for ELB:                         "
@@ -113,7 +113,7 @@ def verbose_first_difference_rule(data: dict):
     print("\n==== Policy Prescription ========================================="
           "========")
     rate_difference = (data['adjusted_fdr_rule_after_inertia'] -
-                       data['fed_rate'])
+                       data['current_fed_rate'])
     rounded_difference = round(rate_difference * 4) / 4
 
     if rounded_difference > 0.125:

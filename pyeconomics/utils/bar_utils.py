@@ -13,7 +13,7 @@ def verbose_balanced_approach_rule(data: dict):
             - natural_unemployment_rate (float): Natural unemployment rate.
             - long_term_real_interest_rate (float): Long-term real interest
               rate.
-            - fed_rate (float): Current Federal Reserve rate.
+            - current_fed_rate (float): Current Federal Reserve rate.
             - inflation_gap (float): Inflation gap.
             - unemployment_gap (float): Unemployment gap.
             - unadjusted_bar_rule (float): Unadjusted Balanced Approach Rule
@@ -58,7 +58,7 @@ def verbose_balanced_approach_rule(data: dict):
     print("Long-Term Real Interest Rate:                    {:.2f}%".format(
         data['long_term_real_interest_rate']))
     print("Current Fed Rate:                                {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("As of Date:                                      {}".format(
         current_date))
     print("\n==== Gaps " + "=" * (line_length - 10))
@@ -99,7 +99,7 @@ def verbose_balanced_approach_rule(data: dict):
     print("  Policy Inertia Coefficient (rho):              {:.2f}".format(
         data['rho']))
     print("  Current Fed Rate:                              * {:.2f}%".format(
-        data['fed_rate']))
+        data['current_fed_rate']))
     print("  Adjustment Coefficient (1 - rho):              "
           "+ (1 - {:.2f})".format(data['rho']))
     print(f"  {rule_acronym} Adjusted for ELB:".ljust(49) +
@@ -110,7 +110,7 @@ def verbose_balanced_approach_rule(data: dict):
 
     # Policy Prescription section
     print("\n==== Policy Prescription " + "=" * (line_length - 25))
-    rate_difference = (data['adjusted_bar_after_inertia'] - data['fed_rate'])
+    rate_difference = (data['adjusted_bar_after_inertia'] - data['current_fed_rate'])
     rounded_difference = round(rate_difference * 4) / 4
 
     if rounded_difference > 0.125:
