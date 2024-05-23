@@ -76,8 +76,11 @@ class FredClient(DataSource):
                     api_key_retrieved = keyring.get_password(
                         "fred", "api_key")
                 if not api_key_retrieved:
-                    raise ValueError("API Key for FRED must be provided or "
-                                     "retrievable from keyring.")
+                    logging.debug("API Key not found, raising ValueError.")
+                    raise ValueError(
+                        "API Key for FRED must be provided "
+                        "or retrievable from keyring.")
+                logging.debug(f"Using API Key: {api_key_retrieved}")
                 cls._instance.client = Fred(api_key=api_key_retrieved)
             return cls._instance
 
