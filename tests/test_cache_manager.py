@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime, timedelta
 from hashlib import sha256
 
@@ -12,14 +13,13 @@ from pyeconomics.api.cache_manager import (
 @pytest.fixture(scope='function', autouse=True)
 def setup_and_teardown():
     """Setup and teardown for tests."""
+    # Ensure the cache directory exists before each test
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     yield
     # Cleanup after test
-    for filename in os.listdir(CACHE_DIR):
-        file_path = os.path.join(CACHE_DIR, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+    if os.path.exists(CACHE_DIR):
+        shutil.rmtree(CACHE_DIR)
 
 
 def test_cache_filename():
@@ -67,6 +67,19 @@ def test_load_from_cache_nonexistent_key():
 
 def test_cache_directory_creation():
     assert os.path.exists(CACHE_DIR)
+
+
+def test_cache_directory_creation_when_not_exists():
+    """Test creation of cache directory when it does not exist."""
+    # Remove the cache directory if it exists
+    if os.path.exists(CACHE_DIR):
+        shutil.rmtree(CACHE_DIR)
+    assert not os.path.exists(CACHE_DIR)  # Ensure the directory does not exist
+    # Re-import cache_manager to trigger the directory creation
+    import importlib
+    import pyeconomics.api.cache_manager as cm
+    importlib.reload(cm)
+    assert os.path.exists(CACHE_DIR)  # Now it should exist
 
 
 if __name__ == '__main__':

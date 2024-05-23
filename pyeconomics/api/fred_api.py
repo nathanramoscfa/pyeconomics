@@ -70,7 +70,7 @@ class FredClient(DataSource):
         """
         with cls._lock:
             if cls._instance is None:
-                cls._instance = super(FredClient, cls).__new__(cls)
+                cls._instance = object.__new__(cls)
                 api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
                 if not api_key_retrieved and KEYRING_AVAILABLE:
                     api_key_retrieved = keyring.get_password(
