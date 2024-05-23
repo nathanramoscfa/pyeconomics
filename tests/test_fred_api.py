@@ -136,26 +136,26 @@ def test_keyring_unavailable():
 
 
 def test_keyring_available_but_no_api_key():
+    # Mock the keyring module directly to return None
     with patch('keyring.get_password', return_value=None):
-        FredClient.reset_instance()
+        FredClient.reset_instance()  # Ensure fresh instance for each test
         with pytest.raises(
             ValueError,
             match="API Key for FRED must be provided "
                   "or retrievable from keyring."
         ):
-            FredClient(api_key=None)
+            FredClient(api_key=None)  # No API key provided
 
 
 def test_no_api_key_provided():
-    with patch('pyeconomics.api.fred_api.keyring') as mock_keyring:
-        mock_keyring.get_password.return_value = None
-        FredClient.reset_instance()
+    with patch('keyring.get_password', return_value=None):
+        FredClient.reset_instance()  # Ensure fresh instance for each test
         with pytest.raises(
             ValueError,
             match="API Key for FRED must be provided or "
                   "retrievable from keyring."
         ):
-            FredClient(api_key=None)
+            FredClient(api_key=None)  # No API key provided
 
 
 def test_fetch_data_no_data_found(fred_client):
