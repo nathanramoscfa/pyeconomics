@@ -115,27 +115,34 @@ def test_keyring_unavailable():
         from importlib import reload
         FredClient.reset_instance()
 
-        # Patch the FredClient to avoid instantiation issues during reload
-        with patch('pyeconomics.api.fred_api.FredClient.__new__', return_value=MagicMock()):
+        # Set a test API key in the environment before reloading
+        with patch.dict(
+            'os.environ',
+            {'FRED_API_KEY': 'test_api_key'}
+        ):
             import pyeconomics.api.fred_api as fred_api
-
-            # Set KEYRING_AVAILABLE to False and reload the module
             fred_api.KEYRING_AVAILABLE = False
             reload(fred_api)
 
-            # Ensure KEYRING_AVAILABLE is set to False
             assert not fred_api.KEYRING_AVAILABLE
 
-        # Ensure no ValueError is raised when keyring is unavailable
-        with patch.dict('os.environ', {'FRED_API_KEY': 'test_api_key'}):
-            client = FredClient(api_key=None)
-            assert client is not None
+            # Use a context manager to create the FredClient instance
+            with patch(
+                'pyeconomics.api.fred_api.FredClient.__new__',
+                    return_value=MagicMock()):
+                # Now the FRED_API_KEY environment variable will be used
+                client = FredClient(api_key=None)
+                assert client is not None
 
 
 def test_keyring_available_but_no_api_key():
     with patch('keyring.get_password', return_value=None):
         FredClient.reset_instance()
-        with pytest.raises(ValueError, match="API Key for FRED must be provided or retrievable from keyring."):
+        with pytest.raises(
+            ValueError,
+            match="API Key for FRED must be provided "
+                  "or retrievable from keyring."
+        ):
             FredClient(api_key=None)
 
 
@@ -143,36 +150,56 @@ def test_no_api_key_provided():
     with patch('pyeconomics.api.fred_api.keyring') as mock_keyring:
         mock_keyring.get_password.return_value = None
         FredClient.reset_instance()
-        with pytest.raises(ValueError, match="API Key for FRED must be provided or retrievable from keyring."):
+        with pytest.raises(
+            ValueError,
+            match="API Key for FRED must be provided or "
+                  "retrievable from keyring."
+        ):
             FredClient(api_key=None)
 
 
 def test_fetch_data_no_data_found(fred_client):
-    with patch.object(fred_client.client, 'get_series', return_value=pd.Series([])):
+    with patch.object(
+        fred_client.client,
+        'get_series',
+            return_value=pd.Series([])):
         with pytest.raises(ValueError, match="No data found for series ID GDP"):
             fred_client.fetch_data('GDP')
 
 
 def test_fetch_data_exception_handling(fred_client):
-    with patch.object(fred_client.client, 'get_series', side_effect=Exception("API error")):
+    with patch.object(
+        fred_client.client,
+        'get_series',
+            side_effect=Exception("API error")):
         with pytest.raises(Exception, match="API error"):
             fred_client.fetch_data('GDP')
 
 
 def test_get_latest_value_exception_handling(fred_client):
-    with patch.object(fred_client, 'fetch_data', side_effect=Exception("Data fetch error")):
+    with patch.object(
+        fred_client,
+        'fetch_data',
+            side_effect=Exception("Data fetch error")):
         with pytest.raises(Exception, match="Data fetch error"):
             fred_client.get_latest_value('GDP')
 
 
 def test_get_historical_value_exception_handling(fred_client):
-    with patch.object(fred_client, 'fetch_data', side_effect=Exception("Data fetch error")):
+    with patch.object(
+        fred_client,
+        'fetch_data',
+            side_effect=Exception("Data fetch error")
+    ):
         with pytest.raises(Exception, match="Data fetch error"):
             fred_client.get_historical_value('GDP', periods=-2)
 
 
 def test_get_series_name_exception_handling(fred_client):
-    with patch.object(fred_client.client, 'get_series_info', side_effect=Exception("API error")):
+    with patch.object(
+        fred_client.client,
+        'get_series_info',
+            side_effect=Exception("API error")):
         with pytest.raises(Exception, match="API error"):
             fred_client.get_series_name('GDP')
 
