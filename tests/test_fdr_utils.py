@@ -14,7 +14,7 @@ def mock_data():
         'lagged_unemployment_rate': 4.2,
         'natural_unemployment_rate': 4.5,
         'lagged_natural_unemployment_rate': 4.6,
-        'fed_rate': 0.5,
+        'current_fed_rate': 0.5,
         'inflation_gap': 0.5,
         'current_unemployment_gap': 0.5,
         'lagged_unemployment_gap': 0.4,

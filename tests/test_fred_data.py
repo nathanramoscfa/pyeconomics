@@ -11,11 +11,11 @@ from pyeconomics.api.fred_data import fetch_historical_fed_funds_rate
 def mock_fred_data():
     """Fixture for mock FRED data."""
     dfedtar_data = {
-        'DATE': pd.date_range(start='2000-01-01', end='2008-12-15', freq='M'),
+        'DATE': pd.date_range(start='2000-01-01', end='2008-12-15', freq='ME'),
         'VALUE': [1.5] * 108
     }
     dfedtaru_data = {
-        'DATE': pd.date_range(start='2008-12-16', end='2020-01-01', freq='M'),
+        'DATE': pd.date_range(start='2008-12-16', end='2020-01-01', freq='ME'),
         'VALUE': [0.25] * 133
     }
     # Fix the lengths to ensure they match

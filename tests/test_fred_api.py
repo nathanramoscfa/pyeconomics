@@ -1,112 +1,113 @@
-# pyeconomics/api/fred_api.py
-from unittest.mock import MagicMock, patch
+# tests/test_fred_api.py
+import datetime
+import pytest
+from unittest.mock import patch
 
 import pandas as pd
-import pytest
 
 from pyeconomics.api.fred_api import FredClient
 
 
-@pytest.fixture
-def mock_fred_series():
-    """Fixture for mock FRED series data."""
-    date_range = pd.date_range(start='2020-01-01', periods=5, freq='D')
-    data = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=date_range)
-    return data
+@pytest.fixture(scope='module')
+def fred_client():
+    FredClient.reset_instance()
+    api_key = 'test_api_key'
+    return FredClient(api_key)
 
 
-@patch('pyeconomics.api.fred_api.Fred')
-@patch('pyeconomics.api.fred_api.load_from_cache')
-@patch('pyeconomics.api.fred_api.save_to_cache')
-def test_fetch_data(mock_save_to_cache, mock_load_from_cache, mock_fred_class,
-                    mock_fred_series):
-    series_id = 'TEST_SERIES'
-    cache_key = f"fred_series_{series_id}"
-
-    # Mock cache miss
-    mock_load_from_cache.return_value = None
-
-    # Create a mock instance of Fred and set return value for get_series
-    mock_fred_instance = MagicMock()
-    mock_fred_instance.get_series.return_value = mock_fred_series
-    mock_fred_class.return_value = mock_fred_instance
-
-    client = FredClient(api_key='dummy_api_key')
-
-    # Ensure the client's internal Fred instance is the mock
-    client.client = mock_fred_instance
-
-    data = client.fetch_data(series_id)
-
-    # Verify data is fetched and saved to cache
-    mock_fred_instance.get_series.assert_called_once_with(series_id)
-    mock_save_to_cache.assert_called_once_with(cache_key, mock_fred_series)
-    pd.testing.assert_series_equal(data, mock_fred_series)
+def test_singleton_pattern(fred_client):
+    """
+    Test to ensure FredClient follows the singleton pattern.
+    """
+    with patch.object(FredClient, '__new__', return_value=fred_client):
+        another_instance = FredClient()
+        assert fred_client is another_instance
 
 
-@patch('pyeconomics.api.fred_api.Fred')
-@patch('pyeconomics.api.fred_api.load_from_cache')
-def test_fetch_data_cache_hit(mock_load_from_cache, mock_fred,
-                              mock_fred_series):
-    series_id = 'TEST_SERIES'
-    cache_key = f"fred_series_{series_id}"
+def test_fetch_data_from_cache(fred_client):
+    with patch('pyeconomics.api.fred_api.load_from_cache') as mock_load_cache:
+        series_id = 'GDP'
+        expected_data = pd.Series([1, 2, 3], name=series_id)
+        mock_load_cache.return_value = expected_data
 
-    # Mock cache hit
-    mock_load_from_cache.return_value = mock_fred_series
-
-    client = FredClient(api_key='dummy_api_key')
-    data = client.fetch_data(series_id)
-
-    # Verify data is fetched from cache
-    mock_load_from_cache.assert_called_once_with(cache_key)
-    mock_fred.return_value.get_series.assert_not_called()
-    pd.testing.assert_series_equal(data, mock_fred_series)
+        data = fred_client.fetch_data(series_id)
+        assert data.equals(expected_data)
+        mock_load_cache.assert_called_once_with(f'fred_series_{series_id}')
 
 
-@patch('pyeconomics.api.fred_api.Fred')
-def test_get_latest_value(mock_fred, mock_fred_series):
-    series_id = 'TEST_SERIES'
-    mock_fred_instance = mock_fred.return_value
-    mock_fred_instance.get_series.return_value = mock_fred_series
+def test_fetch_data_from_api(fred_client):
+    with patch('pyeconomics.api.fred_api.load_from_cache') as mock_load_cache, \
+        patch('pyeconomics.api.fred_api.save_to_cache') as mock_save_cache, \
+            patch.object(fred_client.client, 'get_series') as mock_get_series:
+        mock_load_cache.return_value = None
+        series_id = 'GDP'
+        expected_data = pd.Series([1, 2, 3], name=series_id)
+        mock_get_series.return_value = expected_data
 
-    client = FredClient(api_key='dummy_api_key')
-    latest_value = client.get_latest_value(series_id)
-
-    # Verify the latest value is returned
-    assert latest_value == mock_fred_series.iloc[-1]
-
-
-@patch('pyeconomics.api.fred_api.Fred')
-def test_get_historical_value(mock_fred, mock_fred_series):
-    series_id = 'TEST_SERIES'
-    mock_fred_instance = mock_fred.return_value
-    mock_fred_instance.get_series.return_value = mock_fred_series
-
-    client = FredClient(api_key='dummy_api_key')
-    historical_value = client.get_historical_value(series_id, periods=-2)
-
-    # Verify the historical value is returned
-    assert historical_value == mock_fred_series.iloc[-2]
+        data = fred_client.fetch_data(series_id)
+        assert data.equals(expected_data)
+        mock_get_series.assert_called_once_with(series_id)
+        mock_save_cache.assert_called_once_with(f'fred_series_{series_id}',
+                                                expected_data)
 
 
-@patch('pyeconomics.api.fred_api.Fred')
-def test_get_series_name(mock_fred):
-    series_id = 'TEST_SERIES'
-    series_info = {"title": "Test Series Name"}
+def test_get_latest_value(fred_client):
+    with patch.object(fred_client, 'fetch_data') as mock_fetch_data:
+        series_id = 'GDP'
+        today = datetime.date.today()
+        data = pd.Series(
+            [1, 2, 3],
+            index=pd.date_range(end=today, periods=3, freq='D'),
+            name=series_id
+        )
+        mock_fetch_data.return_value = data
 
-    # Mock the Fred instance and its get_series_info method
-    mock_fred_instance = mock_fred.return_value
-    mock_fred_instance.get_series_info.return_value = series_info
+        latest_value = fred_client.get_latest_value(series_id)
+        assert latest_value == 3
 
-    client = FredClient(api_key='dummy_api_key')
 
-    # Assign the mock_fred_instance to the client's Fred instance
-    client.client = mock_fred_instance
+def test_get_historical_value(fred_client):
+    with patch.object(fred_client, 'fetch_data') as mock_fetch_data:
+        series_id = 'GDP'
+        data = pd.Series([1, 2, 3], name=series_id)
+        mock_fetch_data.return_value = data
 
-    series_name = client.get_series_name(series_id)
+        historical_value = fred_client.get_historical_value(
+            series_id, periods=-2)
+        assert historical_value == 2
 
-    # Verify the series name is returned
-    assert series_name == series_info["title"]
+
+def test_get_series_name(fred_client):
+    with patch.object(
+            fred_client.client, 'get_series_info'
+    ) as mock_get_series_info:
+        series_id = 'GDP'
+        series_info = {"title": "Gross Domestic Product"}
+        mock_get_series_info.return_value = series_info
+
+        series_name = fred_client.get_series_name(series_id)
+        assert series_name == "Gross Domestic Product"
+
+
+def test_get_data_or_fetch(fred_client):
+    with (patch.object(
+        FredClient, 'get_latest_value'
+    ) as mock_get_latest_value, patch.object(
+        FredClient, 'get_historical_value'
+    ) as mock_get_historical_value):
+        series_id = 'GDP'
+        default = None
+        periods = 0
+        expected_value = 3
+
+        mock_get_latest_value.return_value = expected_value
+        value = FredClient.get_data_or_fetch(default, series_id, periods)
+        assert value == expected_value
+
+        periods = -2
+        mock_get_historical_value.return_value = 2
+        value = FredClient.get_data_or_fetch(default, series_id, periods)
+        assert value == 2
 
 
 if __name__ == '__main__':

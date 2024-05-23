@@ -3,7 +3,7 @@ import datetime
 import logging
 import os
 from threading import Lock
-from typing import Optional
+from typing import Optional, Any
 
 import pandas as pd
 from fredapi import Fred
@@ -53,10 +53,10 @@ class FredClient(DataSource):
 
     Inherits from DataSource and implements methods to fetch data from FRED.
     """
-    _instance = None
-    _lock = Lock()
+    _instance: Optional['FredClient'] = None
+    _lock: Lock = Lock()
 
-    def __new__(cls, api_key: Optional[str] = None):
+    def __new__(cls, api_key: Optional[str] = None) -> 'FredClient':
         """
         Ensures a single instance of FredClient using a thread-safe singleton
         pattern.
@@ -69,7 +69,7 @@ class FredClient(DataSource):
             FredClient: Singleton instance.
         """
         with cls._lock:
-            if not isinstance(cls._instance, cls):
+            if cls._instance is None:
                 cls._instance = super(FredClient, cls).__new__(cls)
                 api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
                 if not api_key_retrieved and KEYRING_AVAILABLE:
@@ -80,6 +80,14 @@ class FredClient(DataSource):
                                      "retrievable from keyring.")
                 cls._instance.client = Fred(api_key=api_key_retrieved)
             return cls._instance
+
+    @classmethod
+    def reset_instance(cls) -> None:
+        """
+        Resets the singleton instance. Use this method only in tests.
+        """
+        with cls._lock:
+            cls._instance = None
 
     def fetch_data(self, series_id: str) -> pd.Series:
         """
@@ -99,6 +107,7 @@ class FredClient(DataSource):
         data = load_from_cache(cache_key)
 
         if data is not None:
+            logging.info(f"Data for {series_id} loaded from cache.")
             return data
 
         try:
@@ -106,6 +115,7 @@ class FredClient(DataSource):
             if data.empty:
                 raise ValueError(f"No data found for series ID {series_id}")
             save_to_cache(cache_key, data)
+            logging.info(f"Data for {series_id} fetched and cached.")
             return data
         except Exception as e:
             logging.error(f"Fetching error for {series_id}: {e}")
@@ -120,7 +130,8 @@ class FredClient(DataSource):
             series_id (str): Identifier for the FRED data series.
 
         Returns:
-            float: Most recent data point up to today, or None if no data.
+            Optional[float]: Most recent data point up to today, or None if no
+                data.
         """
         try:
             data = self.fetch_data(series_id)
@@ -132,9 +143,9 @@ class FredClient(DataSource):
             raise
 
     def get_historical_value(
-            self,
-            series_id: str,
-            periods: int = -1
+        self,
+        series_id: str,
+        periods: int = -1
     ) -> Optional[float]:
         """
         Fetches a historical value for a FRED series ID.
@@ -145,11 +156,17 @@ class FredClient(DataSource):
                 historical).
 
         Returns:
-            float: Historical data point value, or None if unavailable.
+            Optional[float]: Historical data point value, or None if
+                unavailable.
         """
-        series = self.fetch_data(series_id)
-        return series.iloc[periods] \
-            if not series.empty and len(series) > -periods else None
+        try:
+            series = self.fetch_data(series_id)
+            return series.iloc[periods] \
+                if not series.empty and len(series) > -periods else None
+        except Exception as e:
+            logging.error(
+                f"Error in getting historical value for {series_id}: {e}")
+            raise
 
     def get_series_name(self, series_id: str) -> str:
         """
@@ -161,32 +178,45 @@ class FredClient(DataSource):
         Returns:
             str: Name of the FRED series.
         """
-        return self.client.get_series_info(series_id)["title"]
+        try:
+            return self.client.get_series_info(series_id)["title"]
+        except Exception as e:
+            logging.error(f"Error in getting series name for {series_id}: {e}")
+            raise
 
     @classmethod
-    def get_data_or_fetch(cls, default, series_id, periods=0):
+    def get_data_or_fetch(
+        cls, default: Any,
+        series_id: str,
+        periods: int = 0
+    ) -> Any:
         """
         Fetches data if default is None using the given FRED series ID. Can
         fetch historical data based on periods.
 
         Args:
-            default (any): Default value to return if not None.
-            series_id (str): FRED series ID for fetching data if
-            default is None.
-            periods (int): Number of periods back to fetch the data.
-                Default is 0 for current data.
+            default (Any): Default value to return if not None.
+            series_id (str): FRED series ID for fetching data if default is
+                None.
+            periods (int): Number of periods back to fetch the data. Default is
+                0 for current data.
 
         Returns:
-            any: Latest value or historical value or default value.
+            Any: Latest value or historical value or default value.
         """
         if default is not None:
             return default
         else:
-            # Check if periods parameter is used to fetch historical data
-            if periods == 0:
-                return cls._instance.get_latest_value(series_id)
-            else:
-                return cls._instance.get_historical_value(series_id, periods)
+            try:
+                if periods == 0:
+                    return cls._instance.get_latest_value(series_id)
+                else:
+                    return cls._instance.get_historical_value(
+                        series_id, periods)
+            except Exception as e:
+                logging.error(
+                    f"Error in get_data_or_fetch for {series_id}: {e}")
+                raise
 
 
 # Global instance of the FredClient

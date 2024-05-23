@@ -13,7 +13,7 @@ def mock_data():
         'current_unemployment_rate': 4.0,
         'natural_unemployment_rate': 4.5,
         'long_term_real_interest_rate': 2.0,
-        'fed_rate': 0.5,
+        'current_fed_rate': 0.5,
         'inflation_gap': 0.5,
         'unemployment_gap': 0.5,
         'alpha': 0.5,
