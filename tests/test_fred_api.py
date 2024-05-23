@@ -136,9 +136,9 @@ def test_keyring_unavailable():
 
 
 def test_keyring_available_but_no_api_key():
-    # Mock the keyring module directly to return None
     with patch('keyring.get_password', return_value=None):
         FredClient.reset_instance()  # Ensure fresh instance for each test
+        # Ensure no environment variable is set
         with patch.dict('os.environ', {}, clear=True):
             with pytest.raises(
                 ValueError,
@@ -151,6 +151,7 @@ def test_keyring_available_but_no_api_key():
 def test_no_api_key_provided():
     with patch('keyring.get_password', return_value=None):
         FredClient.reset_instance()  # Ensure fresh instance for each test
+        # Ensure no environment variable is set
         with patch.dict('os.environ', {}, clear=True):
             with pytest.raises(
                 ValueError,

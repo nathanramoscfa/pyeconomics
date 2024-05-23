@@ -48,7 +48,6 @@ jobs:
     # Run tests with coverage
     - name: Run tests with coverage
       run: |
-        unset FRED_API_KEY
         pytest --cov=./pyeconomics --cov-report=xml
 
     # Upload coverage reports to Codecov
