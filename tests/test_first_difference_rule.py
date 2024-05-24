@@ -1,4 +1,3 @@
-# tests/test_first_difference_rule.py
 import pytest
 import pandas as pd
 from unittest.mock import patch
@@ -38,6 +37,7 @@ def sample_fred_data():
 def test_first_difference_rule(mock_fred_client, sample_fred_data):
     mock_fred_client.return_value = sample_fred_data
 
+    # Default test case
     rate = first_difference_rule(
         current_inflation_rate=3.0,
         current_unemployment_rate=4.0,
@@ -56,6 +56,25 @@ def test_first_difference_rule(mock_fred_client, sample_fred_data):
     assert isinstance(rate, float)
     assert rate == 2.8  # Adjusted expected value based on actual calculation
 
+    # Test without applying effective lower bound (apply_elb=False)
+    rate = first_difference_rule(
+        current_inflation_rate=3.0,
+        current_unemployment_rate=4.0,
+        natural_unemployment_rate=3.5,
+        lagged_unemployment_rate=4.2,
+        lagged_natural_unemployment_rate=3.6,
+        current_fed_rate=2.5,
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=False,
+        verbose=False
+    )
+
+    assert isinstance(rate, float)
+    assert rate == 2.8  # Value without applying ELB
+
 
 def test_historical_first_difference_rule(mock_fred_client, sample_fred_data):
     mock_fred_client.side_effect = lambda series_id: sample_fred_data
@@ -66,6 +85,19 @@ def test_historical_first_difference_rule(mock_fred_client, sample_fred_data):
         rho=0.5,
         elb=0.125,
         apply_elb=True
+    )
+
+    assert isinstance(historical_rates, pd.DataFrame)
+    assert 'AdjustedFirstDifferenceRule' in historical_rates.columns
+    assert historical_rates['AdjustedFirstDifferenceRule'].notnull().all()
+
+    # Test without applying effective lower bound (apply_elb=False)
+    historical_rates = historical_first_difference_rule(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=False
     )
 
     assert isinstance(historical_rates, pd.DataFrame)
@@ -114,6 +146,44 @@ def test_first_difference_rule_verbose_output(
 
     captured = capsys.readouterr()
     assert "==== First Difference Rule (FDR) ===" in captured.out
+
+
+def test_first_difference_rule_value_error(mock_fred_client, sample_fred_data):
+    mock_fred_client.side_effect = lambda default, series_id, periods=0: None
+
+    with pytest.raises(ValueError):
+        first_difference_rule(
+            inflation_series_id='missing_series_id',
+            unemployment_rate_series_id='missing_series_id',
+            natural_unemployment_series_id='missing_series_id',
+            current_inflation_rate=None,
+            current_unemployment_rate=None,
+            natural_unemployment_rate=None,
+            lagged_unemployment_rate=None,
+            lagged_natural_unemployment_rate=None,
+            current_fed_rate=None,
+            inflation_target=2.0,
+            alpha=0.5,
+            rho=0.0,
+            elb=0.125,
+            apply_elb=False,
+            verbose=False
+        )
+
+
+def test_historical_first_difference_rule_exception(
+    mock_fred_client, sample_fred_data
+):
+    mock_fred_client.side_effect = lambda series_id: None
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(
+            inflation_target=2.0,
+            alpha=0.5,
+            rho=0.5,
+            elb=0.125,
+            apply_elb=True
+        )
 
 
 if __name__ == '__main__':

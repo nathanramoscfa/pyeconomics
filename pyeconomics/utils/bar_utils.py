@@ -110,7 +110,8 @@ def verbose_balanced_approach_rule(data: dict):
 
     # Policy Prescription section
     print("\n==== Policy Prescription " + "=" * (line_length - 25))
-    rate_difference = (data['adjusted_bar_after_inertia'] - data['current_fed_rate'])
+    rate_difference = (data['adjusted_bar_after_inertia'] -
+                       data['current_fed_rate'])
     rounded_difference = round(rate_difference * 4) / 4
 
     if rounded_difference > 0.125:

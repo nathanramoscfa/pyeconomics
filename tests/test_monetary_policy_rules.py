@@ -1,4 +1,3 @@
-# pyeconomics/tests/test_monetary_policy_rules.py
 import unittest
 from unittest.mock import patch
 
@@ -33,6 +32,9 @@ class TestMonetaryPolicyRules(unittest.TestCase):
             'First Difference Rule (FDR)'
         ])
         print_verbose_output(estimates, 2.0)
+        self.assertTrue(True)  # No exception should be raised
+
+        print_verbose_output(estimates, 2.0, adjusted=True)
         self.assertTrue(True)  # No exception should be raised
 
     @patch(
@@ -108,10 +110,19 @@ class TestMonetaryPolicyRules(unittest.TestCase):
             'BalancedApproachRule': [3.0, 3.1],
             'BalancedApproachShortfallsRule': [2.7, 2.8],
             'FirstDifferenceRule': [1.5, 1.6],
-            'FedRate': [2.0, 2.1]
+            'FedRate': [2.0, 2.1],
+            'AdjustedTaylorRule': [2.7, 2.8],
+            'AdjustedBalancedApproachRule': [3.2, 3.3],
+            'AdjustedBalancedApproachShortfallsRule': [2.9, 3.0],
+            'AdjustedFirstDifferenceRule': [1.7, 1.8]
         }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
-        plot_historical_policy_rates(historical_policy_rates)
+        # Test unadjusted plot
+        plot_historical_policy_rates(historical_policy_rates, adjusted=False)
+        self.assertTrue(mock_show.called)
+
+        # Test adjusted plot
+        plot_historical_policy_rates(historical_policy_rates, adjusted=True)
         self.assertTrue(mock_show.called)
 
 
