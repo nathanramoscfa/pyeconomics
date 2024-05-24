@@ -8,11 +8,11 @@ financial, and fiscal policy. Whether you're a developer, economist, financial
 analyst, or researcher, PyEconomics aims to be your go-to resource for
 sophisticated economic modeling and analysis.
 
-|               | |
-|---------------| --- |
-| Testing       | [![pytest](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S)](https://codecov.io/gh/nathanramoscfa/pyeconomics) |
-| Package       | [![PyPI Latest Release](https://img.shields.io/pypi/v/pyeconomics.svg)](https://pypi.org/project/pyeconomics/) [![PyPI Downloads](https://static.pepy.tech/badge/pyeconomics)](https://pepy.tech/project/pyeconomics) ![Python Version](https://img.shields.io/pypi/pyversions/pyeconomics) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) |
-| Documentation | [![Documentation Status](https://readthedocs.org/projects/pyeconomics/badge/?version=latest)](https://pyeconomics.readthedocs.io/en/latest/?badge=latest) |
+|               |                                                                                                                                                                                                                                                                                                                                                                                                               |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Testing       | [![pytest](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S)](https://codecov.io/gh/nathanramoscfa/pyeconomics)                                                                                 |
+| Package       | [![PyPI Latest Release](https://img.shields.io/pypi/v/pyeconomics.svg)](https://pypi.org/project/pyeconomics/)  ![Python Version](https://img.shields.io/pypi/pyversions/pyeconomics) [![PyPI Downloads](https://static.pepy.tech/badge/pyeconomics)](https://pepy.tech/project/pyeconomics) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) |
+| Documentation | [![Documentation Status](https://readthedocs.org/projects/pyeconomics/badge/?version=latest)](https://pyeconomics.readthedocs.io/en/latest/?badge=latest)                                                                                                                                                                                                                                                     |
 
 ## Table of Contents
 
