@@ -1,4 +1,5 @@
 # tests/test_fred_api.py
+import os
 import datetime
 import pytest
 from unittest.mock import patch, MagicMock
@@ -226,19 +227,22 @@ def test_keyring_get_password_called():
 
         # Ensure that KEYRING_AVAILABLE is set to True
         with patch('pyeconomics.api.fred_api.KEYRING_AVAILABLE', True):
-            try:
-                FredClient(api_key=None)
-            except ValueError:
-                # If the initialization fails, catch the exception to check why
-                pass
+            with patch.dict(os.environ, {'FRED_API_KEY': ''}):
+                try:
+                    FredClient(api_key=None)
+                except ValueError:
+                    # If the initialization fails,
+                    # catch the exception to check why
+                    pass
 
-            # Additional logging to debug
-            print(f"Called get_password: "
-                  f"{mock_keyring.get_password.call_count} times")
-            for call in mock_keyring.get_password.mock_calls:
-                print(f"Call: {call}")
+                # Additional logging to debug
+                print(f"Called get_password: "
+                      f"{mock_keyring.get_password.call_count} times")
+                for call in mock_keyring.get_password.mock_calls:
+                    print(f"Call: {call}")
 
-            mock_keyring.get_password.assert_called_once_with('fred', 'api_key')
+                mock_keyring.get_password.assert_called_once_with(
+                    'fred', 'api_key')
 
 
 def test_get_data_or_fetch_exception_handling():
