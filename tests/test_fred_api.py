@@ -30,6 +30,18 @@ def test_singleton_none_instance():
     assert FredClient._instance is None
 
 
+def test_singleton_existing_instance(fred_client):
+    """
+    Test to ensure FredClient does not create a new instance if one already
+    exists.
+    """
+    FredClient.reset_instance()  # Ensure a fresh start
+    first_instance = FredClient(api_key='test_api_key')
+    second_instance = FredClient(api_key='another_test_api_key')
+
+    assert first_instance is second_instance  # Should be the same instance
+
+
 def test_fetch_data_from_cache(fred_client):
     with patch('pyeconomics.api.fred_api.load_from_cache') as mock_load_cache:
         series_id = 'GDP'
@@ -234,12 +246,6 @@ def test_keyring_get_password_called():
                     # If the initialization fails,
                     # catch the exception to check why
                     pass
-
-                # Additional logging to debug
-                print(f"Called get_password: "
-                      f"{mock_keyring.get_password.call_count} times")
-                for call in mock_keyring.get_password.mock_calls:
-                    print(f"Call: {call}")
 
                 mock_keyring.get_password.assert_called_once_with(
                     'fred', 'api_key')
