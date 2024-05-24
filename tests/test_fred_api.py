@@ -24,6 +24,11 @@ def test_singleton_pattern(fred_client):
         assert fred_client is another_instance
 
 
+def test_singleton_none_instance():
+    FredClient.reset_instance()
+    assert FredClient._instance is None
+
+
 def test_fetch_data_from_cache(fred_client):
     with patch('pyeconomics.api.fred_api.load_from_cache') as mock_load_cache:
         series_id = 'GDP'
@@ -90,6 +95,8 @@ def test_get_series_name(fred_client):
 
 
 def test_get_data_or_fetch(fred_client):
+    FredClient.reset_instance()  # Reset instance before test
+    FredClient._instance = fred_client  # Ensure the instance is set
     with (patch.object(
         FredClient, 'get_latest_value'
     ) as mock_get_latest_value, patch.object(
@@ -205,6 +212,33 @@ def test_get_series_name_exception_handling(fred_client):
             side_effect=Exception("API error")):
         with pytest.raises(Exception, match="API error"):
             fred_client.get_series_name('GDP')
+
+
+def test_keyring_get_password_called():
+    with patch.dict('sys.modules', {'keyring': MagicMock()}):
+        from importlib import reload
+        import pyeconomics.api.fred_api as fred_api
+        reload(fred_api)
+        FredClient.reset_instance()
+
+        mock_keyring = fred_api.keyring
+        mock_keyring.get_password = MagicMock(return_value='mocked_api_key')
+
+        # Ensure that KEYRING_AVAILABLE is set to True
+        with patch('pyeconomics.api.fred_api.KEYRING_AVAILABLE', True):
+            FredClient(api_key=None)
+            mock_keyring.get_password.assert_called_once_with('fred', 'api_key')
+
+
+def test_get_data_or_fetch_exception_handling():
+    FredClient.reset_instance()
+    with patch.object(
+        FredClient, 'get_latest_value', side_effect=Exception("fetch error")
+    ):
+        with patch('pyeconomics.api.fred_api.KEYRING_AVAILABLE', False):
+            FredClient._instance = FredClient(api_key="test_api_key")
+            with pytest.raises(Exception, match="fetch error"):
+                FredClient.get_data_or_fetch(None, 'GDP', 0)
 
 
 if __name__ == '__main__':

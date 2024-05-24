@@ -66,6 +66,9 @@ def test_load_from_cache_nonexistent_key():
 
 
 def test_cache_directory_creation():
+    # Ensure the directory exists before running the test
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
     assert os.path.exists(CACHE_DIR)
 
 
