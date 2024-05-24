@@ -232,6 +232,12 @@ def test_keyring_get_password_called():
                 # If the initialization fails, catch the exception to check why
                 pass
 
+            # Additional logging to debug
+            print(f"Called get_password: "
+                  f"{mock_keyring.get_password.call_count} times")
+            for call in mock_keyring.get_password.mock_calls:
+                print(f"Call: {call}")
+
             mock_keyring.get_password.assert_called_once_with('fred', 'api_key')
 
 
