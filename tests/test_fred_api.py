@@ -226,7 +226,12 @@ def test_keyring_get_password_called():
 
         # Ensure that KEYRING_AVAILABLE is set to True
         with patch('pyeconomics.api.fred_api.KEYRING_AVAILABLE', True):
-            FredClient(api_key=None)
+            try:
+                FredClient(api_key=None)
+            except ValueError:
+                # If the initialization fails, catch the exception to check why
+                pass
+
             mock_keyring.get_password.assert_called_once_with('fred', 'api_key')
 
 

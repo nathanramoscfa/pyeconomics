@@ -73,6 +73,7 @@ class FredClient(DataSource):
                 cls._instance = object.__new__(cls)
                 api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
                 if not api_key_retrieved and KEYRING_AVAILABLE:
+                    logging.debug("Attempting to retrieve API key from keyring")
                     api_key_retrieved = keyring.get_password(
                         "fred", "api_key")
                 if not api_key_retrieved:
