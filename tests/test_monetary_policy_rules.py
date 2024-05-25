@@ -193,6 +193,17 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         self.assertEqual(estimates.shape, (4, 1))
         self.assertTrue(mock_print_verbose_output.called)
 
+        # Reset mock call count before next test
+        mock_print_verbose_output.reset_mock()
+
+        # Test with verbose set to False
+        estimates = calculate_policy_rule_estimates(
+            current_fed_rate=2.0, verbose=False, rho=0.0, apply_elb=False
+        )
+        self.assertIsInstance(estimates, pd.DataFrame)
+        self.assertEqual(estimates.shape, (4, 1))
+        self.assertFalse(mock_print_verbose_output.called)
+
 
 if __name__ == '__main__':
     unittest.main()
