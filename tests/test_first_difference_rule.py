@@ -225,5 +225,23 @@ def test_historical_first_difference_rule_apply_elb(
     assert (historical_rates['AdjustedFirstDifferenceRule'] >= 0.125).all()
 
 
+def test_historical_first_difference_rule_partial_data(
+        mock_fred_client, sample_fred_data):
+    # Mock to return partial data (None for one series)
+    mock_fred_client.side_effect = [
+        sample_fred_data, sample_fred_data, sample_fred_data, None,
+        sample_fred_data
+    ]
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(
+            inflation_target=2.0,
+            alpha=0.5,
+            rho=0.5,
+            elb=0.125,
+            apply_elb=True
+        )
+
+
 if __name__ == '__main__':
     pytest.main()

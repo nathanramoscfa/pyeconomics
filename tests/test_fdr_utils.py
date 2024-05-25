@@ -80,5 +80,30 @@ def test_verbose_first_difference_rule(capsys, mock_data):
     assert output == expected_output
 
 
+def test_verbose_first_difference_rule_lower_rate(capsys, mock_data):
+    mock_data['adjusted_fdr_rule_after_inertia'] = 0.0
+    verbose_first_difference_rule(mock_data)
+
+    captured = capsys.readouterr()
+    output = captured.out
+
+    assert ("The Adjusted FDR Estimate is 0.50% "
+            "lower than the Current Fed") in output
+    assert ("Rate. The Fed should consider lowering "
+            "the interest rate by 0.50%.") in output
+
+
+def test_verbose_first_difference_rule_equal_rate(capsys, mock_data):
+    mock_data['adjusted_fdr_rule_after_inertia'] = 0.5
+    verbose_first_difference_rule(mock_data)
+
+    captured = capsys.readouterr()
+    output = captured.out
+
+    assert ("The Adjusted FDR Estimate is equal"
+            " to the Current Fed Rate.") in output
+    assert "The Fed should maintain the current interest rate." in output
+
+
 if __name__ == '__main__':
     pytest.main()

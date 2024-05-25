@@ -163,6 +163,36 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         self.assertEqual(estimates.shape, (4, 1))
         self.assertTrue(mock_print_verbose_output.called)
 
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'print_verbose_output')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.fred_client.'
+        'get_latest_value')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.taylor_rule')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'balanced_approach_rule')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'first_difference_rule')
+    def test_calculate_policy_rule_estimates_verbose_only(
+        self, mock_first_difference_rule, mock_balanced_approach_rule,
+            mock_taylor_rule, mock_get_latest_value, mock_print_verbose_output):
+        mock_get_latest_value.return_value = 2.0
+        mock_taylor_rule.return_value = 2.5
+        mock_balanced_approach_rule.return_value = 3.0
+        mock_first_difference_rule.return_value = 1.5
+
+        # Test with verbose only (rho=0.0 and apply_elb=False)
+        estimates = calculate_policy_rule_estimates(
+            current_fed_rate=2.0, verbose=True, rho=0.0, apply_elb=False
+        )
+        self.assertIsInstance(estimates, pd.DataFrame)
+        self.assertEqual(estimates.shape, (4, 1))
+        self.assertTrue(mock_print_verbose_output.called)
+
 
 if __name__ == '__main__':
     unittest.main()
