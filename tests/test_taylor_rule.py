@@ -78,6 +78,20 @@ def test_taylor_rule(mock_fred_client, mock_fred_data):
             apply_elb=False
         )
 
+    # Test with current_fed_rate as None
+    mock_fred_client.get_latest_value.return_value = 1.0
+    result = taylor_rule(
+        inflation_series_id='inflation_rate',
+        unemployment_rate_series_id='unemployment_rate',
+        natural_unemployment_series_id='natural_unemployment_rate',
+        real_interest_rate_series_id='real_interest_rate',
+        inflation_target=2.0, alpha=0.5, beta=0.5, rho=0.0,
+        apply_elb=False,
+        current_fed_rate=None
+    )
+    expected_result = 4.25  # Computed based on the mock data and parameters
+    assert result == expected_result
+
 
 @patch('pyeconomics.models.monetary_policy.taylor_rule.fred_client')
 @patch(

@@ -70,12 +70,16 @@ class FredClient(DataSource):
         """
         with cls._lock:
             if cls._instance is None:
+                logging.debug("Creating new FredClient instance")
                 cls._instance = object.__new__(cls)
                 api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
+                logging.debug(f"API key from environment variable: "
+                              f"{api_key_retrieved}")
                 if not api_key_retrieved and KEYRING_AVAILABLE:
                     logging.debug("Attempting to retrieve API key from keyring")
                     api_key_retrieved = keyring.get_password(
                         "fred", "api_key")
+                    logging.debug(f"API key from keyring: {api_key_retrieved}")
                 if not api_key_retrieved:
                     logging.debug("API Key not found, raising ValueError.")
                     raise ValueError(
@@ -92,6 +96,7 @@ class FredClient(DataSource):
         """
         with cls._lock:
             cls._instance = None
+            logging.debug("FredClient instance reset")
 
     def fetch_data(self, series_id: str) -> pd.Series:
         """

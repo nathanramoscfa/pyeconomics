@@ -262,5 +262,18 @@ def test_get_data_or_fetch_exception_handling():
                 FredClient.get_data_or_fetch(None, 'GDP', 0)
 
 
+def test_instance_creation_with_existing_instance():
+    FredClient.reset_instance()
+    with patch.object(
+            FredClient, '__new__', wraps=FredClient.__new__) as mock_new:
+        first_instance = FredClient(api_key='test_api_key')
+        second_instance = FredClient(api_key='another_test_api_key')
+
+        assert first_instance is second_instance  # Should be the same instance
+        # Ensure __new__ was called twice, but instance creation only once
+        assert mock_new.call_count == 2
+        assert first_instance == second_instance
+
+
 if __name__ == '__main__':
     pytest.main()
