@@ -207,5 +207,23 @@ def test_historical_first_difference_rule_exception(
         )
 
 
+def test_historical_first_difference_rule_apply_elb(
+        mock_fred_client, sample_fred_data):
+    mock_fred_client.side_effect = lambda series_id: sample_fred_data
+
+    historical_rates = historical_first_difference_rule(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.0,
+        elb=0.125,
+        apply_elb=True
+    )
+
+    assert isinstance(historical_rates, pd.DataFrame)
+    assert 'AdjustedFirstDifferenceRule' in historical_rates.columns
+    assert historical_rates['AdjustedFirstDifferenceRule'].notnull().all()
+    assert (historical_rates['AdjustedFirstDifferenceRule'] >= 0.125).all()
+
+
 if __name__ == '__main__':
     pytest.main()

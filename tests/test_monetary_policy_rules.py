@@ -49,7 +49,7 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         'pyeconomics.models.monetary_policy.monetary_policy_rules.'
         'first_difference_rule')
     def test_calculate_policy_rule_estimates(
-            self, mock_first_difference_rule, mock_balanced_approach_rule,
+        self, mock_first_difference_rule, mock_balanced_approach_rule,
             mock_taylor_rule, mock_get_latest_value):
         mock_get_latest_value.return_value = 2.0
         mock_taylor_rule.return_value = 2.5
@@ -73,8 +73,8 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         'pyeconomics.models.monetary_policy.monetary_policy_rules.'
         'historical_first_difference_rule')
     def test_calculate_historical_policy_rates(
-            self, mock_historical_first_difference_rule,
-            mock_historical_balanced_approach_rule,
+        self, mock_historical_first_difference_rule,
+        mock_historical_balanced_approach_rule,
             mock_historical_taylor_rule, mock_fetch_historical_fed_funds_rate):
         mock_historical_taylor_rule.return_value = pd.DataFrame({
             'TaylorRule': [2.5, 2.6],
@@ -124,6 +124,44 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         # Test adjusted plot
         plot_historical_policy_rates(historical_policy_rates, adjusted=True)
         self.assertTrue(mock_show.called)
+
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'print_verbose_output')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.fred_client.'
+        'get_latest_value')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.taylor_rule')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'balanced_approach_rule')
+    @patch(
+        'pyeconomics.models.monetary_policy.monetary_policy_rules.'
+        'first_difference_rule')
+    def test_calculate_policy_rule_estimates_with_none_fed_rate(
+        self, mock_first_difference_rule, mock_balanced_approach_rule,
+            mock_taylor_rule, mock_get_latest_value, mock_print_verbose_output):
+        mock_get_latest_value.return_value = 2.0
+        mock_taylor_rule.return_value = 2.5
+        mock_balanced_approach_rule.return_value = 3.0
+        mock_first_difference_rule.return_value = 1.5
+
+        # Test with current_fed_rate as None
+        estimates = calculate_policy_rule_estimates(
+            current_fed_rate=None, verbose=True, rho=0.7, apply_elb=True
+        )
+        self.assertIsInstance(estimates, pd.DataFrame)
+        self.assertEqual(estimates.shape, (4, 1))
+        self.assertTrue(mock_print_verbose_output.called)
+
+        # Test verbose only
+        estimates = calculate_policy_rule_estimates(
+            current_fed_rate=2.0, verbose=True, rho=0.0, apply_elb=False
+        )
+        self.assertIsInstance(estimates, pd.DataFrame)
+        self.assertEqual(estimates.shape, (4, 1))
+        self.assertTrue(mock_print_verbose_output.called)
 
 
 if __name__ == '__main__':
