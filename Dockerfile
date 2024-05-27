@@ -17,4 +17,4 @@ EXPOSE 8000
 ENV NAME pyeconomics
 
 # Run the application when the container launches
-CMD ["python", "examples/monetary_policy_rules/example.py"]
+CMD ["python", "examples/monetary_policy_rules/monetary_policy_rules.py"]

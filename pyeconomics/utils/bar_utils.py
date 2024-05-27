@@ -1,3 +1,5 @@
+# pyeconomics/utils/bar_utils.py
+
 from datetime import datetime
 
 
@@ -16,11 +18,11 @@ def verbose_balanced_approach_rule(data: dict):
             - current_fed_rate (float): Current Federal Reserve rate.
             - inflation_gap (float): Inflation gap.
             - unemployment_gap (float): Unemployment gap.
-            - unadjusted_bar_rule (float): Unadjusted Balanced Approach Rule
+            - unadjusted_rate (float): Unadjusted Balanced Approach Rule
               estimate.
-            - adjusted_bar_after_elb (float): Balanced Approach Rule adjusted
+            - adjusted_rate_after_elb (float): Balanced Approach Rule adjusted
               for the Effective Lower Bound (ELB).
-            - adjusted_bar_after_inertia (float): Balanced Approach Rule
+            - adjusted_rate_after_inertia (float): Balanced Approach Rule
               adjusted for policy inertia.
             - rho (float): Policy inertia coefficient.
             - alpha (float): Coefficient for the inflation gap.
@@ -84,17 +86,17 @@ def verbose_balanced_approach_rule(data: dict):
             data['beta'], data['unemployment_gap']))
     print("-" * line_length)
     print("  Unadjusted {} Estimate:".format(rule_acronym).ljust(49) +
-          "{:.2f}%".format(data['unadjusted_bar_rule']))
+          "{:.2f}%".format(data['unadjusted_rate']))
     print("\n==== Adjusted {} ".format(rule_name) + "=" *
           (line_length - 15 - len(rule_name)))
     if data['apply_elb']:
         print("  Effective Lower Bound (ELB) Adjustment: ")
         print("  Maximum of {} or ELB:".format(rule_acronym).ljust(49) +
               "max({:.2f}%, {:.2f}%)".format(
-                data['unadjusted_bar_rule'], data['elb']))
+                data['unadjusted_rate'], data['elb']))
         print("-" * line_length)
         print("  {} Adjusted for ELB:".format(rule_acronym).ljust(49) +
-              "{:.2f}%".format(data['adjusted_bar_after_elb']))
+              "{:.2f}%".format(data['adjusted_rate_after_elb']))
     print("\n  Policy Inertia Adjustment:              ")
     print("  Policy Inertia Coefficient (rho):              {:.2f}".format(
         data['rho']))
@@ -103,14 +105,14 @@ def verbose_balanced_approach_rule(data: dict):
     print("  Adjustment Coefficient (1 - rho):              "
           "+ (1 - {:.2f})".format(data['rho']))
     print(f"  {rule_acronym} Adjusted for ELB:".ljust(49) +
-          f"* {data['adjusted_bar_after_elb']:.2f}%")
+          f"* {data['adjusted_rate_after_elb']:.2f}%")
     print("-" * line_length)
     print("  Adjusted {} Estimate:".format(rule_acronym).ljust(49) +
-          "{:.2f}%".format(data['adjusted_bar_after_inertia']))
+          "{:.2f}%".format(data['adjusted_rate_after_inertia']))
 
     # Policy Prescription section
     print("\n==== Policy Prescription " + "=" * (line_length - 25))
-    rate_difference = (data['adjusted_bar_after_inertia'] -
+    rate_difference = (data['adjusted_rate_after_inertia'] -
                        data['current_fed_rate'])
     rounded_difference = round(rate_difference * 4) / 4
 

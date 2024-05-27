@@ -6,7 +6,9 @@ from pyeconomics.models.monetary_policy.first_difference_rule import (
     first_difference_rule,
     historical_first_difference_rule
 )
-from pyeconomics.api.fred_api import FredClient
+from pyeconomics.api import FredClient
+from pyeconomics.data.economic_indicators import EconomicIndicators
+from pyeconomics.data.model_parameters import FirstDifferenceRuleParameters
 
 
 @pytest.fixture
@@ -37,14 +39,16 @@ def sample_fred_data():
 def test_first_difference_rule(mock_fred_client, sample_fred_data):
     mock_fred_client.return_value = sample_fred_data
 
-    # Default test case
-    rate = first_difference_rule(
+    indicators = EconomicIndicators(
         current_inflation_rate=3.0,
         current_unemployment_rate=4.0,
         natural_unemployment_rate=3.5,
         lagged_unemployment_rate=4.2,
         lagged_natural_unemployment_rate=3.6,
-        current_fed_rate=2.5,
+        current_fed_rate=2.5
+    )
+
+    params = FirstDifferenceRuleParameters(
         inflation_target=2.0,
         alpha=0.5,
         rho=0.5,
@@ -52,45 +56,21 @@ def test_first_difference_rule(mock_fred_client, sample_fred_data):
         apply_elb=True,
         verbose=False
     )
+
+    rate = first_difference_rule(indicators, params)
 
     assert isinstance(rate, float)
     assert rate == 2.8  # Adjusted expected value based on actual calculation
 
-    # Test without applying effective lower bound (apply_elb=False)
-    rate = first_difference_rule(
-        current_inflation_rate=3.0,
-        current_unemployment_rate=4.0,
-        natural_unemployment_rate=3.5,
-        lagged_unemployment_rate=4.2,
-        lagged_natural_unemployment_rate=3.6,
-        current_fed_rate=2.5,
-        inflation_target=2.0,
-        alpha=0.5,
-        rho=0.5,
-        elb=0.125,
-        apply_elb=False,
-        verbose=False
-    )
+    params.apply_elb = False
+    rate = first_difference_rule(indicators, params)
 
     assert isinstance(rate, float)
     assert rate == 2.8  # Value without applying ELB
 
-    # Test with current_fed_rate as None
     mock_fred_client.get_latest_value.return_value = 1.0
-    rate = first_difference_rule(
-        current_inflation_rate=3.0,
-        current_unemployment_rate=4.0,
-        natural_unemployment_rate=3.5,
-        lagged_unemployment_rate=4.2,
-        lagged_natural_unemployment_rate=3.6,
-        current_fed_rate=None,
-        inflation_target=2.0,
-        alpha=0.5,
-        rho=0.5,
-        elb=0.125,
-        apply_elb=True,
-        verbose=False
-    )
+    indicators.current_fed_rate = None
+    rate = first_difference_rule(indicators, params)
 
     assert isinstance(rate, float)
     assert rate == 3.4  # Adjusted expected value based on actual calculation
@@ -99,7 +79,13 @@ def test_first_difference_rule(mock_fred_client, sample_fred_data):
 def test_historical_first_difference_rule(mock_fred_client, sample_fred_data):
     mock_fred_client.side_effect = lambda series_id: sample_fred_data
 
-    historical_rates = historical_first_difference_rule(
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
         inflation_target=2.0,
         alpha=0.5,
         rho=0.5,
@@ -107,18 +93,14 @@ def test_historical_first_difference_rule(mock_fred_client, sample_fred_data):
         apply_elb=True
     )
 
+    historical_rates = historical_first_difference_rule(indicators, params)
+
     assert isinstance(historical_rates, pd.DataFrame)
     assert 'AdjustedFirstDifferenceRule' in historical_rates.columns
     assert historical_rates['AdjustedFirstDifferenceRule'].notnull().all()
 
-    # Test without applying effective lower bound (apply_elb=False)
-    historical_rates = historical_first_difference_rule(
-        inflation_target=2.0,
-        alpha=0.5,
-        rho=0.5,
-        elb=0.125,
-        apply_elb=False
-    )
+    params.apply_elb = False
+    historical_rates = historical_first_difference_rule(indicators, params)
 
     assert isinstance(historical_rates, pd.DataFrame)
     assert 'AdjustedFirstDifferenceRule' in historical_rates.columns
@@ -133,14 +115,22 @@ def test_historical_first_difference_rule_missing_data(
         sample_fred_data, pd.Series()
     ]
 
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
     with pytest.raises(ValueError):
-        historical_first_difference_rule(
-            inflation_target=2.0,
-            alpha=0.5,
-            rho=0.5,
-            elb=0.125,
-            apply_elb=True
-        )
+        historical_first_difference_rule(indicators, params)
 
 
 def test_first_difference_rule_verbose_output(
@@ -150,13 +140,16 @@ def test_first_difference_rule_verbose_output(
 ):
     mock_fred_client.return_value = sample_fred_data
 
-    first_difference_rule(
+    indicators = EconomicIndicators(
         current_inflation_rate=3.0,
         current_unemployment_rate=4.0,
         natural_unemployment_rate=3.5,
         lagged_unemployment_rate=4.2,
         lagged_natural_unemployment_rate=3.6,
-        current_fed_rate=2.5,
+        current_fed_rate=2.5
+    )
+
+    params = FirstDifferenceRuleParameters(
         inflation_target=2.0,
         alpha=0.5,
         rho=0.5,
@@ -165,6 +158,8 @@ def test_first_difference_rule_verbose_output(
         verbose=True
     )
 
+    first_difference_rule(indicators, params)
+
     captured = capsys.readouterr()
     assert "==== First Difference Rule (FDR) ===" in captured.out
 
@@ -172,24 +167,23 @@ def test_first_difference_rule_verbose_output(
 def test_first_difference_rule_value_error(mock_fred_client, sample_fred_data):
     mock_fred_client.side_effect = lambda default, series_id, periods=0: None
 
+    indicators = EconomicIndicators(
+        inflation_series_id='missing_series_id',
+        unemployment_rate_series_id='missing_series_id',
+        natural_unemployment_series_id='missing_series_id'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.0,
+        elb=0.125,
+        apply_elb=False,
+        verbose=False
+    )
+
     with pytest.raises(ValueError):
-        first_difference_rule(
-            inflation_series_id='missing_series_id',
-            unemployment_rate_series_id='missing_series_id',
-            natural_unemployment_series_id='missing_series_id',
-            current_inflation_rate=None,
-            current_unemployment_rate=None,
-            natural_unemployment_rate=None,
-            lagged_unemployment_rate=None,
-            lagged_natural_unemployment_rate=None,
-            current_fed_rate=None,
-            inflation_target=2.0,
-            alpha=0.5,
-            rho=0.0,
-            elb=0.125,
-            apply_elb=False,
-            verbose=False
-        )
+        first_difference_rule(indicators, params)
 
 
 def test_historical_first_difference_rule_exception(
@@ -197,27 +191,44 @@ def test_historical_first_difference_rule_exception(
 ):
     mock_fred_client.side_effect = lambda series_id: None
 
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
     with pytest.raises(ValueError):
-        historical_first_difference_rule(
-            inflation_target=2.0,
-            alpha=0.5,
-            rho=0.5,
-            elb=0.125,
-            apply_elb=True
-        )
+        historical_first_difference_rule(indicators, params)
 
 
 def test_historical_first_difference_rule_apply_elb(
-        mock_fred_client, sample_fred_data):
+    mock_fred_client, sample_fred_data
+):
     mock_fred_client.side_effect = lambda series_id: sample_fred_data
 
-    historical_rates = historical_first_difference_rule(
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
         inflation_target=2.0,
         alpha=0.5,
         rho=0.0,
         elb=0.125,
         apply_elb=True
     )
+
+    historical_rates = historical_first_difference_rule(indicators, params)
 
     assert isinstance(historical_rates, pd.DataFrame)
     assert 'AdjustedFirstDifferenceRule' in historical_rates.columns
@@ -226,21 +237,30 @@ def test_historical_first_difference_rule_apply_elb(
 
 
 def test_historical_first_difference_rule_partial_data(
-        mock_fred_client, sample_fred_data):
+    mock_fred_client, sample_fred_data
+):
     # Mock to return partial data (None for one series)
     mock_fred_client.side_effect = [
         sample_fred_data, sample_fred_data, sample_fred_data, None,
         sample_fred_data
     ]
 
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
     with pytest.raises(ValueError):
-        historical_first_difference_rule(
-            inflation_target=2.0,
-            alpha=0.5,
-            rho=0.5,
-            elb=0.125,
-            apply_elb=True
-        )
+        historical_first_difference_rule(indicators, params)
 
 
 def test_historical_first_difference_rule_apply_elb_lambda(
@@ -249,13 +269,21 @@ def test_historical_first_difference_rule_apply_elb_lambda(
     # Mock to return full data
     mock_fred_client.side_effect = lambda series_id: sample_fred_data
 
-    historical_rates = historical_first_difference_rule(
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
         inflation_target=2.0,
         alpha=0.5,
         rho=0.5,
         elb=0.125,
         apply_elb=True
     )
+
+    historical_rates = historical_first_difference_rule(indicators, params)
 
     assert isinstance(historical_rates, pd.DataFrame)
     assert 'AdjustedFirstDifferenceRule' in historical_rates.columns

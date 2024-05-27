@@ -6,7 +6,7 @@ import pandas as pd
 from pyeconomics.models.monetary_policy.monetary_policy_rules import (
     print_fred_series_names, print_verbose_output,
     calculate_policy_rule_estimates,
-    calculate_historical_policy_rates, plot_historical_policy_rates
+    calculate_historical_policy_rates, plot_historical_rule_estimates
 )
 
 
@@ -118,11 +118,11 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
         # Test unadjusted plot
-        plot_historical_policy_rates(historical_policy_rates, adjusted=False)
+        plot_historical_rule_estimates(historical_policy_rates, adjusted=False)
         self.assertTrue(mock_show.called)
 
         # Test adjusted plot
-        plot_historical_policy_rates(historical_policy_rates, adjusted=True)
+        plot_historical_rule_estimates(historical_policy_rates, adjusted=True)
         self.assertTrue(mock_show.called)
 
     @patch(

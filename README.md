@@ -8,11 +8,17 @@ financial, and fiscal policy. Whether you're a developer, economist, financial
 analyst, or researcher, PyEconomics aims to be your go-to resource for
 sophisticated economic modeling and analysis.
 
-|               |                                                                                                                                                                                                                                                                                                                                                                                                               |
-|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Testing       | [![pytest](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S)](https://codecov.io/gh/nathanramoscfa/pyeconomics)                                                                                 |
-| Package       | [![PyPI Latest Release](https://img.shields.io/pypi/v/pyeconomics.svg)](https://pypi.org/project/pyeconomics/)  ![Python Version](https://img.shields.io/pypi/pyversions/pyeconomics) [![PyPI Downloads](https://static.pepy.tech/badge/pyeconomics)](https://pepy.tech/project/pyeconomics) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) |
-| Documentation | [![Documentation Status](https://readthedocs.org/projects/pyeconomics/badge/?version=latest)](https://pyeconomics.readthedocs.io/en/latest/?badge=latest)                                                                                                                                                                                                                                                     |
+| Category            | Badge                                                                                                                                                                                                                                                                                                                                                                                                        |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Testing**         | [![pytest](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S)](https://codecov.io/gh/nathanramoscfa/pyeconomics)                                                                                |
+| **Package**         | [![PyPI Latest Release](https://img.shields.io/pypi/v/pyeconomics.svg)](https://pypi.org/project/pyeconomics/) ![Python Version](https://img.shields.io/pypi/pyversions/pyeconomics) [![PyPI Downloads](https://static.pepy.tech/badge/pyeconomics)](https://pepy.tech/project/pyeconomics) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT) |
+| **Documentation**   | [![Documentation Status](https://readthedocs.org/projects/pyeconomics/badge/?version=latest)](https://pyeconomics.readthedocs.io/en/latest/?badge=latest)                                                                                                                                                                                                                                                    |
+| **Release**         | [![Release Status](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml)                                                                                                                                                                                                                      |
+| **Build Status**    | [![Build Status](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml)                                                                                                                                                                                                                            |
+| **Maintainability** | [![Maintainability](https://api.codeclimate.com/v1/badges/8d0d8b5a5bed8fe94814/maintainability)](https://codeclimate.com/github/nathanramoscfa/pyeconomics/maintainability)                                                                                                                                                                                                                                  |
+| **Code Style**      | [![Code Style: Flake8](https://img.shields.io/badge/code%20style-flake8-brightgreen.svg)](https://github.com/PyCQA/flake8)                                                                                                                                                                                                                                                                                   |
+| **Dependencies**    | [![Dependency Status](https://img.shields.io/librariesio/github/nathanramoscfa/pyeconomics)](https://libraries.io/github/nathanramoscfa/pyeconomics)                                                                                                                                                                                                                                                         |
+| **Security**        | [![Security Status](https://snyk.io/test/github/nathanramoscfa/pyeconomics/badge.svg)](https://snyk.io/test/github/nathanramoscfa/pyeconomics)                                                                                                                                                                                                                                                               |
 
 ## Table of Contents
 
@@ -225,13 +231,13 @@ Unemployment Gap:                                0.51%
 ```python
 # Import pyeconomics modules
 from pyeconomics.models.monetary_policy import calculate_historical_policy_rates
-from pyeconomics.models.monetary_policy import plot_historical_policy_rates
+from pyeconomics.models.monetary_policy import plot_historical_rule_estimates
 
 # Calculate historical policy rates
 historical_policy_estimates = calculate_historical_policy_rates().dropna()
 
 # Plot historical policy rates
-plot_historical_policy_rates(historical_policy_estimates)
+plot_historical_rule_estimates(historical_policy_estimates)
 ```
 
 ![plot_historical_policy.png](media/plot_historical_policy_rates.png)
@@ -241,7 +247,7 @@ plot_historical_policy_rates(historical_policy_estimates)
 ```python
 # Import pyeconomics modules
 from pyeconomics.models.monetary_policy import calculate_historical_policy_rates
-from pyeconomics.models.monetary_policy import plot_historical_policy_rates
+from pyeconomics.models.monetary_policy import plot_historical_rule_estimates
 
 # Adjustment Parameters
 rho = 0.7  # Policy Inertia Coefficient
@@ -254,10 +260,8 @@ adjusted_historical_policy_estimates = calculate_historical_policy_rates(
 ).dropna()
 
 # Plot adjusted historical policy rates
-plot_historical_policy_rates(
-    adjusted_historical_policy_estimates,
-    adjusted=True
-)
+plot_historical_rule_estimates(adjusted_historical_policy_estimates,
+                               adjusted=True)
 ```
 ![plot_adj_historical_rates.png](media/plot_adj_historical_rates.png)
 
