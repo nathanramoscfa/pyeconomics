@@ -1,10 +1,13 @@
+# tests/test_first_difference_rule.py
+
 import pytest
 import pandas as pd
 from unittest.mock import patch
 
 from pyeconomics.models.monetary_policy.first_difference_rule import (
     first_difference_rule,
-    historical_first_difference_rule
+    historical_first_difference_rule,
+    plot_historical_fdr
 )
 from pyeconomics.api import FredClient
 from pyeconomics.data.economic_indicators import EconomicIndicators
@@ -296,6 +299,19 @@ def test_historical_first_difference_rule_apply_elb_lambda(
                 lambda x: max(x, 0.125))
         )
     )
+
+
+@patch('pyeconomics.models.monetary_policy.first_difference_rule.plt.show')
+def test_plot_historical_fdr(mock_show):
+    historical_rates = pd.DataFrame({
+        'FirstDifferenceRule': [2.5, 2.6],
+        'AdjustedFirstDifferenceRule': [2.7, 2.8],
+        'FedRate': [2.0, 2.1]
+    }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
+
+    # Test plot
+    plot_historical_fdr(historical_rates)
+    assert mock_show.called
 
 
 if __name__ == '__main__':

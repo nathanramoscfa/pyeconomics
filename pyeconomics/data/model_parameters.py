@@ -1,4 +1,5 @@
 # pyeconomics/data/model_parameters.py
+
 from dataclasses import dataclass
 
 

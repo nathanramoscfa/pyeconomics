@@ -1,4 +1,5 @@
-# pyeconomics/tests/test_fdr_utils.py
+# tests/test_fdr_utils.py
+
 import pytest
 from datetime import datetime
 

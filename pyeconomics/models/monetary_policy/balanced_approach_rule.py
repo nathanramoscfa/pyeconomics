@@ -1,15 +1,8 @@
-# Import standard libraries
-import os
-import sys
+# pyeconomics/models/monetary_policy/balanced_approach_rule.py
 
-# Configure system path
-sys.path.insert(0, os.path.abspath('../../'))
-
-# Import third-party libraries
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Import pyeconomics modules
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import BalancedApproachRuleParameters

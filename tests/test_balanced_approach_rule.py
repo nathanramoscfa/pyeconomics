@@ -1,3 +1,5 @@
+# tests/test_balanced_approach_rule.py
+
 from unittest.mock import patch
 import pandas as pd
 import pytest
@@ -6,7 +8,9 @@ from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import BalancedApproachRuleParameters
 
 from pyeconomics.models.monetary_policy.balanced_approach_rule import (
-    balanced_approach_rule, historical_balanced_approach_rule
+    balanced_approach_rule,
+    historical_balanced_approach_rule,
+    plot_historical_bar_basr_rule
 )
 
 
@@ -144,6 +148,25 @@ def test_historical_balanced_approach_rule(
     assert not result.empty
     assert all(
         result['BalancedApproachShortfallsRule'] == 3.75)  # Based on mock data
+
+
+@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.plt.show')
+def test_plot_historical_bar_basr_rule(mock_show):
+    historical_rates = pd.DataFrame({
+        'BalancedApproachRule': [3.0, 3.1],
+        'BalancedApproachShortfallsRule': [2.7, 2.8],
+        'AdjustedBalancedApproachRule': [3.2, 3.3],
+        'AdjustedBalancedApproachShortfallsRule': [2.9, 3.0],
+        'FedRate': [2.0, 2.1]
+    }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
+
+    # Test unadjusted plot
+    plot_historical_bar_basr_rule(historical_rates, adjusted=False)
+    assert mock_show.called
+
+    # Test adjusted plot
+    plot_historical_bar_basr_rule(historical_rates, adjusted=True)
+    assert mock_show.called
 
 
 if __name__ == '__main__':

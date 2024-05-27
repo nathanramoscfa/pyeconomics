@@ -1,3 +1,5 @@
+# tests/test_monetary_policy_rules.py
+
 import unittest
 from unittest.mock import patch
 
@@ -6,9 +8,11 @@ import pandas as pd
 from pyeconomics.data.economic_indicators import EconomicIndicators
 
 from pyeconomics.models.monetary_policy.monetary_policy_rules import (
-    print_fred_series_names, print_verbose_output,
+    print_fred_series_names,
+    print_verbose_output,
     calculate_policy_rule_estimates,
-    calculate_historical_policy_rates, plot_historical_rule_estimates
+    calculate_historical_policy_rates,
+    plot_historical_rule_estimates
 )
 
 

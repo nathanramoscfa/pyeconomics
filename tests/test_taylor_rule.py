@@ -1,3 +1,5 @@
+# tests/test_taylor_rule.py
+
 from unittest.mock import patch
 import pandas as pd
 import pytest
@@ -6,7 +8,7 @@ from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import TaylorRuleParameters
 
 from pyeconomics.models.monetary_policy.taylor_rule import (
-    taylor_rule, historical_taylor_rule
+    taylor_rule, historical_taylor_rule, plot_historical_taylor_rule
 )
 
 
@@ -145,6 +147,19 @@ def test_historical_taylor_rule_missing_data(
 
     with pytest.raises(ValueError):
         historical_taylor_rule(indicators, params)
+
+
+@patch('pyeconomics.models.monetary_policy.taylor_rule.plt.show')
+def test_plot_historical_taylor_rule(mock_show):
+    historical_rule_estimates = pd.DataFrame({
+        'TaylorRule': [2.5, 2.6],
+        'AdjustedTaylorRule': [2.7, 2.8],
+        'FedRate': [2.0, 2.1]
+    }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
+
+    # Test plot
+    plot_historical_taylor_rule(historical_rule_estimates)
+    assert mock_show.called
 
 
 if __name__ == '__main__':
