@@ -17,12 +17,12 @@ def mock_data():
         'unemployment_gap': 0.5,
         'alpha': 0.5,
         'beta': 0.5,
-        'unadjusted_bar_rule': 1.0,
-        'adjusted_bar_after_elb': 1.0,
+        'unadjusted_rate': 1.0,
+        'adjusted_rate_after_elb': 1.0,
         'apply_elb': False,
         'elb': 0.0,
         'rho': 0.5,
-        'adjusted_bar_after_inertia': 0.75,
+        'adjusted_rate_after_inertia': 0.75,
         'use_shortfalls_rule': False,
         'use_shortfalls': False
     }
@@ -137,10 +137,10 @@ def test_verbose_balanced_approach_rule_shortfalls(capsys, mock_data):
 
 def test_verbose_balanced_approach_rule_apply_elb(capsys, mock_data):
     mock_data['apply_elb'] = True
-    mock_data['adjusted_bar_after_elb'] = 1.25
-    mock_data['unadjusted_bar_rule'] = 1.0
+    mock_data['adjusted_rate_after_elb'] = 1.25
+    mock_data['unadjusted_rate'] = 1.0
     mock_data['elb'] = 0.5
-    mock_data['adjusted_bar_after_inertia'] = 0.88
+    mock_data['adjusted_rate_after_inertia'] = 0.88
     verbose_balanced_approach_rule(mock_data)
 
     captured = capsys.readouterr()
@@ -199,7 +199,7 @@ def test_verbose_balanced_approach_rule_apply_elb(capsys, mock_data):
 
 
 def test_verbose_balanced_approach_rule_lower_rate(capsys, mock_data):
-    mock_data['adjusted_bar_after_inertia'] = 0.25
+    mock_data['adjusted_rate_after_inertia'] = 0.25
     verbose_balanced_approach_rule(mock_data)
 
     captured = capsys.readouterr()
@@ -253,7 +253,7 @@ def test_verbose_balanced_approach_rule_lower_rate(capsys, mock_data):
 
 
 def test_verbose_balanced_approach_rule_maintain_rate(capsys, mock_data):
-    mock_data['adjusted_bar_after_inertia'] = 0.5
+    mock_data['adjusted_rate_after_inertia'] = 0.50
     verbose_balanced_approach_rule(mock_data)
 
     captured = capsys.readouterr()

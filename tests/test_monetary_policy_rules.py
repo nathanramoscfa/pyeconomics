@@ -3,6 +3,8 @@ from unittest.mock import patch
 
 import pandas as pd
 
+from pyeconomics.data.economic_indicators import EconomicIndicators
+
 from pyeconomics.models.monetary_policy.monetary_policy_rules import (
     print_fred_series_names, print_verbose_output,
     calculate_policy_rule_estimates,
@@ -56,7 +58,14 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         mock_balanced_approach_rule.return_value = 3.0
         mock_first_difference_rule.return_value = 1.5
 
-        estimates = calculate_policy_rule_estimates(verbose=True)
+        indicators = EconomicIndicators(
+            inflation_series_id='inflation_rate',
+            unemployment_rate_series_id='unemployment_rate',
+            natural_unemployment_series_id='natural_unemployment_rate',
+            real_interest_rate_series_id='real_interest_rate'
+        )
+
+        estimates = calculate_policy_rule_estimates(indicators, verbose=True)
         self.assertIsInstance(estimates, pd.DataFrame)
         self.assertEqual(estimates.shape, (4, 1))
 
@@ -97,8 +106,16 @@ class TestMonetaryPolicyRules(unittest.TestCase):
             'FedRate': [2.0, 2.1]
         }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
-        historical_rates = calculate_historical_policy_rates(rho=0.7,
-                                                             apply_elb=True)
+        indicators = EconomicIndicators(
+            inflation_series_id='inflation_rate',
+            unemployment_rate_series_id='unemployment_rate',
+            natural_unemployment_series_id='natural_unemployment_rate',
+            real_interest_rate_series_id='real_interest_rate'
+        )
+
+        historical_rates = calculate_historical_policy_rates(
+            indicators, rho=0.7, apply_elb=True
+        )
         self.assertIsInstance(historical_rates, pd.DataFrame)
         self.assertEqual(historical_rates.shape,
                          (2, 9))  # Adjusted for new columns
@@ -147,9 +164,16 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         mock_balanced_approach_rule.return_value = 3.0
         mock_first_difference_rule.return_value = 1.5
 
+        indicators = EconomicIndicators(
+            inflation_series_id='inflation_rate',
+            unemployment_rate_series_id='unemployment_rate',
+            natural_unemployment_series_id='natural_unemployment_rate',
+            real_interest_rate_series_id='real_interest_rate'
+        )
+
         # Test with current_fed_rate as None
         estimates = calculate_policy_rule_estimates(
-            current_fed_rate=None, verbose=True, rho=0.7, apply_elb=True
+            indicators, verbose=True, rho=0.7, apply_elb=True
         )
         self.assertIsInstance(estimates, pd.DataFrame)
         self.assertEqual(estimates.shape, (4, 1))
@@ -157,7 +181,7 @@ class TestMonetaryPolicyRules(unittest.TestCase):
 
         # Test verbose only
         estimates = calculate_policy_rule_estimates(
-            current_fed_rate=2.0, verbose=True, rho=0.0, apply_elb=False
+            indicators, verbose=True, rho=0.0, apply_elb=False
         )
         self.assertIsInstance(estimates, pd.DataFrame)
         self.assertEqual(estimates.shape, (4, 1))
@@ -185,9 +209,16 @@ class TestMonetaryPolicyRules(unittest.TestCase):
         mock_balanced_approach_rule.return_value = 3.0
         mock_first_difference_rule.return_value = 1.5
 
+        indicators = EconomicIndicators(
+            inflation_series_id='inflation_rate',
+            unemployment_rate_series_id='unemployment_rate',
+            natural_unemployment_series_id='natural_unemployment_rate',
+            real_interest_rate_series_id='real_interest_rate'
+        )
+
         # Test with verbose only (rho=0.0 and apply_elb=False)
         estimates = calculate_policy_rule_estimates(
-            current_fed_rate=2.0, verbose=True, rho=0.0, apply_elb=False
+            indicators, verbose=True, rho=0.0, apply_elb=False
         )
         self.assertIsInstance(estimates, pd.DataFrame)
         self.assertEqual(estimates.shape, (4, 1))
@@ -198,7 +229,7 @@ class TestMonetaryPolicyRules(unittest.TestCase):
 
         # Test with verbose set to False
         estimates = calculate_policy_rule_estimates(
-            current_fed_rate=2.0, verbose=False, rho=0.0, apply_elb=False
+            indicators, verbose=False, rho=0.0, apply_elb=False
         )
         self.assertIsInstance(estimates, pd.DataFrame)
         self.assertEqual(estimates.shape, (4, 1))
