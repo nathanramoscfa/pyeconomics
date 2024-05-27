@@ -52,7 +52,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Office/Business :: Financial :: Investment'
     ],
-    python_requires='>=3.12',
+    python_requires='>=3.8',
     project_urls={
         'Bug Reports': 'https://github.com/nathanramoscfa/pyeconomics/issues',
         'Source': 'https://github.com/nathanramoscfa/pyeconomics',
