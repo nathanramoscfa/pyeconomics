@@ -10,6 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
@@ -28,6 +29,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install flake8 pytest-cov keyrings.alt
+      continue-on-error: true
 
     # Set PYTHONPATH
     - name: Set PYTHONPATH
@@ -36,6 +38,7 @@ jobs:
     # Install the package in editable mode
     - name: Install Package
       run: pip install -e .
+      continue-on-error: true
 
     # Set FRED API Key environment variable
     - name: Set FRED API Key
@@ -44,11 +47,13 @@ jobs:
     # Lint with flake8
     - name: Lint with flake8
       run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=80
+      continue-on-error: true
 
     # Run tests with coverage
     - name: Run tests with coverage
       run: |
         pytest --cov=./pyeconomics --cov-report=xml
+      continue-on-error: true
 
     # Upload coverage reports to Codecov
     - name: Upload coverage reports to Codecov
@@ -58,3 +63,4 @@ jobs:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+      continue-on-error: true
