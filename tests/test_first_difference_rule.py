@@ -314,5 +314,109 @@ def test_plot_historical_fdr(mock_show):
     assert mock_show.called
 
 
+def test_historical_first_difference_rule_missing_inflation_data(
+    mock_fred_client, sample_fred_data
+):
+    mock_fred_client.side_effect = [
+        None, sample_fred_data, sample_fred_data,
+        sample_fred_data, sample_fred_data
+    ]
+
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(indicators, params)
+
+
+def test_historical_first_difference_rule_missing_unemployment_data(
+    mock_fred_client, sample_fred_data
+):
+    mock_fred_client.side_effect = [
+        sample_fred_data, None, sample_fred_data,
+        sample_fred_data, sample_fred_data
+    ]
+
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(indicators, params)
+
+
+def test_historical_first_difference_rule_missing_natural_unemployment_data(
+    mock_fred_client, sample_fred_data
+):
+    mock_fred_client.side_effect = [
+        sample_fred_data, sample_fred_data, None,
+        sample_fred_data, sample_fred_data
+    ]
+
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(indicators, params)
+
+
+def test_historical_first_difference_rule_missing_fed_rate_data(
+    mock_fred_client, sample_fred_data
+):
+    mock_fred_client.side_effect = [
+        sample_fred_data, sample_fred_data, sample_fred_data,
+        sample_fred_data, None
+    ]
+
+    indicators = EconomicIndicators(
+        inflation_series_id='PCETRIM12M159SFRBDAL',
+        unemployment_rate_series_id='UNRATE',
+        natural_unemployment_series_id='NROU'
+    )
+
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
+    with pytest.raises(ValueError):
+        historical_first_difference_rule(indicators, params)
+
+
 if __name__ == '__main__':
     pytest.main()
