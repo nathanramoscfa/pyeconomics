@@ -2,19 +2,20 @@
 
 from datetime import datetime
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 
-from .taylor_rule import taylor_rule, historical_taylor_rule
 from .balanced_approach_rule import (
     balanced_approach_rule, historical_balanced_approach_rule)
+from .taylor_rule import taylor_rule, historical_taylor_rule
 from .first_difference_rule import (
     first_difference_rule, historical_first_difference_rule)
 from ...api import fetch_historical_fed_funds_rate, fred_client
 from ...data.economic_indicators import EconomicIndicators
 from ...data.model_parameters import (
-    TaylorRuleParameters, BalancedApproachRuleParameters,
-    FirstDifferenceRuleParameters
+    BalancedApproachRuleParameters,
+    FirstDifferenceRuleParameters,
+    TaylorRuleParameters,
 )
 
 
@@ -120,7 +121,7 @@ def print_verbose_output(
 
 
 def calculate_policy_rule_estimates(
-        indicators: EconomicIndicators,
+        indicators: EconomicIndicators = EconomicIndicators(),
         inflation_target: float = 2.0,
         rho: float = 0.0,
         elb: float = 0.125,
@@ -212,7 +213,7 @@ def calculate_policy_rule_estimates(
 
 
 def calculate_historical_policy_rates(
-        indicators: EconomicIndicators,
+        indicators: EconomicIndicators = EconomicIndicators(),
         inflation_target: float = 2.0,
         rho: float = 0.0,
         elb: float = 0.125,

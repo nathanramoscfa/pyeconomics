@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from typing import Optional
 
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
@@ -10,8 +11,10 @@ from pyeconomics.utils import verbose_balanced_approach_rule
 
 
 def balanced_approach_rule(
-        indicators: EconomicIndicators,
-        params: BalancedApproachRuleParameters
+        indicators: EconomicIndicators = EconomicIndicators(),
+        params: BalancedApproachRuleParameters =
+        BalancedApproachRuleParameters(),
+        verbose: Optional[bool] = None
 ) -> float:
     """
     Computes the Balanced Approach Rule interest rate based on economic
@@ -21,13 +24,19 @@ def balanced_approach_rule(
         indicators (EconomicIndicators): Economic indicators data class.
         params (BalancedApproachRuleParameters): Balanced Approach Rule
             parameters data class.
+        verbose (bool, optional): Whether to print verbose output. If not
+            provided, defaults to the value in params. Defaults to None.
 
     Returns:
         float: Balanced Approach Rule interest rate estimate.
     """
+    # Override params.verbose if verbose is explicitly provided
+    verbose = verbose if verbose is not None else params.verbose
+
     # Fetch data if not provided
     indicators.current_inflation_rate = fred_client.get_data_or_fetch(
-        indicators.current_inflation_rate, indicators.inflation_series_id)
+        indicators.current_inflation_rate,
+        indicators.inflation_series_id)
     indicators.current_unemployment_rate = fred_client.get_data_or_fetch(
         indicators.current_unemployment_rate,
         indicators.unemployment_rate_series_id)
@@ -70,12 +79,12 @@ def balanced_approach_rule(
 
     # Apply policy inertia
     adjusted_rate_after_inertia = (
-            params.rho * indicators.current_fed_rate +
-            (1 - params.rho) * adjusted_rate_after_elb
+        params.rho * indicators.current_fed_rate +
+        (1 - params.rho) * adjusted_rate_after_elb
     )
 
     # Verbose output
-    if params.verbose:
+    if verbose:
         data = {
             'current_inflation_rate': indicators.current_inflation_rate,
             'inflation_target': params.inflation_target,

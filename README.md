@@ -105,15 +105,16 @@ Here are some basic examples of how to use PyEconomics for calculating and visua
 ### Example 1: Calculate Current Policy Rule Estimates
 
 ```python
-# Import pyeconomics modules
-from pyeconomics.models.monetary_policy import calculate_policy_rule_estimates
+# Import pyeconomics
+import pyeconomics as pyecon
 
 # Calculate policy rule estimates
-policy_estimates = calculate_policy_rule_estimates(verbose=True)
+policy_estimates = pyecon.calculate_policy_rule_estimates(verbose=True)
 ```
 
 Verbose Print Statement:
 ```
+
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                           Interest Rate Policy Estimates                          │
 ├───────────────────────────────────────────────────────────────────────────────────┤
@@ -138,20 +139,22 @@ Verbose Print Statement:
 ### Example 2: Adjust Taylor Rule for Effective Lower Bound (ELB) and Policy Inertia
 
 ```python
-# Import pyeconomics modules
-from pyeconomics.models.monetary_policy import calculate_policy_rule_estimates
+# Import pyeconomics
+import pyeconomics as pyecon
 
 # Adjustment Parameters
 rho = 0.7  # Policy Inertia Coefficient
 apply_elb = True  # Apply Effective Lower Bound
 
-adjusted_policy_estimates = calculate_policy_rule_estimates(
+adjusted_policy_estimates = pyecon.calculate_policy_rule_estimates(
     rho=rho,
     apply_elb=apply_elb,
     verbose=True
 )
 ```
+
 Verbose Print Statement:
+
 ```
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                      Adjusted Interest Rate Policy Estimates                      │
@@ -178,13 +181,14 @@ Verbose Print Statement:
 
 ```python
 # Import pyeconomics modules
-from pyeconomics.models.monetary_policy import taylor_rule
+import pyeconomics as pyecon
 
 # Calculate policy rule estimates
-policy_estimates = taylor_rule(verbose=True)
+policy_estimates = pyecon.taylor_rule(verbose=True)
 ```
 
 Verbose Print Statement:
+
 ```
 ==== Economic Indicators =================================================
 Current Inflation:                               3.04%
@@ -230,14 +234,13 @@ Unemployment Gap:                                0.51%
 
 ```python
 # Import pyeconomics modules
-from pyeconomics.models.monetary_policy import calculate_historical_policy_rates
-from pyeconomics.models.monetary_policy import plot_historical_rule_estimates
+import pyeconomics as pyecon
 
 # Calculate historical policy rates
-historical_policy_estimates = calculate_historical_policy_rates().dropna()
+historical_policy_estimates = pyecon.calculate_historical_policy_rates().dropna()
 
 # Plot historical policy rates
-plot_historical_rule_estimates(historical_policy_estimates)
+pyecon.plot_historical_rule_estimates(historical_policy_estimates)
 ```
 
 ![plot_historical_policy.png](media/plot_historical_policy_rates.png)
@@ -246,22 +249,22 @@ plot_historical_rule_estimates(historical_policy_estimates)
 
 ```python
 # Import pyeconomics modules
-from pyeconomics.models.monetary_policy import calculate_historical_policy_rates
-from pyeconomics.models.monetary_policy import plot_historical_rule_estimates
+import pyeconomics as pyecon
 
 # Adjustment Parameters
 rho = 0.7  # Policy Inertia Coefficient
 apply_elb = True  # Apply Effective Lower Bound
 
 # Calculate adjusted historical policy rates
-adjusted_historical_policy_estimates = calculate_historical_policy_rates(
+adjusted_historical_policy_estimates = pyecon.calculate_historical_policy_rates(
     rho=rho,
     apply_elb=apply_elb
 ).dropna()
 
 # Plot adjusted historical policy rates
-plot_historical_rule_estimates(adjusted_historical_policy_estimates,
-                               adjusted=True)
+pyecon.plot_historical_rule_estimates(
+    adjusted_historical_policy_estimates,
+    adjusted=True)
 ```
 ![plot_adj_historical_rates.png](media/plot_adj_historical_rates.png)
 

@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from typing import Optional
 
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
@@ -10,8 +11,9 @@ from pyeconomics.utils import verbose_taylor_rule
 
 
 def taylor_rule(
-        indicators: EconomicIndicators,
-        params: TaylorRuleParameters
+        indicators: EconomicIndicators = EconomicIndicators(),
+        params: TaylorRuleParameters = TaylorRuleParameters(),
+        verbose: Optional[bool] = None
 ) -> float:
     """
     Computes the Taylor Rule interest rate based on economic indicators.
@@ -19,31 +21,43 @@ def taylor_rule(
     Args:
         indicators (EconomicIndicators): Economic indicators data class.
         params (TaylorRuleParameters): Taylor Rule parameters data class.
+        verbose (bool, optional): Whether to print verbose output. If not
+            provided, defaults to the value in params. Defaults to None.
 
     Returns:
         float: Taylor Rule interest rate estimate.
     """
+    # Override params.verbose if verbose is explicitly provided
+    verbose = verbose if verbose is not None else params.verbose
+
     # Fetch data if not provided
     indicators.current_inflation_rate = fred_client.get_data_or_fetch(
-        indicators.current_inflation_rate, indicators.inflation_series_id)
+        indicators.current_inflation_rate,
+        indicators.inflation_series_id
+    )
     indicators.current_unemployment_rate = fred_client.get_data_or_fetch(
         indicators.current_unemployment_rate,
-        indicators.unemployment_rate_series_id)
+        indicators.unemployment_rate_series_id
+    )
     indicators.natural_unemployment_rate = fred_client.get_data_or_fetch(
         indicators.natural_unemployment_rate,
-        indicators.natural_unemployment_series_id)
+        indicators.natural_unemployment_series_id
+    )
     indicators.long_term_real_interest_rate = fred_client.get_data_or_fetch(
         indicators.long_term_real_interest_rate,
-        indicators.real_interest_rate_series_id)
+        indicators.real_interest_rate_series_id
+    )
 
     if indicators.current_fed_rate is None:
         indicators.current_fed_rate = fred_client.get_latest_value('DFEDTARU')
 
-    if None in (indicators.current_inflation_rate,
-                indicators.current_unemployment_rate,
-                indicators.natural_unemployment_rate,
-                indicators.long_term_real_interest_rate,
-                indicators.current_fed_rate):
+    if None in (
+        indicators.current_inflation_rate,
+        indicators.current_unemployment_rate,
+        indicators.natural_unemployment_rate,
+        indicators.long_term_real_interest_rate,
+        indicators.current_fed_rate
+    ):
         raise ValueError("Required economic data is missing.")
 
     # Calculate gaps and Taylor Rule estimate
@@ -51,11 +65,12 @@ def taylor_rule(
     unemployment_gap = (indicators.natural_unemployment_rate -
                         indicators.current_unemployment_rate)
 
-    unadjusted_taylor_rule = (indicators.long_term_real_interest_rate +
-                              indicators.current_inflation_rate +
-                              params.alpha * inflation_gap +
-                              params.beta * params.okun_factor *
-                              unemployment_gap)
+    unadjusted_taylor_rule = (
+        indicators.long_term_real_interest_rate +
+        indicators.current_inflation_rate +
+        params.alpha * inflation_gap +
+        params.beta * params.okun_factor * unemployment_gap
+    )
 
     # Apply effective lower bound constraint
     if params.apply_elb:
@@ -65,12 +80,11 @@ def taylor_rule(
 
     # Apply policy inertia
     adjusted_taylor_rule_after_inertia = (
-            params.rho * indicators.current_fed_rate +
-            (1 - params.rho) * adjusted_taylor_rule_after_elb
+        params.rho * indicators.current_fed_rate +
+        (1 - params.rho) * adjusted_taylor_rule_after_elb
     )
 
-    # Verbose output
-    if params.verbose:
+    if verbose:
         data = {
             'current_inflation_rate': indicators.current_inflation_rate,
             'inflation_target': params.inflation_target,
@@ -88,9 +102,9 @@ def taylor_rule(
             'rho': params.rho,
             'alpha': params.alpha,
             'beta': params.beta,
-            'okun_factor': params.okun_factor,
             'elb': params.elb,
-            'apply_elb': params.apply_elb
+            'apply_elb': params.apply_elb,
+            'okun_factor': params.okun_factor
         }
         verbose_taylor_rule(data)
 
