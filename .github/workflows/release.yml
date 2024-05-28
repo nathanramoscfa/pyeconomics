@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
+      uses: actions/checkout@v4  # Already updated to Node.js 20
 
     - name: Set up Python
-      uses: actions/setup-python@v4  # Ensure to use the latest version for Node.js 20 support
+      uses: actions/setup-python@v4  # Already updated to Node.js 20
       with:
         python-version: ${{ matrix.python-version }}
 
