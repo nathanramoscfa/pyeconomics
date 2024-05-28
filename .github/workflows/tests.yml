@@ -53,7 +53,7 @@ jobs:
 
     # Upload coverage reports to Codecov
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3  # Ensure the latest version for Node.js 20 support
+      uses: codecov/codecov-action@v4  # Ensure the latest version for Node.js 20 support
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
