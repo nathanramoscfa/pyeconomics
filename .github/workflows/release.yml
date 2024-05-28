@@ -14,37 +14,32 @@ jobs:
         python-version: ['3.11', '3.12']
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+    - name: Check out code
+      uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-        continue-on-error: true
+    - name: Set up Python
+      uses: actions/setup-python@v4  # Ensure to use the latest version for Node.js 20 support
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+    - name: Extract version from tag
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: Update version number
-        run: |
-          echo "__version__ = '${{ env.VERSION }}'" > pyeconomics/__version__.py
+    - name: Update version number
+      run: |
+        echo "__version__ = '${{ env.VERSION }}'" > pyeconomics/__version__.py
 
-      - name: Install build dependencies
-        run: pip install setuptools wheel
-        continue-on-error: true
+    - name: Install build dependencies
+      run: pip install setuptools wheel
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        continue-on-error: true
+    - name: Install dependencies
+      run: pip install -r requirements.txt
 
-      - name: Build package
-        run: python setup.py sdist bdist_wheel
-        continue-on-error: true
+    - name: Build package
+      run: python setup.py sdist bdist_wheel
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.4.2
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-        continue-on-error: true
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
