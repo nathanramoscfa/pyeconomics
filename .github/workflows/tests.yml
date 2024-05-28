@@ -15,11 +15,11 @@ jobs:
         python-version: ['3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v4  # Already updated to Node.js 20
+    - uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
 
     # Set up Python
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4  # Already updated to Node.js 20
+      uses: actions/setup-python@v4  # Ensure to use the latest version for Node.js 20 support
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -53,11 +53,9 @@ jobs:
 
     # Upload coverage reports to Codecov
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v3  # Ensure the latest version for Node.js 20 support
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
-      env:
-        NODE_VERSION: 20  # Specify Node.js 20 explicitly

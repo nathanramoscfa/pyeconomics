@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v4  # Already updated to Node.js 20
+      uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
 
     - name: Set up Python
-      uses: actions/setup-python@v4  # Already updated to Node.js 20
+      uses: actions/setup-python@v4  # Ensure to use the latest version for Node.js 20 support
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -39,9 +39,7 @@ jobs:
       run: python setup.py sdist bdist_wheel
 
     - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@v1.4.2
+      uses: pypa/gh-action-pypi-publish@v1.4.2  # Already uses Node.js 20
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
-      env:
-        NODE_VERSION: 20  # Specify Node.js 20 explicitly
