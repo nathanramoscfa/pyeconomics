@@ -59,3 +59,5 @@ jobs:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+      env:
+        NODE_VERSION: 20  # Specify Node.js 20 explicitly

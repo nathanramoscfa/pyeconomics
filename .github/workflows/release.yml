@@ -43,3 +43,5 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+      env:
+        NODE_VERSION: 20  # Specify Node.js 20 explicitly
