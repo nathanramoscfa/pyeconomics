@@ -19,23 +19,45 @@ sophisticated economic modeling and analysis.
    * - Category
      - Badge
    * - **Testing**
-     - `![pytest](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S)](https://codecov.io/gh/nathanramoscfa/pyeconomics)`
+     - .. raw:: html
+
+           <a href="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml"><img src="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg" alt="pytest"></a>
+           <a href="https://codecov.io/gh/nathanramoscfa/pyeconomics"><img src="https://codecov.io/gh/nathanramoscfa/pyeconomics/graph/badge.svg?token=I1CRHDN73S" alt="codecov"></a>
    * - **Package**
-     - `[![PyPI Latest Release](https://img.shields.io/pypi/v/pyeconomics.svg)](https://pypi.org/project/pyeconomics/) ![Python Version](https://img.shields.io/pypi/pyversions/pyeconomics) [![PyPI Downloads](https://static.pepy.tech/badge/pyeconomics)](https://pepy.tech/project/pyeconomics) [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)`
+     - .. raw:: html
+
+           <a href="https://pypi.org/project/pyeconomics/"><img src="https://img.shields.io/pypi/v/pyeconomics.svg" alt="PyPI Latest Release"></a>
+           <img src="https://img.shields.io/pypi/pyversions/pyeconomics" alt="Python Version">
+           <a href="https://pepy.tech/project/pyeconomics"><img src="https://static.pepy.tech/badge/pyeconomics" alt="PyPI Downloads"></a>
+           <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License: MIT"></a>
    * - **Documentation**
-     - `[![Documentation Status](https://readthedocs.org/projects/pyeconomics/badge/?version=latest)](https://pyeconomics.readthedocs.io/en/latest/?badge=latest)`
+     - .. raw:: html
+
+           <a href="https://pyeconomics.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/pyeconomics/badge/?version=latest" alt="Documentation Status"></a>
    * - **Release**
-     - `[![Release Status](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml)`
+     - .. raw:: html
+
+           <a href="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml"><img src="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/release.yml/badge.svg" alt="Release Status"></a>
    * - **Build Status**
-     - `[![Build Status](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg)](https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml)`
+     - .. raw:: html
+
+           <a href="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml"><img src="https://github.com/nathanramoscfa/pyeconomics/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
    * - **Maintainability**
-     - `[![Maintainability](https://api.codeclimate.com/v1/badges/8d0d8b5a5bed8fe94814/maintainability)](https://codeclimate.com/github/nathanramoscfa/pyeconomics/maintainability)`
+     - .. raw:: html
+
+           <a href="https://codeclimate.com/github/nathanramoscfa/pyeconomics/maintainability"><img src="https://api.codeclimate.com/v1/badges/8d0d8b5a5bed8fe94814/maintainability" alt="Maintainability"></a>
    * - **Code Style**
-     - `[![Code Style: Flake8](https://img.shields.io/badge/code%20style-flake8-brightgreen.svg)](https://github.com/PyCQA/flake8)`
+     - .. raw:: html
+
+           <a href="https://github.com/PyCQA/flake8"><img src="https://img.shields.io/badge/code%20style-flake8-brightgreen.svg" alt="Code Style: Flake8"></a>
    * - **Dependencies**
-     - `[![Dependency Status](https://img.shields.io/librariesio/github/nathanramoscfa/pyeconomics)](https://libraries.io/github/nathanramoscfa/pyeconomics)`
+     - .. raw:: html
+
+           <a href="https://libraries.io/github/nathanramoscfa/pyeconomics"><img src="https://img.shields.io/librariesio/github/nathanramoscfa/pyeconomics" alt="Dependency Status"></a>
    * - **Security**
-     - `[![Security Status](https://snyk.io/test/github/nathanramoscfa/pyeconomics/badge.svg)](https://snyk.io/test/github/nathanramoscfa/pyeconomics)`
+     - .. raw:: html
+
+           <a href="https://snyk.io/test/github/nathanramoscfa/pyeconomics"><img src="https://snyk.io/test/github/nathanramoscfa/pyeconomics/badge.svg" alt="Security Status"></a>
 
 Contents
 ========
