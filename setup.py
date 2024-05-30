@@ -50,7 +50,7 @@ setup(
         'Programming Language :: Python :: 3.12',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Office/Business :: Financial',
         'Topic :: Office/Business :: Financial :: Investment'
     ],
     python_requires='>=3.11, <3.13',

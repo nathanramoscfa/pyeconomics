@@ -24,14 +24,14 @@ sophisticated economic modeling and analysis.
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Docker](#docker)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [Contact](#contact)
+- [Introduction](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#introduction)
+- [Features](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#features)
+- [Installation](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#installation)
+- [Usage](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#usage)
+- [Docker](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#docker)
+- [Roadmap](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#roadmap)
+- [Contributing](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#contributing)
+- [Contact](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#contact)
 
 ## Introduction
 
@@ -98,8 +98,8 @@ features, you need to configure your FRED API access.
 A detailed step-by-step guide on obtaining and securely storing your FRED API 
 key is available here:
 
-- [FRED API Key Configuration Guide (Markdown)](markdown/FRED_API_CONFIGURATION.md)
-- [FRED API Key Configuration Guide (Jupyter Notebook)](examples/api_configuration/fred_api_configuration.ipynb)
+- [FRED API Key Configuration Guide (Markdown)](https://github.com/nathanramoscfa/pyeconomics/blob/main/markdown/FRED_API_CONFIGURATION.md)
+- [FRED API Key Configuration Guide (Jupyter Notebook)](https://github.com/nathanramoscfa/pyeconomics/blob/main/examples/api_configuration/fred_api_configuration.ipynb)
 
 ## Usage
 
@@ -116,8 +116,8 @@ policy_estimates = pyecon.calculate_policy_rule_estimates(verbose=True)
 ```
 
 Verbose Print Statement:
-```
 
+```text
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                           Interest Rate Policy Estimates                          │
 ├───────────────────────────────────────────────────────────────────────────────────┤
@@ -158,7 +158,7 @@ adjusted_policy_estimates = pyecon.calculate_policy_rule_estimates(
 
 Verbose Print Statement:
 
-```
+```text
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                      Adjusted Interest Rate Policy Estimates                      │
 ├───────────────────────────────────────────────────────────────────────────────────┤
@@ -192,7 +192,7 @@ policy_estimates = pyecon.taylor_rule(verbose=True)
 
 Verbose Print Statement:
 
-```
+```text
 ==== Economic Indicators =================================================
 Current Inflation:                               3.04%
 Target Inflation:                                2.00%
@@ -246,7 +246,9 @@ historical_policy_estimates = pyecon.calculate_historical_policy_rates().dropna(
 pyecon.plot_historical_rule_estimates(historical_policy_estimates)
 ```
 
-![plot_historical_policy.png](media/plot_historical_policy_rates.png)
+<p style="text-align: center;">
+    <img width="100%" src="https://github.com/nathanramoscfa/pyeconomics/blob/main/media/plot_historical_policy_rates.png?raw=true" alt="Policy Rules Plot">
+</p>
 
 ### Example 5: Calculate and Plot the Adjusted Historical Policy Rules Adjusted
 
@@ -269,11 +271,14 @@ pyecon.plot_historical_rule_estimates(
     adjusted_historical_policy_estimates,
     adjusted=True)
 ```
-![plot_adj_historical_rates.png](media/plot_adj_historical_rates.png)
+
+<p style="text-align: center;">
+    <img width="100%" src="https://github.com/nathanramoscfa/pyeconomics/blob/main/media/plot_adj_historical_rates.png?raw=true" alt="Policy Rules Plot">
+</p>
 
 ### Examples
 
-For more comprehensive examples, refer to the [examples](examples) directory in
+For more comprehensive examples, refer to the [examples](https://github.com/nathanramoscfa/pyeconomics/tree/main/examples) directory in
 the repository.
 
 ## Docker
@@ -325,7 +330,7 @@ PyEconomics.
 ## Roadmap
 
 The following models and categories are planned for future development. 
-[Contributions](#contributing) are welcome!
+[Contributions](https://github.com/nathanramoscfa/pyeconomics/blob/main/markdown/CONTRIBUTING.md) are welcome!
 
 <details>
 <summary><strong>Monetary Policy Models</strong></summary>
@@ -439,10 +444,10 @@ The following models and categories are planned for future development.
 
 Contributions are welcome! If you have a model you'd like to implement or an 
 improvement to an existing model, please refer to our detailed 
-[Contributing Guide](markdown/CONTRIBUTING.md).
+[Contributing Guide](https://github.com/nathanramoscfa/pyeconomics/blob/main/markdown/CONTRIBUTING.md).
 
 By participating in this project, you agree to abide by the 
-[Code of Conduct](markdown/CODE_OF_CONDUCT.md).
+[Code of Conduct](https://github.com/nathanramoscfa/pyeconomics/blob/main/markdown/CODE_OF_CONDUCT.md).
 
 Thank you for your contributions!
 
