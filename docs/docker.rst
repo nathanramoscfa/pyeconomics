@@ -12,8 +12,8 @@ To run PyEconomics using Docker, follow these steps:
       FRED_API_KEY=your_fred_api_key_here
 
 2. **Build the Docker Image**:
-   Navigate to your project directory and run the following command to build the
-   Docker image:
+   Navigate to your pyeconomics root directory and run the following command to
+   build the Docker image:
 
    .. code-block:: shell
 
