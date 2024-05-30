@@ -117,7 +117,7 @@ policy_estimates = pyecon.calculate_policy_rule_estimates(verbose=True)
 
 Verbose Print Statement:
 
-```text
+<pre>
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                           Interest Rate Policy Estimates                          │
 ├───────────────────────────────────────────────────────────────────────────────────┤
@@ -137,7 +137,7 @@ Verbose Print Statement:
 │ Balanced Approach Shortfalls Rule (BASR) suggests raising the rate by 0.25%.      │
 │ First Difference Rule (FDR) suggests raising the rate by 0.50%.                   │
 └───────────────────────────────────────────────────────────────────────────────────┘
-```
+</pre>
 
 ### Example 2: Adjust Taylor Rule for Effective Lower Bound (ELB) and Policy Inertia
 
@@ -158,7 +158,7 @@ adjusted_policy_estimates = pyecon.calculate_policy_rule_estimates(
 
 Verbose Print Statement:
 
-```text
+<pre>
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │                      Adjusted Interest Rate Policy Estimates                      │
 ├───────────────────────────────────────────────────────────────────────────────────┤
@@ -178,7 +178,7 @@ Verbose Print Statement:
 │ Balanced Approach Shortfalls Rule (BASR) suggests maintaining the current rate.   │
 │ First Difference Rule (FDR) suggests raising the rate by 0.25%.                   │
 └───────────────────────────────────────────────────────────────────────────────────┘
-```
+</pre>
 
 ### Example 3: Calculate Current Taylor Rule Estimates
 
