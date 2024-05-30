@@ -108,6 +108,8 @@ Thumbs.db
 *.csv
 *.json
 secrets.py
+render_readme.py
+output.html
 
 # Virtual environments
 env/
