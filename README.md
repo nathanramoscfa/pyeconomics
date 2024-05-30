@@ -1,4 +1,6 @@
-![PyEconomics Logo](docs/_static/logo.png)
+<p style="text-align: center;">
+    <img width="60%" src="https://github.com/nathanramoscfa/pyeconomics/raw/main/docs/_static/logo.png" alt="PyEconomics Logo">
+</p>
 
 # PyEconomics
 
