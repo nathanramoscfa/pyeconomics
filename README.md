@@ -117,27 +117,9 @@ policy_estimates = pyecon.calculate_policy_rule_estimates(verbose=True)
 
 Verbose Print Statement:
 
-<pre>
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                           Interest Rate Policy Estimates                          │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Taylor Rule (TR)                                                      6.17%       │
-│ Balanced Approach Rule (BAR)                                          6.68%       │
-│ Balanced Approach Shortfalls Rule (BASR)                              5.66%       │
-│ First Difference Rule (FDR)                                           5.97%       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Federal Funds Rate (FFR)                                              5.50%       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ As of Date                                                     May 20, 2024       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│                                Policy Prescription                                │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Taylor Rule (TR) suggests raising the rate by 0.75%.                              │
-│ Balanced Approach Rule (BAR) suggests raising the rate by 1.25%.                  │
-│ Balanced Approach Shortfalls Rule (BASR) suggests raising the rate by 0.25%.      │
-│ First Difference Rule (FDR) suggests raising the rate by 0.50%.                   │
-└───────────────────────────────────────────────────────────────────────────────────┘
-</pre>
+<p style="text-align: left;">
+    <img width="80%" src="https://github.com/nathanramoscfa/pyeconomics/blob/main/media/verbose_policy_estimates.png?raw=true" alt="Policy Rules Plot">
+</p>
 
 ### Example 2: Adjust Taylor Rule for Effective Lower Bound (ELB) and Policy Inertia
 
@@ -158,27 +140,9 @@ adjusted_policy_estimates = pyecon.calculate_policy_rule_estimates(
 
 Verbose Print Statement:
 
-<pre>
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                      Adjusted Interest Rate Policy Estimates                      │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Taylor Rule (TR)                                                      5.70%       │
-│ Balanced Approach Rule (BAR)                                          5.86%       │
-│ Balanced Approach Shortfalls Rule (BASR)                              5.55%       │
-│ First Difference Rule (FDR)                                           5.64%       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Federal Funds Rate (FFR)                                              5.50%       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ As of Date                                                     May 21, 2024       │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│                            Adjusted Policy Prescription                           │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│ Taylor Rule (TR) suggests raising the rate by 0.25%.                              │
-│ Balanced Approach Rule (BAR) suggests raising the rate by 0.25%.                  │
-│ Balanced Approach Shortfalls Rule (BASR) suggests maintaining the current rate.   │
-│ First Difference Rule (FDR) suggests raising the rate by 0.25%.                   │
-└───────────────────────────────────────────────────────────────────────────────────┘
-</pre>
+<p style="text-align: left;">
+    <img width="80%" src="https://github.com/nathanramoscfa/pyeconomics/blob/main/media/verbose_unadj_policy_estimates.png?raw=true" alt="Policy Rules Plot">
+</p>
 
 ### Example 3: Calculate Current Taylor Rule Estimates
 
