@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/" # Check for GitHub Actions in all workflow files
+    schedule:
+      interval: "weekly" # Check for updates weekly

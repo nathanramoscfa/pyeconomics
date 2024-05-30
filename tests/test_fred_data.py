@@ -1,4 +1,5 @@
-# pyeconomics/api/fred_data.py
+# tests/test_fred_data.py
+
 from unittest.mock import patch
 
 import pandas as pd

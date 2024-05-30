@@ -1,16 +1,22 @@
 # pyeconomics/models/monetary_policy/monetary_policy_rules.py
+
 from datetime import datetime
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 
-from .taylor_rule import taylor_rule, historical_taylor_rule
 from .balanced_approach_rule import (
     balanced_approach_rule, historical_balanced_approach_rule)
+from .taylor_rule import taylor_rule, historical_taylor_rule
 from .first_difference_rule import (
     first_difference_rule, historical_first_difference_rule)
-from ...api.fred_data import fetch_historical_fed_funds_rate
-from ...api import fred_client
+from ...api import fetch_historical_fed_funds_rate, fred_client
+from ...data.economic_indicators import EconomicIndicators
+from ...data.model_parameters import (
+    BalancedApproachRuleParameters,
+    FirstDifferenceRuleParameters,
+    TaylorRuleParameters,
+)
 
 
 def print_fred_series_names(
@@ -20,8 +26,8 @@ def print_fred_series_names(
         real_interest_rate_series_id: str = 'DFII10'
 ) -> None:
     """
-    Print the FRED series IDs and their corresponding names for various economic
-    indicators.
+    Print the FRED series IDs and their corresponding names for various
+    economic indicators.
 
     Args:
         inflation_series_id (str): FRED Series ID for inflation data.
@@ -115,17 +121,7 @@ def print_verbose_output(
 
 
 def calculate_policy_rule_estimates(
-        inflation_series_id: str = 'PCETRIM12M159SFRBDAL',
-        unemployment_rate_series_id: str = 'UNRATE',
-        natural_unemployment_series_id: str = 'NROU',
-        real_interest_rate_series_id: str = 'DFII10',
-        current_inflation_rate: float = None,
-        current_unemployment_rate: float = None,
-        natural_unemployment_rate: float = None,
-        lagged_unemployment_rate: float = None,
-        lagged_natural_unemployment_rate: float = None,
-        long_term_real_interest_rate: float = None,
-        current_fed_rate: float = None,
+        indicators: EconomicIndicators = EconomicIndicators(),
         inflation_target: float = 2.0,
         rho: float = 0.0,
         elb: float = 0.125,
@@ -136,26 +132,8 @@ def calculate_policy_rule_estimates(
     Calculate and return the monetary policy rule estimates as a DataFrame.
 
     Args:
-        inflation_series_id (str): FRED Series ID for inflation data.
-        unemployment_rate_series_id (str): FRED Series ID for unemployment rate.
-        natural_unemployment_series_id (str): FRED Series ID for natural
-            unemployment rate.
-        real_interest_rate_series_id (str): FRED Series ID for long-term real
-            interest rate.
-        current_inflation_rate (float): Current inflation rate. If not provided,
-            the latest value from FRED is fetched.
-        current_unemployment_rate (float): Current unemployment rate. If not
-            provided, the latest value from FRED is fetched.
-        natural_unemployment_rate (float): Natural unemployment rate. If not
-            provided, the latest value from FRED is fetched.
-        lagged_unemployment_rate (float): Unemployment rate from four periods
-            ago.
-        lagged_natural_unemployment_rate (float): Natural unemployment rate from
-            four periods ago.
-        long_term_real_interest_rate (float): Long-term real interest rate. If
-            not provided, the latest value from FRED is fetched.
-        current_fed_rate (float): Current Federal Funds Target Rate. If not
-            provided, the latest value from FRED is fetched.
+        indicators (EconomicIndicators): Instance containing economic
+            indicators.
         inflation_target (float): Target inflation rate.
         rho (float): Policy inertia coefficient. Defaults to 0.0 which means
             no inertia and no adjustment is made to Taylor Rule estimate. A
@@ -168,51 +146,46 @@ def calculate_policy_rule_estimates(
 
     Returns:
         pd.DataFrame: DataFrame containing the policy estimates.
-
     """
     # Fetch the current Federal Funds Rate if not provided
-    if current_fed_rate is None:
-        current_fed_rate = fred_client.get_latest_value('DFEDTARU')
+    if indicators.current_fed_rate is None:
+        indicators.current_fed_rate = fred_client.get_latest_value('DFEDTARU')
 
-    # Create a dictionary to store common parameters
-    params = {
-        'inflation_series_id': inflation_series_id,
-        'unemployment_rate_series_id': unemployment_rate_series_id,
-        'natural_unemployment_series_id': natural_unemployment_series_id,
-        'real_interest_rate_series_id': real_interest_rate_series_id,
-        'current_inflation_rate': current_inflation_rate,
-        'current_unemployment_rate': current_unemployment_rate,
-        'natural_unemployment_rate': natural_unemployment_rate,
-        'long_term_real_interest_rate': long_term_real_interest_rate,
-        'current_fed_rate': current_fed_rate,
-        'inflation_target': inflation_target,
-        'rho': rho,
-        'elb': elb,
-        'apply_elb': apply_elb
-    }
+    tr_params = TaylorRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
+    )
+
+    bar_params = BalancedApproachRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
+    )
+
+    fdr_params = FirstDifferenceRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
+    )
 
     # Current Taylor Rule calculation using FRED data
-    tr_estimate = taylor_rule(**params)
+    tr_estimate = taylor_rule(indicators, tr_params)
 
     # Current Balanced Approach Rule calculation using FRED data
-    bar_estimate = balanced_approach_rule(**params)
+    bar_estimate = balanced_approach_rule(indicators, bar_params)
 
     # Current Balanced Approach (Shortfalls) Rule calculation using FRED data
-    basr_estimate = balanced_approach_rule(use_shortfalls_rule=True, **params)
-
-    # Create a copy of params for First Difference Rule and remove unnecessary
-    # keys
-    fdr_params = params.copy()
-    fdr_params.update({
-        'lagged_unemployment_rate': lagged_unemployment_rate,
-        'lagged_natural_unemployment_rate': lagged_natural_unemployment_rate
-    })
-    del fdr_params['real_interest_rate_series_id']
-    del fdr_params['long_term_real_interest_rate']
-    del fdr_params['current_fed_rate']
+    basr_params = bar_params
+    basr_params.use_shortfalls_rule = True
+    basr_estimate = balanced_approach_rule(
+        indicators, bar_params)
 
     # Current First Difference Rule calculation using FRED data
-    fdr_estimate = first_difference_rule(**fdr_params)
+    fdr_estimate = first_difference_rule(indicators, fdr_params)
 
     # Compile the estimates into a DataFrame
     estimates = pd.DataFrame(
@@ -231,20 +204,16 @@ def calculate_policy_rule_estimates(
         ]
     )
 
-    if verbose & (rho > 0.0) or apply_elb:
-        print_verbose_output(estimates, current_fed_rate, adjusted=True)
-        print("")
-    else:
-        if verbose:
-            print_verbose_output(estimates, current_fed_rate)
+    if verbose and (rho > 0.0 or apply_elb):
+        print_verbose_output(
+            estimates, indicators.current_fed_rate, adjusted=True)
+    elif verbose:
+        print_verbose_output(estimates, indicators.current_fed_rate)
     return estimates
 
 
 def calculate_historical_policy_rates(
-        inflation_series_id: str = 'PCETRIM12M159SFRBDAL',
-        unemployment_rate_series_id: str = 'UNRATE',
-        natural_unemployment_series_id: str = 'NROU',
-        real_interest_rate_series_id: str = 'DFII10',
+        indicators: EconomicIndicators = EconomicIndicators(),
         inflation_target: float = 2.0,
         rho: float = 0.0,
         elb: float = 0.125,
@@ -255,12 +224,8 @@ def calculate_historical_policy_rates(
     DataFrame.
 
     Args:
-        inflation_series_id (str): FRED Series ID for inflation data.
-        unemployment_rate_series_id (str): FRED Series ID for unemployment rate.
-        natural_unemployment_series_id (str): FRED Series ID for natural
-            unemployment rate.
-        real_interest_rate_series_id (str): FRED Series ID for long-term real
-            interest rate.
+        indicators (EconomicIndicators): Instance containing economic
+            indicators.
         inflation_target (float): Target inflation rate.
         rho (float): Policy inertia coefficient. Defaults to 0.0 which means
             no inertia and no adjustment is made to Taylor Rule estimate. A
@@ -273,37 +238,41 @@ def calculate_historical_policy_rates(
     Returns:
         pd.DataFrame: DataFrame containing the historical policy estimates.
     """
-    # Create a dictionary to store common parameters
-    params = {
-        'inflation_series_id': inflation_series_id,
-        'unemployment_rate_series_id': unemployment_rate_series_id,
-        'natural_unemployment_series_id': natural_unemployment_series_id,
-        'real_interest_rate_series_id': real_interest_rate_series_id,
-        'inflation_target': inflation_target,
-        'rho': rho,
-        'elb': elb,
-        'apply_elb': apply_elb
-    }
-
-    # Historical Taylor Rule calculation using FRED data
-    historical_tr = historical_taylor_rule(**params)
-
-    # Historical BAR calculation using FRED data
-    historical_bar = historical_balanced_approach_rule(**params)
-
-    # Historical BASR calculation using FRED data
-    historical_basr = historical_balanced_approach_rule(
-        use_shortfalls_rule=True,
-        **params
+    tr_params = TaylorRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
     )
 
-    # Create a copy of params for First Difference Rule and remove unnecessary
-    # keys
-    fdr_params = params.copy()
-    del fdr_params['real_interest_rate_series_id']
+    bar_params = BalancedApproachRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
+    )
+
+    fdr_params = FirstDifferenceRuleParameters(
+        inflation_target=inflation_target,
+        rho=rho,
+        elb=elb,
+        apply_elb=apply_elb
+    )
+
+    # Historical Taylor Rule calculation using FRED data
+    historical_tr = historical_taylor_rule(indicators, tr_params)
+
+    # Historical BAR calculation using FRED data
+    historical_bar = historical_balanced_approach_rule(indicators, bar_params)
+
+    # Historical BASR calculation using FRED data
+    basr_params = bar_params
+    basr_params.use_shortfalls_rule = True
+    historical_basr = historical_balanced_approach_rule(
+        indicators, basr_params)
 
     # Historical First Difference Rule (FDR) calculation using FRED data
-    historical_fdr = historical_first_difference_rule(**fdr_params)
+    historical_fdr = historical_first_difference_rule(indicators, fdr_params)
 
     # Combine historical rates into a single DataFrame
     historical_policy_rates = pd.concat([
@@ -321,7 +290,7 @@ def calculate_historical_policy_rates(
     return historical_policy_rates
 
 
-def plot_historical_policy_rates(
+def plot_historical_rule_estimates(
         historical_policy_rates: pd.DataFrame,
         adjusted: bool = False
 ) -> None:

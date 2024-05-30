@@ -1,6 +1,9 @@
 Installation
 ============
 
+From PyPI
+---------
+
 To install PyEconomics, use `pip`:
 
 .. code-block:: sh

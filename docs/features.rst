@@ -1,13 +1,15 @@
 Features
 ========
 
-### Current Features
+Current Features
+----------------
 
 - **Monetary Policy Rules**: Implementation of well-known monetary policy rules.
 - **Cache Management**: Efficient caching for API calls to improve performance
   and reduce redundant data fetching.
 
-### Planned Features
+Planned Features
+----------------
 
 - **Exchange Rate Models**: Models for predicting future exchange rates.
 - **Macroeconomic Models**: Comprehensive macroeconomic models.
