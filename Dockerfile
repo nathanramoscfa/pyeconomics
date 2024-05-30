@@ -1,20 +1,29 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# Use the official Python image from the Docker Hub
+FROM python:3.11-slim
 
-# Set the working directory in the container to /app
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
+# Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port available to the world outside this container
-EXPOSE 8000
+# Copy the entire project into the container
+COPY . .
 
-# Define environment variable
-ENV NAME pyeconomics
+# Copy the start script into the container
+COPY start.sh .
 
-# Run the application when the container launches
-CMD ["python", "examples/monetary_policy_rules/monetary_policy_rules.py"]
+# Make the start script executable
+RUN chmod +x start.sh
+
+# Set environment variables for consistent behavior
+ENV PYTHONUNBUFFERED=1
+
+# Expose port 8888 for Jupyter Lab
+EXPOSE 8888
+
+# Start Jupyter Lab using the start script
+CMD ["./start.sh"]

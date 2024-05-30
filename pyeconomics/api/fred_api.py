@@ -1,8 +1,6 @@
-# pyeconomics/api/fred_api.py
-
-import datetime
-import logging
 import os
+import logging
+import datetime
 from threading import Lock
 from typing import Optional, Any
 
@@ -78,9 +76,13 @@ class FredClient(DataSource):
                               f"{api_key_retrieved}")
                 if not api_key_retrieved and KEYRING_AVAILABLE:
                     logging.debug("Attempting to retrieve API key from keyring")
-                    api_key_retrieved = keyring.get_password(
-                        "fred", "api_key")
-                    logging.debug(f"API key from keyring: {api_key_retrieved}")
+                    try:
+                        api_key_retrieved = keyring.get_password(
+                            "fred", "api_key")
+                        logging.debug(f"API key from keyring: "
+                                      f"{api_key_retrieved}")
+                    except Exception as e:
+                        logging.debug(f"Keyring not available: {e}")
                 if not api_key_retrieved:
                     logging.debug("API Key not found, raising ValueError.")
                     raise ValueError(

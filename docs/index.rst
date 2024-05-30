@@ -45,10 +45,12 @@ Contents
    :caption: Contents:
 
    introduction
-   installation
-   usage
-   api_key
    features
+   installation
+   api_key
+   usage
+   examples
+   docker
    roadmap
    contributing
    contact
