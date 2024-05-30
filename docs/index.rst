@@ -4,7 +4,7 @@
 Welcome to PyEconomics's documentation!
 ========================================
 
-.. image:: docs/_static/logo.png
+.. image:: _static/logo.png
    :alt: PyEconomics Logo
 
 **PyEconomics** is a Python library for economic and financial analysis,
@@ -49,7 +49,6 @@ Contents
    installation
    api_key
    usage
-   examples
    docker
    roadmap
    contributing
