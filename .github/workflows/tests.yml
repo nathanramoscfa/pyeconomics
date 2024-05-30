@@ -19,7 +19,7 @@ jobs:
 
     # Set up Python
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4  # Ensure to use the latest version for Node.js 20 support
+      uses: actions/setup-python@v5  # Ensure to use the latest version for Node.js 20 support
       with:
         python-version: ${{ matrix.python-version }}
 
