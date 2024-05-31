@@ -12,14 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
+    - uses: actions/checkout@v4
 
     # Set up Python
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5  # Ensure to use the latest version for Node.js 20 support
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -53,7 +53,7 @@ jobs:
 
     # Upload coverage reports to Codecov
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4  # Ensure the latest version for Node.js 20 support
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml

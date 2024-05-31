@@ -62,7 +62,7 @@ class FredClient(DataSource):
 
         Args:
             api_key (Optional[str]): The FRED API key, retrieved from
-                keyring if None.
+                keyring or environment variable if None.
 
         Returns:
             FredClient: Singleton instance.
