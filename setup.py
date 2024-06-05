@@ -46,7 +46,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Intended Audience :: Financial and Insurance Industry',
-        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'License :: OSI Approved :: MIT License',
@@ -54,7 +53,7 @@ setup(
         'Topic :: Office/Business :: Financial',
         'Topic :: Office/Business :: Financial :: Investment'
     ],
-    python_requires='>=3.10, <3.13',
+    python_requires='>=3.11, <3.13',
     project_urls={
         'Bug Reports': 'https://github.com/nathanramoscfa/pyeconomics/issues',
         'Source': 'https://github.com/nathanramoscfa/pyeconomics',
