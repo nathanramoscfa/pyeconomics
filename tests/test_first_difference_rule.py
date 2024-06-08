@@ -309,8 +309,16 @@ def test_plot_historical_fdr(mock_show):
         'FedRate': [2.0, 2.1]
     }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
+    params = FirstDifferenceRuleParameters(
+        inflation_target=2.0,
+        alpha=0.5,
+        rho=0.5,
+        elb=0.125,
+        apply_elb=True
+    )
+
     # Test plot
-    plot_historical_fdr(historical_rates)
+    plot_historical_fdr(historical_rates, params)
     assert mock_show.called
 
 
