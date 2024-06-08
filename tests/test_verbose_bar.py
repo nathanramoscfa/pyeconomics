@@ -1,4 +1,4 @@
-# tests/test_bar_utils.py
+# tests/test_verbose_bar.py
 
 import pytest
 from datetime import datetime

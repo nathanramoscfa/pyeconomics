@@ -1,4 +1,4 @@
-# tests/test_fdr_utils.py
+# tests/test_verbose_fdr.py
 
 import pytest
 from datetime import datetime

@@ -1,4 +1,4 @@
-# tests/test_tr_utils.py
+# tests/test_verbose_tr.py
 
 import pytest
 from datetime import datetime
