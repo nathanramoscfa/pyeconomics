@@ -79,11 +79,11 @@ Contents
 Introduction
 ============
 
-PyEconomics is a versatile and comprehensive library that integrates artificial
-intelligence with various economic and financial models. It is designed to
-support the development and analysis of monetary policy rules, exchange rate
-models, macroeconomic and microeconomic models, discounted cash flow models,
-and much more.
+**PyEconomics** is a versatile and comprehensive library that integrates
+artificial intelligence with various economic and financial models. It is
+designed to support the development and analysis of monetary policy rules,
+exchange rate models, macroeconomic and microeconomic models, discounted cash
+flow models, and much more.
 
 Features
 ========
@@ -160,7 +160,8 @@ key is available here:
 Usage
 =====
 
-Here are some basic examples of how to use PyEconomics for calculating and visualizing monetary policy rules.
+Here are some basic examples of how to use PyEconomics for calculating and
+visualizing monetary policy rules.
 
 Example 1: Calculate Policy Rule Estimates Adjusted for Effective Lower Bound
 (ELB) and Policy Inertia (Rho) with AI Analysis
@@ -313,14 +314,14 @@ in the repository.
 Docker
 ======
 
-To run PyEconomics in a Docker container, follow these steps:
+To run **PyEconomics** in a Docker container, follow these steps:
 
 1. **Ensure Docker is Running**: Make sure Docker is
 [installed](https://www.docker.com/products/docker-desktop/) and running on
 your system.
 
-2. **Configure the .env File**: Create a `.env` file in the root directory of
-the `pyeconomics` with the following content:
+2. **Configure the .env File**: Create a ``.env`` file in the root directory of
+the ``pyeconomics`` with the following content:
 
     .. code-block:: none
 

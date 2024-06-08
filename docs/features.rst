@@ -4,9 +4,10 @@ Features
 Current Features
 ----------------
 
-- **Monetary Policy Rules**: Implementation of well-known monetary policy rules.
+- **AI Integration**: AI-generated monetary policy decisions.
 - **Cache Management**: Efficient caching for API calls to improve performance
   and reduce redundant data fetching.
+- **Monetary Policy Rules**: Implementation of well-known monetary policy rules.
 
 Planned Features
 ----------------

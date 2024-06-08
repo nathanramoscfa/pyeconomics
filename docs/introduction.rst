@@ -50,7 +50,8 @@ Introduction
      - .. image:: https://snyk.io/test/github/nathanramoscfa/pyeconomics/badge.svg
           :target: https://snyk.io/test/github/nathanramoscfa/pyeconomics
 
-PyEconomics is a versatile and comprehensive library that integrates various
-economic and financial models. It is designed to support the development and
-analysis of monetary policy rules, exchange rate models, macroeconomic and
-microeconomic models, discounted cash flow models, and much more.
+PyEconomics is a versatile and comprehensive library that integrates artificial
+intelligence with various economic and financial models. It is designed to
+support the development and analysis of monetary policy rules, exchange rate
+models, macroeconomic and microeconomic models, discounted cash flow models,
+and much more.
