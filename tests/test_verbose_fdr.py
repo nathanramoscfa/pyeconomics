@@ -26,7 +26,10 @@ def mock_data():
         'apply_elb': False,
         'elb': 0.0,
         'rho': 0.5,
-        'adjusted_fdr_rule_after_inertia': 0.75
+        'adjusted_fdr_rule_after_inertia': 0.75,
+        'include_ai_analysis': False,
+        'max_tokens': 500,
+        'model': 'chatgpt-4o'
     }
 
 
@@ -40,19 +43,19 @@ def test_verbose_first_difference_rule(capsys, mock_data):
     expected_output = (
         "\n==== Economic Indicators "
         "============================================\n"
-        "Current Inflation:                               2.50%\n"
-        "Target Inflation:                                2.00%\n"
-        "Current Unemployment Rate:                       4.00%\n"
-        "Lagged Unemployment Rate:                        4.20%\n"
-        "Natural Unemployment Rate:                       4.50%\n"
-        "Lagged Natural Unemployment Rate:                4.60%\n"
-        "Last Fed Rate:                                   0.50%\n"
-        f"As of Date:                                      {as_of_date}\n"
+        "  Current Inflation:                               2.50%\n"
+        "  Target Inflation:                                2.00%\n"
+        "  Current Unemployment Rate:                       4.00%\n"
+        "  Lagged Unemployment Rate:                        4.20%\n"
+        "  Natural Unemployment Rate:                       4.50%\n"
+        "  Lagged Natural Unemployment Rate:                4.60%\n"
+        "  Last Fed Rate:                                   0.50%\n"
+        f"  As of Date:                                      {as_of_date}\n"
         "\n==== Gaps "
         "===========================================================\n"
-        "Inflation Gap:                                   0.50%\n"
-        "Current Unemployment Gap:                        0.50%\n"
-        "Lagged Unemployment Gap:                         0.40%\n"
+        "  Inflation Gap:                                   0.50%\n"
+        "  Current Unemployment Gap:                        0.50%\n"
+        "  Lagged Unemployment Gap:                         0.40%\n"
         "\n==== First Difference Rule (FDR) "
         "====================================\n"
         "  Last Fed Rate:                                 0.50%\n"

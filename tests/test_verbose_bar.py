@@ -27,7 +27,9 @@ def mock_data():
         'rho': 0.5,
         'adjusted_rate_after_inertia': 0.75,
         'use_shortfalls_rule': False,
-        'use_shortfalls': False
+        'include_ai_analysis': False,
+        'max_tokens': 500,
+        'model': 'chatgpt-4o'
     }
 
 

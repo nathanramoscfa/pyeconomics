@@ -45,31 +45,31 @@ def verbose_first_difference_rule(data: dict):
     print(
         "\n==== Economic Indicators ==========================================="
         "=")
-    print("Current Inflation:                               {:.2f}%".format(
+    print("  Current Inflation:                               {:.2f}%".format(
         data['current_inflation_rate']))
-    print("Target Inflation:                                {:.2f}%".format(
+    print("  Target Inflation:                                {:.2f}%".format(
         data['inflation_target']))
-    print("Current Unemployment Rate:                       {:.2f}%".format(
+    print("  Current Unemployment Rate:                       {:.2f}%".format(
         data['current_unemployment_rate']))
-    print("Lagged Unemployment Rate:                        {:.2f}%".format(
+    print("  Lagged Unemployment Rate:                        {:.2f}%".format(
         data['lagged_unemployment_rate']))
-    print("Natural Unemployment Rate:                       {:.2f}%".format(
+    print("  Natural Unemployment Rate:                       {:.2f}%".format(
         data['natural_unemployment_rate']))
-    print("Lagged Natural Unemployment Rate:                {:.2f}%".format(
+    print("  Lagged Natural Unemployment Rate:                {:.2f}%".format(
         data['lagged_natural_unemployment_rate']))
-    print("Last Fed Rate:                                   {:.2f}%".format(
+    print("  Last Fed Rate:                                   {:.2f}%".format(
         data['current_fed_rate']))
-    print("As of Date:                                      {}".format(
+    print("  As of Date:                                      {}".format(
         current_date))
 
     print(
         "\n==== Gaps =========================================================="
         "=")
-    print("Inflation Gap:                                   {:.2f}%".format(
+    print("  Inflation Gap:                                   {:.2f}%".format(
         data['inflation_gap']))
-    print("Current Unemployment Gap:                        {:.2f}%".format(
+    print("  Current Unemployment Gap:                        {:.2f}%".format(
         data['current_unemployment_gap']))
-    print("Lagged Unemployment Gap:                         {:.2f}%".format(
+    print("  Lagged Unemployment Gap:                         {:.2f}%".format(
         data['lagged_unemployment_gap']))
 
     print(

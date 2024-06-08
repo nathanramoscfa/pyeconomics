@@ -25,7 +25,10 @@ def mock_data():
         'apply_elb': False,
         'elb': 0.0,
         'rho': 0.5,
-        'adjusted_taylor_rule_after_inertia': 0.75
+        'adjusted_taylor_rule_after_inertia': 0.75,
+        'include_ai_analysis': False,
+        'max_tokens': 500,
+        'model': 'chatgpt-4o'
     }
 
 
@@ -37,44 +40,49 @@ def test_verbose_taylor_rule(capsys, mock_data):
 
     as_of_date = datetime.now().strftime("%B %d, %Y")
     expected_output = (
-        "==== Economic Indicators "
-        "=================================================\n"
-        "Current Inflation:                               2.50%\n"
-        "Target Inflation:                                2.00%\n"
-        "Current Unemployment Rate:                       4.00%\n"
-        "Natural Unemployment Rate:                       4.50%\n"
-        "Long-Term Real Interest Rate:                    2.00%\n"
-        "Current Fed Rate:                                0.50%\n"
-        f"As of Date:                                      {as_of_date}\n"
-        "\n==== Gaps "
-        "================================================================\n"
-        "Inflation Gap:                                   0.50%\n"
-        "Unemployment Gap:                                0.50%\n"
-        "\n==== Taylor Rule "
-        "=========================================================\n"
-        "  Long-Term Real Interest Rate:                  2.00%\n"
-        "  Current Inflation:                             + 2.50%\n"
-        "  Alpha * Inflation Gap:                         + 0.50 * 0.50%\n"
-        "  Beta * Okun Factor * Unemployment Gap:         "
-        "+ 0.50 * 2.00 * 0.50%\n"
-        "-------------------------------------"
-        "-------------------------------------\n"
-        "  Unadjusted Taylor Rule Estimate:               1.00%\n"
-        "\n==== Adjusted Taylor Rule "
-        "================================================\n"
-        "\n  Policy Inertia Adjustment:              \n"
-        "  Policy Inertia Coefficient (rho):              0.50\n"
-        "  Current Fed Rate:                              * 0.50%\n"
-        "  Adjustment Coefficient (1 - rho):              + (1 - 0.50)\n"
-        "  Taylor Rule Adjusted for ELB:                  * 1.00%\n"
-        "-------------------------------------"
-        "-------------------------------------\n"
-        "  Adjusted Taylor Rule Estimate:                 0.75%\n"
-        "\n==== Policy Prescription "
-        "=================================================\n"
-        "  The Adjusted Taylor Rule Estimate is 0.25% higher than the "
-        "Current \n  Fed Rate. The Fed should consider raising the interest "
-        "rate by 0.25%.\n"
+        '==== Economic Indicators ============================================='
+        '====\n'
+        '  Current Inflation:                             2.50%\n'
+        '  Target Inflation:                              2.00%\n'
+        '  Current Unemployment Rate:                     4.00%\n'
+        '  Natural Unemployment Rate:                     4.50%\n'
+        '  Long-Term Real Interest Rate:                  2.00%\n'
+        '  Current Fed Rate:                              0.50%\n'
+        '  As of Date:                                    June 08, 2024\n'
+        '\n'
+        '==== Gaps ============================================================'
+        '====\n'
+        '  Inflation Gap:                                 0.50%\n'
+        '  Unemployment Gap:                              0.50%\n'
+        '\n'
+        '==== Taylor Rule ====================================================='
+        '====\n'
+        '  Long-Term Real Interest Rate:                  2.00%\n'
+        '  Current Inflation:                             + 2.50%\n'
+        '  Alpha * Inflation Gap:                         + 0.50 * 0.50%\n'
+        '  Beta * Okun Factor * Unemployment Gap:         '
+        '+ 0.50 * 2.00 * 0.50%\n'
+        '----------------------------------------------------------------------'
+        '----\n'
+        '  Unadjusted Taylor Rule Estimate:               1.00%\n'
+        '\n'
+        '==== Adjusted Taylor Rule ============================================'
+        '====\n'
+        '\n'
+        '  Policy Inertia Adjustment:              \n'
+        '  Policy Inertia Coefficient (rho):              0.50\n'
+        '  Current Fed Rate:                              * 0.50%\n'
+        '  Adjustment Coefficient (1 - rho):              + (1 - 0.50)\n'
+        '  Taylor Rule Adjusted for ELB:                  * 1.00%\n'
+        '----------------------------------------------------------------------'
+        '----\n'
+        '  Adjusted Taylor Rule Estimate:                 0.75%\n'
+        '\n'
+        '==== Policy Prescription ============================================='
+        '====\n'
+        '  The Adjusted Taylor Rule Estimate is 0.25% higher than the Current '
+        '\n  Fed Rate. The Fed should consider raising the interest rate by '
+        '0.25%.'
     )
 
     # Comparing the captured output with the expected output
@@ -96,17 +104,17 @@ def test_verbose_taylor_rule_apply_elb(capsys, mock_data):
     expected_output = (
         "==== Economic Indicators "
         "=================================================\n"
-        "Current Inflation:                               2.50%\n"
-        "Target Inflation:                                2.00%\n"
-        "Current Unemployment Rate:                       4.00%\n"
-        "Natural Unemployment Rate:                       4.50%\n"
-        "Long-Term Real Interest Rate:                    2.00%\n"
-        "Current Fed Rate:                                0.50%\n"
-        f"As of Date:                                      {as_of_date}\n"
+        "  Current Inflation:                             2.50%\n"
+        "  Target Inflation:                              2.00%\n"
+        "  Current Unemployment Rate:                     4.00%\n"
+        "  Natural Unemployment Rate:                     4.50%\n"
+        "  Long-Term Real Interest Rate:                  2.00%\n"
+        "  Current Fed Rate:                              0.50%\n"
+        f"  As of Date:                                    {as_of_date}\n"
         "\n==== Gaps "
         "================================================================\n"
-        "Inflation Gap:                                   0.50%\n"
-        "Unemployment Gap:                                0.50%\n"
+        "  Inflation Gap:                                 0.50%\n"
+        "  Unemployment Gap:                              0.50%\n"
         "\n==== Taylor Rule "
         "=========================================================\n"
         "  Long-Term Real Interest Rate:                  2.00%\n"
@@ -154,17 +162,17 @@ def test_verbose_taylor_rule_lower_rate(capsys, mock_data):
     expected_output = (
         "==== Economic Indicators "
         "=================================================\n"
-        "Current Inflation:                               2.50%\n"
-        "Target Inflation:                                2.00%\n"
-        "Current Unemployment Rate:                       4.00%\n"
-        "Natural Unemployment Rate:                       4.50%\n"
-        "Long-Term Real Interest Rate:                    2.00%\n"
-        "Current Fed Rate:                                0.50%\n"
-        f"As of Date:                                      {as_of_date}\n"
+        "  Current Inflation:                             2.50%\n"
+        "  Target Inflation:                              2.00%\n"
+        "  Current Unemployment Rate:                     4.00%\n"
+        "  Natural Unemployment Rate:                     4.50%\n"
+        "  Long-Term Real Interest Rate:                  2.00%\n"
+        "  Current Fed Rate:                              0.50%\n"
+        f"  As of Date:                                    {as_of_date}\n"
         "\n==== Gaps "
         "================================================================\n"
-        "Inflation Gap:                                   0.50%\n"
-        "Unemployment Gap:                                0.50%\n"
+        "  Inflation Gap:                                 0.50%\n"
+        "  Unemployment Gap:                              0.50%\n"
         "\n==== Taylor Rule "
         "=========================================================\n"
         "  Long-Term Real Interest Rate:                  2.00%\n"
@@ -207,17 +215,17 @@ def test_verbose_taylor_rule_maintain_rate(capsys, mock_data):
     expected_output = (
         "==== Economic Indicators "
         "=================================================\n"
-        "Current Inflation:                               2.50%\n"
-        "Target Inflation:                                2.00%\n"
-        "Current Unemployment Rate:                       4.00%\n"
-        "Natural Unemployment Rate:                       4.50%\n"
-        "Long-Term Real Interest Rate:                    2.00%\n"
-        "Current Fed Rate:                                0.50%\n"
-        f"As of Date:                                      {as_of_date}\n"
+        "  Current Inflation:                             2.50%\n"
+        "  Target Inflation:                              2.00%\n"
+        "  Current Unemployment Rate:                     4.00%\n"
+        "  Natural Unemployment Rate:                     4.50%\n"
+        "  Long-Term Real Interest Rate:                  2.00%\n"
+        "  Current Fed Rate:                              0.50%\n"
+        f"  As of Date:                                    {as_of_date}\n"
         "\n==== Gaps "
         "================================================================\n"
-        "Inflation Gap:                                   0.50%\n"
-        "Unemployment Gap:                                0.50%\n"
+        "  Inflation Gap:                                 0.50%\n"
+        "  Unemployment Gap:                              0.50%\n"
         "\n==== Taylor Rule "
         "=========================================================\n"
         "  Long-Term Real Interest Rate:                  2.00%\n"
