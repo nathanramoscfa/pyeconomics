@@ -142,8 +142,8 @@ If you want to install the package from the source code, follow these steps:
 
        pip install .
 
-API Key
-=======
+API Keys
+========
 
 Some features of PyEconomics require access to the FRED API. To use these
 features, you need to configure your FRED API access.
@@ -163,10 +163,8 @@ Usage
 Here are some basic examples of how to use PyEconomics for calculating and
 visualizing monetary policy rules.
 
-Example 1: Calculate Policy Rule Estimates Adjusted for Effective Lower Bound
-(ELB) and Policy Inertia (Rho) with AI Analysis
------------------------------------------------------------------------------
------------------------------------------------
+Example 1: Calculate Policy Rule Estimates Adjusted for Effective Lower Bound (ELB) and Policy Inertia (Rho) with AI Analysis
+-----------------------------------------------------------------------------------------------------------------------------
 
 .. code-block:: python
 
@@ -223,10 +221,8 @@ Verbose Print Statement:
 
 .. image:: ../media/plot_historical_policy_rates.png
 
-Example 3: Calculate Adjusted Taylor Rule for Effective Lower Bound (ELB) and
-Policy Inertia (Rho)
------------------------------------------------------------------------------
---------------------
+Example 3: Calculate Adjusted Taylor Rule for Effective Lower Bound (ELB) and Policy Inertia (Rho)
+--------------------------------------------------------------------------------------------------
 
 .. code-block:: python
 

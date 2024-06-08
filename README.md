@@ -27,6 +27,7 @@ financial modeling.
 - [Introduction](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#introduction)
 - [Features](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#features)
 - [Installation](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#installation)
+- [API Keys](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#api-keys)
 - [Usage](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#usage)
 - [Docker](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#docker)
 - [Roadmap](https://github.com/nathanramoscfa/pyeconomics?tab=readme-ov-file#roadmap)
@@ -91,7 +92,7 @@ If you want to install the package from the source code, follow these steps:
     pip install .
     ```
 
-## API Key
+## API Keys
 
 Some features of PyEconomics require access to the FRED API and the OpenAI API. 
 To use these features, you need to configure your FRED and OpenAI API access.
