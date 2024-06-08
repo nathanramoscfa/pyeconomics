@@ -15,10 +15,11 @@ from .taylor_rule import (
 )
 
 from .monetary_policy_rules import (
-    print_fred_series_names, print_verbose_output,
-    calculate_policy_rule_estimates, calculate_historical_policy_rates,
-    plot_historical_rule_estimates
+    verbose_monetary_policy_rules, calculate_policy_rule_estimates,
+    calculate_historical_policy_rates, plot_historical_rule_estimates
 )
+
+from ...utils.utils import print_fred_series_names
 
 __all__ = [
     'balanced_approach_rule',
@@ -33,6 +34,6 @@ __all__ = [
     'plot_historical_fdr',
     'plot_historical_taylor_rule',
     'print_fred_series_names',
-    'print_verbose_output',
+    'verbose_monetary_policy_rules',
     'taylor_rule',
 ]

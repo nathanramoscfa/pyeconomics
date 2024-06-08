@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime
 
-from pyeconomics.utils.fdr_utils import verbose_first_difference_rule
+from verbose.first_difference_rule import verbose_first_difference_rule
 
 
 @pytest.fixture

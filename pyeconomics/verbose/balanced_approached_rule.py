@@ -1,6 +1,9 @@
-# pyeconomics/utils/bar_utils.py
+# pyeconomics/verbose/balanced_approached_rule.py
 
 from datetime import datetime
+
+from pyeconomics.ai.balanced_approach_rule import balanced_approach_rule
+from pyeconomics.utils.utils import wrap_text
 
 
 def verbose_balanced_approach_rule(data: dict):
@@ -30,7 +33,10 @@ def verbose_balanced_approach_rule(data: dict):
             - elb (float): Effective Lower Bound (ELB) rate.
             - apply_elb (bool): Whether to apply the ELB adjustment.
             - use_shortfalls_rule (bool): Whether to use the shortfalls rule.
-            - use_shortfalls (bool): Whether to use the shortfalls gap.
+            - include_ai_analysis (bool): Whether to include AI-generated
+              analysis.
+            - max_tokens (int): Maximum number of tokens for the AI response.
+            - model (str): The OpenAI model to use for the analysis.
 
     Returns:
         None
@@ -110,26 +116,39 @@ def verbose_balanced_approach_rule(data: dict):
     print("  Adjusted {} Estimate:".format(rule_acronym).ljust(49) +
           "{:.2f}%".format(data['adjusted_rate_after_inertia']))
 
-    # Policy Prescription section
-    print("\n==== Policy Prescription " + "=" * (line_length - 25))
-    rate_difference = (data['adjusted_rate_after_inertia'] -
-                       data['current_fed_rate'])
-    rounded_difference = round(rate_difference * 4) / 4
+    # Optionally add AI-generated analysis
+    if data['include_ai_analysis']:
+        ai_analysis = balanced_approach_rule(
+            data, max_tokens=data['max_tokens'], model=data['model'])
+        wrapped_ai_analysis = wrap_text(ai_analysis, 72, indent=2)
+        print("\n==== AI-Generated Policy Prescription ========================"
+              "============")
+        print(wrapped_ai_analysis)
+        print(f"\n  *Generated with {data['model']}. Use with caution. ChatGPT "
+              f"can make mistakes. Check important info.")
+        print("================================================================"
+              "==========")
 
-    if rounded_difference > 0.125:
-        print(f"  The Adjusted {rule_acronym} Estimate is "
-              f"{rate_difference:.2f}% higher than the Current Fed \n"
-              f"  Rate. The Fed should consider raising the interest "
-              f"rate by {rounded_difference:.2f}%.")
-    elif rounded_difference < -0.125:
-        print(f"  The Adjusted {rule_acronym} Estimate is "
-              f"{abs(rate_difference):.2f}% lower than the Current Fed \n"
-              f"  Rate. The Fed should consider lowering the interest "
-              f"rate by {abs(rounded_difference):.2f}%.")
     else:
-        print(f"  The Adjusted {rule_acronym} Estimate is equal to the Current "
-              f"Fed Rate.\n  The Fed should maintain the current interest "
-              f"rate.")
+        # Policy Prescription section
+        print("\n==== Policy Prescription " + "=" * (line_length - 25))
+        rate_difference = (data['adjusted_rate_after_inertia'] -
+                           data['current_fed_rate'])
+        rounded_difference = round(rate_difference * 4) / 4
+        if rounded_difference > 0.125:
+            print(f"  The Adjusted {rule_acronym} Estimate is "
+                  f"{rate_difference:.2f}% higher than the Current Fed \n"
+                  f"  Rate. The Fed should consider raising the interest "
+                  f"rate by {rounded_difference:.2f}%.")
+        elif rounded_difference < -0.125:
+            print(f"  The Adjusted {rule_acronym} Estimate is "
+                  f"{abs(rate_difference):.2f}% lower than the Current Fed \n"
+                  f"  Rate. The Fed should consider lowering the interest "
+                  f"rate by {abs(rounded_difference):.2f}%.")
+        else:
+            print(f"  The Adjusted {rule_acronym} Estimate is equal to the "
+                  f"Current Fed Rate.\n  The Fed should maintain the current "
+                  f"interest rate.")
 
     # Adding a note explaining BAR and BASR
     print("\nNote:")

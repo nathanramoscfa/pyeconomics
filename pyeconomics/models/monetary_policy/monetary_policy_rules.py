@@ -1,7 +1,5 @@
 # pyeconomics/models/monetary_policy/monetary_policy_rules.py
 
-from datetime import datetime
-
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -16,117 +14,14 @@ from ...data.model_parameters import (
     BalancedApproachRuleParameters,
     FirstDifferenceRuleParameters,
     TaylorRuleParameters,
+    MonetaryPolicyRulesParameters
 )
-
-
-def print_fred_series_names(
-        inflation_series_id: str = 'PCETRIM12M159SFRBDAL',
-        unemployment_rate_series_id: str = 'UNRATE',
-        natural_unemployment_series_id: str = 'NROU',
-        real_interest_rate_series_id: str = 'DFII10'
-) -> None:
-    """
-    Print the FRED series IDs and their corresponding names for various
-    economic indicators.
-
-    Args:
-        inflation_series_id (str): FRED Series ID for inflation data.
-        unemployment_rate_series_id (str): FRED Series ID for unemployment rate.
-        natural_unemployment_series_id (str): FRED Series ID for natural
-            unemployment rate.
-        real_interest_rate_series_id (str): FRED Series ID for long-term real
-            interest rate.
-
-    Returns:
-        None
-    """
-    # Print the series names and their IDs
-    print(
-        f"Inflation Series ID:               "
-        f"{fred_client.get_series_name(inflation_series_id)}")
-    print(
-        f"Unemployment Rate Series ID:       "
-        f"{fred_client.get_series_name(unemployment_rate_series_id)}")
-    print(
-        f"Natural Unemployment Series ID:    "
-        f"{fred_client.get_series_name(natural_unemployment_series_id)}")
-    print(
-        f"Real Interest Rate Series ID:      "
-        f"{fred_client.get_series_name(real_interest_rate_series_id)}")
-
-
-def print_verbose_output(
-        estimates: pd.DataFrame,
-        current_fed_rate: float,
-        adjusted: bool = False
-) -> None:
-    """
-    Format and print the verbose output of the interest rate policy estimates.
-
-    Args:
-        estimates (pd.DataFrame): DataFrame containing the policy estimates.
-        current_fed_rate (float): The current Federal Funds Rate.
-        adjusted (bool): Whether the output is for adjusted estimates.
-
-    Returns:
-        None
-    """
-    # Formatting and printing the verbose output
-    as_of_date = datetime.now().strftime("%B %d, %Y")
-    width = 85  # Total width of the box
-    title = " Adjusted Interest Rate Policy Estimates " \
-        if adjusted else " Interest Rate Policy Estimates "
-    prescription_title = " Adjusted Policy Prescription " \
-        if adjusted else " Policy Prescription "
-
-    print("")
-    print("┌" + "─" * (width - 2) + "┐")
-    print("│" + title.center(width - 2) + "│")
-    print("├" + "─" * (width - 2) + "┤")
-    for rule, row in estimates.iterrows():
-        line = f" {rule:69} {row['Estimate (%)']:.2f}%"
-        print(f"│{line:<{width - 2}}│")
-    print("├" + "─" * (width - 2) + "┤")
-    ffr_description = "Federal Funds Rate (FFR)"
-    ffr_value = f"{current_fed_rate:.2f}%"
-    line = f" {ffr_description:<62} {ffr_value:>12}"
-    print(f"│{line:<{width - 2}}│")
-    print("├" + "─" * (width - 2) + "┤")
-    line = f" As of Date {as_of_date:>64}"
-    print(f"│{line:<{width - 2}}│")
-    print("├" + "─" * (width - 2) + "┤")
-    print("│" + prescription_title.center(width - 2) + "│")
-    print("├" + "─" * (width - 2) + "┤")
-
-    # Calculate the difference between each estimate and the current Fed rate
-    for rule, row in estimates.iterrows():
-        rate_difference = row['Estimate (%)'] - current_fed_rate
-        rounded_difference = round(rate_difference * 4) / 4
-
-        if rounded_difference > 0.125:
-            suggestion = (f"suggests raising the rate by "
-                          f"{rounded_difference:.2f}%.")
-        elif rounded_difference < -0.125:
-            suggestion = (f"suggests lowering the rate by "
-                          f"{abs(rounded_difference):.2f}%.")
-        else:
-            suggestion = "suggests maintaining the current rate."
-
-        # Combine rule and suggestion into one sentence and pad to fit the width
-        full_suggestion = f" {rule} {suggestion}"
-        print(f"│{full_suggestion:<{width - 2}}│")
-
-    print("└" + "─" * (width - 2) + "┘")
-    print("")
+from ...verbose.monetary_policy_rules import verbose_monetary_policy_rules
 
 
 def calculate_policy_rule_estimates(
-        indicators: EconomicIndicators = EconomicIndicators(),
-        inflation_target: float = 2.0,
-        rho: float = 0.0,
-        elb: float = 0.125,
-        apply_elb: bool = False,
-        verbose: bool = False
+    indicators: EconomicIndicators = EconomicIndicators(),
+    params: MonetaryPolicyRulesParameters = MonetaryPolicyRulesParameters()
 ) -> pd.DataFrame:
     """
     Calculate and return the monetary policy rule estimates as a DataFrame.
@@ -134,15 +29,8 @@ def calculate_policy_rule_estimates(
     Args:
         indicators (EconomicIndicators): Instance containing economic
             indicators.
-        inflation_target (float): Target inflation rate.
-        rho (float): Policy inertia coefficient. Defaults to 0.0 which means
-            no inertia and no adjustment is made to Taylor Rule estimate. A
-            value of 1.0 would mean full inertia and immediate central bank
-            adjustment to the Taylor Rule estimate.
-        elb (float): Effective lower bound for interest rates.
-        apply_elb (bool): Whether to apply the effective lower bound
-            constraint to the Taylor Rule estimate.
-        verbose (bool): Whether to print verbose output.
+        params (MonetaryPolicyRulesParameters): Instance containing the policy
+            rule parameters.
 
     Returns:
         pd.DataFrame: DataFrame containing the policy estimates.
@@ -152,24 +40,25 @@ def calculate_policy_rule_estimates(
         indicators.current_fed_rate = fred_client.get_latest_value('DFEDTARU')
 
     tr_params = TaylorRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
-    )
-
-    bar_params = BalancedApproachRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
     )
 
     fdr_params = FirstDifferenceRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
+    )
+
+    params.beta = 2.0
+    bar_params = BalancedApproachRuleParameters(
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
     )
 
     # Current Taylor Rule calculation using FRED data
@@ -193,7 +82,7 @@ def calculate_policy_rule_estimates(
             tr_estimate,
             bar_estimate,
             basr_estimate,
-            fdr_estimate
+            fdr_estimate,
         ],
         columns=['Estimate (%)'],
         index=[
@@ -204,20 +93,32 @@ def calculate_policy_rule_estimates(
         ]
     )
 
-    if verbose and (rho > 0.0 or apply_elb):
-        print_verbose_output(
-            estimates, indicators.current_fed_rate, adjusted=True)
-    elif verbose:
-        print_verbose_output(estimates, indicators.current_fed_rate)
+    # Compile dictionary for input into AI model
+    ai_dict = {}
+    if params.include_ai_analysis:
+        ai_dict['include_ai_analysis'] = params.include_ai_analysis
+        ai_dict['max_tokens'] = params.max_tokens
+        ai_dict['model'] = params.model
+        ai_dict['adjusted'] = params.rho > 0.0 or params.apply_elb
+
+    if params.verbose and (params.rho > 0.0 or params.apply_elb):
+        verbose_monetary_policy_rules(
+            estimates,
+            indicators.current_fed_rate,
+            ai_dict,
+            adjusted=True,
+            elb=params.elb,
+            rho=params.rho
+        )
+    elif params.verbose:
+        verbose_monetary_policy_rules(
+            estimates, indicators.current_fed_rate, ai_dict)
     return estimates
 
 
 def calculate_historical_policy_rates(
-        indicators: EconomicIndicators = EconomicIndicators(),
-        inflation_target: float = 2.0,
-        rho: float = 0.0,
-        elb: float = 0.125,
-        apply_elb: bool = False
+    indicators: EconomicIndicators = EconomicIndicators(),
+    params: MonetaryPolicyRulesParameters = MonetaryPolicyRulesParameters()
 ) -> pd.DataFrame:
     """
     Calculate and return the historical monetary policy rule estimates as a
@@ -226,37 +127,31 @@ def calculate_historical_policy_rates(
     Args:
         indicators (EconomicIndicators): Instance containing economic
             indicators.
-        inflation_target (float): Target inflation rate.
-        rho (float): Policy inertia coefficient. Defaults to 0.0 which means
-            no inertia and no adjustment is made to Taylor Rule estimate. A
-            value of 1.0 would mean full inertia and immediate central bank
-            adjustment to the Taylor Rule estimate.
-        elb (float): Effective lower bound for interest rates.
-        apply_elb (bool): Whether to apply the effective lower bound
-            constraint to the Taylor Rule estimate.
+        params (MonetaryPolicyRulesParameters): Instance containing the policy
+            rule parameters.
 
     Returns:
         pd.DataFrame: DataFrame containing the historical policy estimates.
     """
     tr_params = TaylorRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
     )
 
     bar_params = BalancedApproachRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
     )
 
     fdr_params = FirstDifferenceRuleParameters(
-        inflation_target=inflation_target,
-        rho=rho,
-        elb=elb,
-        apply_elb=apply_elb
+        inflation_target=params.inflation_target,
+        rho=params.rho,
+        elb=params.elb,
+        apply_elb=params.apply_elb
     )
 
     # Historical Taylor Rule calculation using FRED data
@@ -292,7 +187,7 @@ def calculate_historical_policy_rates(
 
 def plot_historical_rule_estimates(
         historical_policy_rates: pd.DataFrame,
-        adjusted: bool = False
+        params: MonetaryPolicyRulesParameters
 ) -> None:
     """
     Extract the time range from the data, plot the (adjusted or unadjusted)
@@ -301,13 +196,14 @@ def plot_historical_rule_estimates(
     Args:
         historical_policy_rates (pd.DataFrame): DataFrame containing the
             historical policy rates.
-        adjusted (bool): If True, plot the adjusted policy rates. If False,
-            plot the unadjusted policy rates.
+        params (MonetaryPolicyRulesParameters): Instance containing the policy
+            rule parameters.
 
     Returns:
         None
     """
     # Determine which columns to use based on the adjusted parameter
+    adjusted = params.rho > 0.0 or params.apply_elb
     if adjusted:
         columns = [
             'AdjustedTaylorRule',

@@ -1,0 +1,17 @@
+Given the following data from a Balanced Approach Rule calculation:
+
+Current inflation Rate: {current_inflation_rate}
+Inflation Target: {inflation_target}
+Current Unemployment Rate: {current_unemployment_rate}
+Natural Unemployment Rate: {natural_unemployment_rate}
+Long-term Real Interest Rate: {long_term_real_interest_rate}
+Current Federal Funds Rate: {current_fed_rate}
+Inflation Gap: {inflation_gap}
+Unemployment Gap: {unemployment_gap}
+Unadjusted Balanced Approach Rule Estimate: {unadjusted_balanced_approach_rule}
+Adjusted Balanced Approach Rule after ELB: {adjusted_balanced_approach_rule_after_elb}
+Adjusted Balanced Approach Rule after inertia: {adjusted_balanced_approach_rule_after_inertia}
+
+Provide a one-paragraph interpretation and policy prescription based on these
+results, as if you were the Federal Open Commitee (FOMC) of the Federal
+Reserve. The tone should be formal and data-driven. Limit to 100 words.

@@ -1,6 +1,9 @@
-# pyeconomics/utils/fdr_utils.py
+# pyeconomics/verbose/first_difference_rule.py
 
 from datetime import datetime
+
+from pyeconomics.ai.first_difference_rule import first_difference_rule
+from pyeconomics.utils.utils import wrap_text
 
 
 def verbose_first_difference_rule(data: dict):
@@ -30,6 +33,10 @@ def verbose_first_difference_rule(data: dict):
               adjusted for the Effective Lower Bound (ELB).
             - adjusted_fdr_rule_after_inertia (float): First Difference Rule
               adjusted for policy inertia.
+            - include_ai_analysis (bool): Whether to include AI-generated
+              analysis.
+            - max_tokens (int): Maximum number of tokens for the AI response.
+            - model (str): The OpenAI model to use for the analysis.
 
     Returns:
         None
@@ -111,24 +118,38 @@ def verbose_first_difference_rule(data: dict):
     print("  Adjusted FDR Estimate:                         {:.2f}%".format(
         data['adjusted_fdr_rule_after_inertia']))
 
-    # Policy Prescription section
-    print("\n==== Policy Prescription ========================================="
-          "========")
-    rate_difference = (data['adjusted_fdr_rule_after_inertia'] -
-                       data['current_fed_rate'])
-    rounded_difference = round(rate_difference * 4) / 4
+    # Optionally add AI-generated analysis
+    if data['include_ai_analysis']:
+        ai_analysis = first_difference_rule(
+            data, max_tokens=data['max_tokens'], model=data['model'])
+        wrapped_ai_analysis = wrap_text(ai_analysis, 72, indent=2)
+        print("\n==== AI-Generated Analysis ==================================="
+              "============")
+        print(wrapped_ai_analysis)
+        print(f"\n  *Generated with {data['model']}. Use with caution. ChatGPT "
+              f"can make mistakes. Check important info.")
+        print("================================================================"
+              "==========")
 
-    if rounded_difference > 0.125:
-        print(f"  The Adjusted FDR Estimate is "
-              f"{rate_difference:.2f}% higher than the Current Fed \n"
-              f"  Rate. The Fed should consider raising the interest "
-              f"rate by {rounded_difference:.2f}%.")
-    elif rounded_difference < -0.125:
-        print(f"  The Adjusted FDR Estimate is "
-              f"{abs(rate_difference):.2f}% lower than the Current Fed \n"
-              f"  Rate. The Fed should consider lowering the interest "
-              f"rate by {abs(rounded_difference):.2f}%.")
     else:
-        print(f"  The Adjusted FDR Estimate is equal to the Current "
-              f"Fed Rate.\n  The Fed should maintain the current interest "
-              f"rate.")
+        # Policy Prescription section
+        print("\n==== Policy Prescription ====================================="
+              "============")
+        rate_difference = (data['adjusted_fdr_rule_after_inertia'] -
+                           data['current_fed_rate'])
+        rounded_difference = round(rate_difference * 4) / 4
+
+        if rounded_difference > 0.125:
+            print(f"  The Adjusted FDR Estimate is "
+                  f"{rate_difference:.2f}% higher than the Current Fed \n"
+                  f"  Rate. The Fed should consider raising the interest "
+                  f"rate by {rounded_difference:.2f}%.")
+        elif rounded_difference < -0.125:
+            print(f"  The Adjusted FDR Estimate is "
+                  f"{abs(rate_difference):.2f}% lower than the Current Fed \n"
+                  f"  Rate. The Fed should consider lowering the interest "
+                  f"rate by {abs(rounded_difference):.2f}%.")
+        else:
+            print(f"  The Adjusted FDR Estimate is equal to the Current "
+                  f"Fed Rate.\n  The Fed should maintain the current interest "
+                  f"rate.")

@@ -9,7 +9,7 @@ from pyeconomics.data.economic_indicators import EconomicIndicators
 
 from pyeconomics.models.monetary_policy.monetary_policy_rules import (
     print_fred_series_names,
-    print_verbose_output,
+    verbose_monetary_policy_rules,
     calculate_policy_rule_estimates,
     calculate_historical_policy_rates,
     plot_historical_rule_estimates
@@ -37,10 +37,10 @@ class TestMonetaryPolicyRules(unittest.TestCase):
             'Balanced Approach Shortfalls Rule (BASR)',
             'First Difference Rule (FDR)'
         ])
-        print_verbose_output(estimates, 2.0)
+        verbose_monetary_policy_rules(estimates,,,
         self.assertTrue(True)  # No exception should be raised
 
-        print_verbose_output(estimates, 2.0, adjusted=True)
+        verbose_monetary_policy_rules(estimates,,,
         self.assertTrue(True)  # No exception should be raised
 
     @patch(

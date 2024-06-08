@@ -1,14 +1,18 @@
 # pyeconomics/models/monetary_policy/first_difference_rule.py
 
+import os
+
 import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
 
+from pyeconomics.ai.first_difference_rule import plot_interpretation
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import FirstDifferenceRuleParameters
-from pyeconomics.utils import verbose_first_difference_rule
+from pyeconomics.verbose import verbose_first_difference_rule
+from pyeconomics.utils.utils import wrap_text
 
 
 def first_difference_rule(
@@ -103,7 +107,10 @@ def first_difference_rule(
             'alpha': params.alpha,
             'rho': params.rho,
             'elb': params.elb,
-            'apply_elb': params.apply_elb
+            'apply_elb': params.apply_elb,
+            'include_ai_analysis': params.include_ai_analysis,
+            'max_tokens': params.max_tokens,
+            'model': params.model
         }
         verbose_first_difference_rule(data)
 
@@ -200,7 +207,8 @@ def historical_first_difference_rule(
 
 
 def plot_historical_fdr(
-        historical_rates: pd.DataFrame
+    historical_rates: pd.DataFrame,
+    params: FirstDifferenceRuleParameters,
 ) -> None:
     """
     Extracts the time range from the data and plots the First Difference
@@ -210,6 +218,8 @@ def plot_historical_fdr(
         historical_rates (pd.DataFrame): DataFrame containing the
             historical rates including FDR estimates and the Federal
             Funds Rate.
+        params (FirstDifferenceRuleParameters): First Difference Rule parameters
+            data class.
 
     Returns:
         None
@@ -244,4 +254,24 @@ def plot_historical_fdr(
         ha="center"
     )
 
+    # Save the plot as an image in the media directory
+    plot_image_path = os.path.join(
+        os.path.dirname(__file__),
+        '../../../media', 'taylor_rule_plot.png'
+    )
+    plt.savefig(plot_image_path, bbox_inches='tight')
+
     plt.show()  # Display the plot
+
+    # Optionally add AI-generated analysis
+    if params.include_ai_analysis:
+        interpretation = plot_interpretation(
+            plot_image_path, params.max_tokens, params.model)
+        wrapped_interpretation = wrap_text(interpretation, 72, indent=2)
+        print("\n==== AI-Generated Analysis ==================================="
+              "============")
+        print(wrapped_interpretation)
+        print("\n  *Use with caution. ChatGPT can make mistakes. Check "
+              "important info.")
+        print("================================================================"
+              "==========")

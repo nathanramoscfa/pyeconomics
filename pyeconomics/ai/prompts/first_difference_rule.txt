@@ -1,0 +1,18 @@
+Given the following data from a First Difference Rule calculation:
+
+- Current Inflation Rate: {current_inflation_rate}%
+- Target Inflation Rate: {inflation_target}%
+- Current Unemployment Rate: {current_unemployment_rate}%
+- Lagged Unemployment Rate: {lagged_unemployment_rate}%
+- Natural Unemployment Rate: {natural_unemployment_rate}%
+- Lagged Natural Unemployment Rate: {lagged_natural_unemployment_rate}%
+- Current Federal Funds Rate: {current_fed_rate}%
+- Inflation Gap: {inflation_gap}%
+- Unemployment Gap: {current_unemployment_gap}%
+- Unadjusted First Difference Rule Estimate: {unadjusted_fdr_rule}%
+- Adjusted First Difference after ELB: {adjusted_fdr_rule_after_elb}%
+- Adjusted First Difference after Inertia: {adjusted_fdr_rule_after_inertia}%
+
+Provide a one-paragraph interpretation and policy prescription based on these
+results, as if you were the Federal Open Commitee (FOMC) of the Federal
+Reserve. The tone should be formal and data-driven. Limit to 100 words.

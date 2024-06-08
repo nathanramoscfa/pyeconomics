@@ -1,19 +1,23 @@
 # pyeconomics/models/monetary_policy/taylor_rule.py
 
+import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
 
+from pyeconomics.ai.taylor_rule import plot_interpretation
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import TaylorRuleParameters
-from pyeconomics.utils import verbose_taylor_rule
+from pyeconomics.verbose import verbose_taylor_rule
+from pyeconomics.utils.utils import wrap_text
 
 
 def taylor_rule(
-        indicators: EconomicIndicators = EconomicIndicators(),
-        params: TaylorRuleParameters = TaylorRuleParameters(),
-        verbose: Optional[bool] = None
+    indicators: EconomicIndicators = EconomicIndicators(),
+    params: TaylorRuleParameters = TaylorRuleParameters(),
+    verbose: Optional[bool] = None,
 ) -> float:
     """
     Computes the Taylor Rule interest rate based on economic indicators.
@@ -22,7 +26,7 @@ def taylor_rule(
         indicators (EconomicIndicators): Economic indicators data class.
         params (TaylorRuleParameters): Taylor Rule parameters data class.
         verbose (bool, optional): Whether to print verbose output. If not
-            provided, defaults to the value in params. Defaults to None.
+            provided, defaults to the values in params. Defaults to None.
 
     Returns:
         float: Taylor Rule interest rate estimate.
@@ -104,7 +108,10 @@ def taylor_rule(
             'beta': params.beta,
             'elb': params.elb,
             'apply_elb': params.apply_elb,
-            'okun_factor': params.okun_factor
+            'okun_factor': params.okun_factor,
+            'include_ai_analysis': params.include_ai_analysis,
+            'max_tokens': params.max_tokens,
+            'model': params.model
         }
         verbose_taylor_rule(data)
 
@@ -179,7 +186,8 @@ def historical_taylor_rule(
 
 
 def plot_historical_taylor_rule(
-        historical_rule_estimates: pd.DataFrame
+    historical_rule_estimates: pd.DataFrame,
+    params: TaylorRuleParameters
 ) -> None:
     """
     Extract the time range from the data, plot the Taylor Rule estimates and
@@ -189,6 +197,7 @@ def plot_historical_taylor_rule(
         historical_rule_estimates (pd.DataFrame): DataFrame containing the
             historical rates including Taylor Rule estimates and the Federal
             Funds Rate.
+        params (TaylorRuleParameters): Taylor Rule parameters data class.
 
     Returns:
         None
@@ -222,4 +231,24 @@ def plot_historical_taylor_rule(
         ha="center"
     )
 
+    # Save the plot as an image in the media directory
+    plot_image_path = os.path.join(
+        os.path.dirname(__file__),
+        '../../../media', 'taylor_rule_plot.png'
+    )
+    plt.savefig(plot_image_path, bbox_inches='tight')
+
     plt.show()  # Display the plot
+
+    # Optionally add AI-generated analysis
+    if params.include_ai_analysis:
+        interpretation = plot_interpretation(
+            plot_image_path, params.max_tokens, params.model)
+        wrapped_interpretation = wrap_text(interpretation, 72, indent=2)
+        print("\n==== AI-Generated Analysis ==================================="
+              "============")
+        print(wrapped_interpretation)
+        print("\n  *Use with caution. ChatGPT can make mistakes. Check "
+              "important info.")
+        print("================================================================"
+              "==========")

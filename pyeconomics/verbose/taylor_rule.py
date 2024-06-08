@@ -1,6 +1,9 @@
-# pyeconomics/utils/tr_utils.py
+# pyeconomics/verbose/taylor_rule.py
 
 from datetime import datetime
+
+from pyeconomics.ai.taylor_rule import taylor_rule
+from pyeconomics.utils.utils import wrap_text
 
 
 def verbose_taylor_rule(data: dict):
@@ -30,6 +33,10 @@ def verbose_taylor_rule(data: dict):
             - okun_factor (float): Okun factor.
             - elb (float): Effective Lower Bound (ELB) rate.
             - apply_elb (bool): Whether to apply the ELB adjustment.
+            - include_ai_analysis (bool): Whether to include AI-generated
+                analysis.
+            - max_tokens (int): Maximum number of tokens for the AI response.
+            - model (str): The OpenAI model to use for the analysis.
 
     Returns:
         None
@@ -37,25 +44,25 @@ def verbose_taylor_rule(data: dict):
     current_date = datetime.now().strftime("%B %d, %Y")
     print("\n==== Economic Indicators ========================================="
           "========")
-    print("Current Inflation:                               {:.2f}%".format(
+    print("  Current Inflation:                             {:.2f}%".format(
         data['current_inflation_rate']))
-    print("Target Inflation:                                {:.2f}%".format(
+    print("  Target Inflation:                              {:.2f}%".format(
         data['inflation_target']))
-    print("Current Unemployment Rate:                       {:.2f}%".format(
+    print("  Current Unemployment Rate:                     {:.2f}%".format(
         data['current_unemployment_rate']))
-    print("Natural Unemployment Rate:                       {:.2f}%".format(
+    print("  Natural Unemployment Rate:                     {:.2f}%".format(
         data['natural_unemployment_rate']))
-    print("Long-Term Real Interest Rate:                    {:.2f}%".format(
+    print("  Long-Term Real Interest Rate:                  {:.2f}%".format(
         data['long_term_real_interest_rate']))
-    print("Current Fed Rate:                                {:.2f}%".format(
+    print("  Current Fed Rate:                              {:.2f}%".format(
         data['current_fed_rate']))
-    print("As of Date:                                      {}".format(
+    print("  As of Date:                                    {}".format(
         current_date))
     print("\n==== Gaps ========================================================"
           "========")
-    print("Inflation Gap:                                   {:.2f}%".format(
+    print("  Inflation Gap:                                 {:.2f}%".format(
         data['inflation_gap']))
-    print("Unemployment Gap:                                {:.2f}%".format(
+    print("  Unemployment Gap:                              {:.2f}%".format(
         data['unemployment_gap']))
     print("\n==== Taylor Rule ================================================="
           "========")
@@ -98,22 +105,45 @@ def verbose_taylor_rule(data: dict):
           "------")
     print("  Adjusted Taylor Rule Estimate:                 {:.2f}%".format(
         data['adjusted_taylor_rule_after_inertia']))
-    print("\n==== Policy Prescription ========================================="
-          "========")
-    rate_difference = (data['adjusted_taylor_rule_after_inertia'] -
-                       data['current_fed_rate'])
-    rounded_difference = round(rate_difference * 4) / 4
 
-    if rounded_difference > 0.125:
-        print("  The Adjusted Taylor Rule Estimate is {:.2f}% higher than the "
-              "Current \n  Fed Rate. The Fed should consider raising the "
-              "interest rate by {:.2f}%.".format(
-                rate_difference, rounded_difference))
-    elif rounded_difference < -0.125:
-        print("  The Adjusted Taylor Rule Estimate is {:.2f}% lower than the "
-              "Current \n  Fed Rate. The Fed should consider lowering the "
-              "interest rate by {:.2f}%.".format(
-                abs(rate_difference), rounded_difference))
+    # Optionally add AI-generated analysis
+    if data['include_ai_analysis']:
+        print("\n==== AI-Generated Policy Prescription ========================"
+              "============")
+        analysis = taylor_rule(
+            data, max_tokens=data['max_tokens'], model=data['model'])
+        analysis = wrap_text(analysis, 72, indent=2)
+        print(analysis)
+        print("                                                               "
+              "          ")
+        caution_text = (
+            f"*Generated with {data['model']}. Use with caution. ChatGPT "
+            f"can make mistakes. Check important info.")
+        caution_text = wrap_text(caution_text, 72, indent=2)
+        print(caution_text)
+        print("================================================================"
+              "==========")
+
     else:
-        print("  The Adjusted Taylor Rule Estimate is equal to the Current "
-              "Fed Rate.\n  The Fed should maintain the current interest rate.")
+        print(
+            "\n==== Policy Prescription ======================================="
+            "==========")
+        rate_difference = (data['adjusted_taylor_rule_after_inertia'] -
+                           data['current_fed_rate'])
+        rounded_difference = round(rate_difference * 4) / 4
+        if rounded_difference > 0.125:
+            print(
+                "  The Adjusted Taylor Rule Estimate is {:.2f}% higher than "
+                "the Current \n  Fed Rate. The Fed should consider raising the "
+                "interest rate by {:.2f}%.".format(
+                    rate_difference, rounded_difference))
+        elif rounded_difference < -0.125:
+            print(
+                "  The Adjusted Taylor Rule Estimate is {:.2f}% lower than the "
+                "Current \n  Fed Rate. The Fed should consider lowering the "
+                "interest rate by {:.2f}%.".format(
+                    abs(rate_difference), rounded_difference))
+        else:
+            print("  The Adjusted Taylor Rule Estimate is equal to the Current "
+                  "Fed Rate.\n  The Fed should maintain the current interest "
+                  "rate.")

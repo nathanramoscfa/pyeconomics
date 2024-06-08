@@ -1,0 +1,12 @@
+Given the following monetary policy rule estimates and the current Federal
+Funds Rate:
+
+- Taylor Rule: {taylor_rule}%
+- Balanced Approach Rule: {balanced_approach_rule}%
+- Balanced Approach Shortfalls Rule: {balanced_approach_shortfalls_rule}%
+- First Difference Rule: {first_difference_rule}%
+- Current Federal Reserve Rate: {current_fed_rate}%
+
+Provide a one-paragraph policy prescription as if you were the Federal Open
+Commitee (FOMC) of the Federal Reserve. The tone should be formal and
+data-driven. Limit to 100 words.

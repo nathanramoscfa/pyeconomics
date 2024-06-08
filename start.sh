@@ -14,7 +14,7 @@ mkdir -p /root/.jupyter/lab/workspaces/unique-workspace
 # Start JupyterLab with a command to open the notebook
 exec jupyter lab \
     --ip=0.0.0.0 \
-    --port=8888 \
+    --port=8080 \
     --no-browser \
     --allow-root \
     --notebook-dir=/app/examples \

@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime
 
-from pyeconomics.utils.bar_utils import verbose_balanced_approach_rule
+from verbose.balanced_approached_rule import verbose_balanced_approach_rule
 
 
 @pytest.fixture

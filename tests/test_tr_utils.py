@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime
 
-from pyeconomics.utils.tr_utils import verbose_taylor_rule
+from verbose.taylor_rule import verbose_taylor_rule
 
 
 @pytest.fixture

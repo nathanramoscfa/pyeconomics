@@ -1,0 +1,3 @@
+Provide a one-paragraph analysis of this plot, as if you were the Federal Open
+Commitee (FOMC) of the Federal Reserve. The tone should be formal and
+data-driven. Limit to 100 words.

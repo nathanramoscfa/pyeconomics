@@ -9,6 +9,7 @@ from .data import BalancedApproachRuleParameters
 from .data import EconomicIndicators
 from .data import FirstDifferenceRuleParameters
 from .data import TaylorRuleParameters
+from .data import MonetaryPolicyRulesParameters
 
 # Models imports
 from .models.monetary_policy import balanced_approach_rule
@@ -22,14 +23,16 @@ from .models.monetary_policy import plot_historical_rule_estimates
 from .models.monetary_policy import plot_historical_bar_basr_rule
 from .models.monetary_policy import plot_historical_fdr
 from .models.monetary_policy import plot_historical_taylor_rule
-from .models.monetary_policy import print_fred_series_names
-from .models.monetary_policy import print_verbose_output
+from .models.monetary_policy import verbose_monetary_policy_rules
 from .models.monetary_policy import taylor_rule
 
-# Utilities imports
-from .utils.bar_utils import verbose_balanced_approach_rule
-from .utils.fdr_utils import verbose_first_difference_rule
-from .utils.tr_utils import verbose_taylor_rule
+# Verbose imports
+from .verbose.balanced_approached_rule import verbose_balanced_approach_rule
+from .verbose.first_difference_rule import verbose_first_difference_rule
+from .verbose.taylor_rule import verbose_taylor_rule
+
+# Utility imports
+from .utils.utils import print_fred_series_names
 
 # Exported symbols
 __all__ = [
@@ -47,12 +50,13 @@ __all__ = [
     'historical_first_difference_rule',
     'historical_taylor_rule',
     'load_from_cache',
+    'MonetaryPolicyRulesParameters',
     'plot_historical_rule_estimates',
     'plot_historical_bar_basr_rule',
     'plot_historical_fdr',
     'plot_historical_taylor_rule',
     'print_fred_series_names',
-    'print_verbose_output',
+    'verbose_monetary_policy_rules',
     'save_to_cache',
     'TaylorRuleParameters',
     'taylor_rule',

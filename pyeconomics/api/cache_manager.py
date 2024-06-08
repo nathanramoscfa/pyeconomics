@@ -42,7 +42,7 @@ def save_to_cache(key: str, data: Any) -> None:
         pickle.dump(data, f)
 
 
-def load_from_cache(key: str, expiry: timedelta = timedelta(days=1)):
+def load_from_cache(key: str, expiry: timedelta = timedelta(hours=6)):
     """Load data from the cache if available and not expired.
 
     Args:

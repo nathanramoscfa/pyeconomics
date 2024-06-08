@@ -1,20 +1,23 @@
 # pyeconomics/models/monetary_policy/balanced_approach_rule.py
 
+import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
 
+from pyeconomics.ai.balanced_approach_rule import plot_interpretation
 from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import BalancedApproachRuleParameters
-from pyeconomics.utils import verbose_balanced_approach_rule
+from pyeconomics.verbose import verbose_balanced_approach_rule
+from pyeconomics.utils import utils
 
 
 def balanced_approach_rule(
-        indicators: EconomicIndicators = EconomicIndicators(),
-        params: BalancedApproachRuleParameters =
-        BalancedApproachRuleParameters(),
-        verbose: Optional[bool] = None
+    indicators: EconomicIndicators = EconomicIndicators(),
+    params: BalancedApproachRuleParameters = BalancedApproachRuleParameters(),
+    verbose: Optional[bool] = None
 ) -> float:
     """
     Computes the Balanced Approach Rule interest rate based on economic
@@ -103,7 +106,10 @@ def balanced_approach_rule(
             'beta': params.beta,
             'elb': params.elb,
             'apply_elb': params.apply_elb,
-            'use_shortfalls_rule': params.use_shortfalls_rule
+            'use_shortfalls_rule': params.use_shortfalls_rule,
+            'include_ai_analysis': params.include_ai_analysis,
+            'max_tokens': params.max_tokens,
+            'model': params.model
         }
         verbose_balanced_approach_rule(data)
 
@@ -111,8 +117,8 @@ def balanced_approach_rule(
 
 
 def historical_balanced_approach_rule(
-        indicators: EconomicIndicators,
-        params: BalancedApproachRuleParameters
+    indicators: EconomicIndicators,
+    params: BalancedApproachRuleParameters
 ) -> pd.DataFrame:
     """
     Computes historical Balanced Approach Rule interest rates using economic
@@ -190,7 +196,8 @@ def historical_balanced_approach_rule(
 
 def plot_historical_bar_basr_rule(
     historical_rates: pd.DataFrame,
-    adjusted: bool = False
+    adjusted: bool = False,
+    params: BalancedApproachRuleParameters = BalancedApproachRuleParameters(),
 ) -> None:
     """
     Extract the time range from the data, plot either the Balanced Approach
@@ -204,6 +211,8 @@ def plot_historical_bar_basr_rule(
             along with their adjusted versions if applicable.
         adjusted (bool): A flag to determine whether to plot the adjusted or
             unadjusted rates.
+        params (BalancedApproachRuleParameters): Balanced Approach Rule model
+            parameters data class.
 
     Returns:
         None
@@ -256,4 +265,24 @@ def plot_historical_bar_basr_rule(
         ha="center"
     )
 
+    # Save the plot as an image in the media directory
+    plot_image_path = os.path.join(
+        os.path.dirname(__file__),
+        '../../../media', 'bar_rule_plot.png'
+    )
+    plt.savefig(plot_image_path, bbox_inches='tight')
+
     plt.show()  # Display the plot
+
+    # Optionally add AI-generated analysis
+    if params.include_ai_analysis:
+        interpretation = plot_interpretation(
+            plot_image_path, params.max_tokens, params.model)
+        wrapped_interpretation = utils.wrap_text(interpretation, 72, indent=2)
+        print("\n==== AI-Generated Analysis ==================================="
+              "============")
+        print(wrapped_interpretation)
+        print("\n  *Use with caution. ChatGPT can make mistakes. Check "
+              "important info.")
+        print("================================================================"
+              "==========")

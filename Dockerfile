@@ -22,8 +22,8 @@ RUN chmod +x start.sh
 # Set environment variables for consistent behavior
 ENV PYTHONUNBUFFERED=1
 
-# Expose port 8888 for Jupyter Lab
-EXPOSE 8888
+# Expose port 8080 for Jupyter Lab
+EXPOSE 8080
 
 # Start Jupyter Lab using the start script
 CMD ["./start.sh"]
