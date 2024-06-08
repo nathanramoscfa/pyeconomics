@@ -8,12 +8,13 @@ import pandas as pd
 from pyeconomics.data.economic_indicators import EconomicIndicators
 
 from pyeconomics.models.monetary_policy.monetary_policy_rules import (
-    print_fred_series_names,
     verbose_monetary_policy_rules,
     calculate_policy_rule_estimates,
     calculate_historical_policy_rates,
     plot_historical_rule_estimates
 )
+
+from pyeconomics.utils.utils import print_fred_series_names
 
 
 class TestMonetaryPolicyRules(unittest.TestCase):
@@ -37,10 +38,10 @@ class TestMonetaryPolicyRules(unittest.TestCase):
             'Balanced Approach Shortfalls Rule (BASR)',
             'First Difference Rule (FDR)'
         ])
-        verbose_monetary_policy_rules(estimates,,,
+        verbose_monetary_policy_rules(estimates, 2.0)
         self.assertTrue(True)  # No exception should be raised
 
-        verbose_monetary_policy_rules(estimates,,,
+        verbose_monetary_policy_rules(estimates, 2.0, adjusted=True)
         self.assertTrue(True)  # No exception should be raised
 
     @patch(
