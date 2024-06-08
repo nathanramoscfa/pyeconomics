@@ -8,10 +8,10 @@ Welcome to PyEconomics's documentation!
    :alt: PyEconomics Logo
 
 **PyEconomics** is a Python library for economic and financial analysis,
-designed to provide tools and models for analyzing various aspects of economic,
-financial, and fiscal policy. Whether you're a developer, economist, financial
-analyst, or researcher, PyEconomics aims to be your go-to resource for
-sophisticated economic modeling and analysis.
+designed to provide AI-powered tools and models for analyzing various aspects
+of economic, financial, and fiscal policy. Whether you're a developer,
+economist, financial analyst, or researcher, PyEconomics aims to be your go-to
+resource for sophisticated economic modeling and analysis.
 
 .. list-table::
    :header-rows: 1

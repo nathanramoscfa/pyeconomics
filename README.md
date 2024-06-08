@@ -5,10 +5,10 @@
 # PyEconomics
 
 **PyEconomics** is a Python library for economic and financial analysis,
-designed to provide tools and models for analyzing various aspects of economics 
-finance. Whether you're a developer, economist, financial analyst, or 
-researcher, PyEconomics aims to be a useful resource for economic and financial
-modeling.
+designed to provide AI-powered tools and models for analyzing various aspects 
+of economics finance. Whether you're a developer, economist, financial analyst, 
+or researcher, PyEconomics aims to be a useful resource for economic and 
+financial modeling.
 
 | Category            | Badge                                                                                                                                                                                                                                                                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
