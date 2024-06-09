@@ -157,8 +157,12 @@ def test_plot_historical_taylor_rule(mock_show):
         'FedRate': [2.0, 2.1]
     }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
+    params = TaylorRuleParameters(
+        inflation_target=2.0, alpha=0.5, beta=0.5, rho=0.0, apply_elb=False
+    )
+
     # Test plot
-    plot_historical_taylor_rule(historical_rule_estimates)
+    plot_historical_taylor_rule(historical_rule_estimates, params)
     assert mock_show.called
 
 

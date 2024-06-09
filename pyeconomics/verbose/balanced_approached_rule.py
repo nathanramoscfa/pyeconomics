@@ -152,5 +152,7 @@ def verbose_balanced_approach_rule(data: dict):
 
     # Adding a note explaining BAR and BASR
     print("\nNote:")
-    print("-BAR stands for Balanced Approach Rule.")
-    print("-BASR stands for Balanced Approach Shortfalls Rule.")
+    if data['use_shortfalls_rule']:
+        print("-BASR stands for Balanced Approach Shortfalls Rule.")
+    else:
+        print("-BAR stands for Balanced Approach Rule.")

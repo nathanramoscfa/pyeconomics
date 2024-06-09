@@ -17,7 +17,7 @@ from pyeconomics.utils.utils import wrap_text
 def taylor_rule(
     indicators: EconomicIndicators = EconomicIndicators(),
     params: TaylorRuleParameters = TaylorRuleParameters(),
-    verbose: Optional[bool] = None,
+    verbose: Optional[bool] = None
 ) -> float:
     """
     Computes the Taylor Rule interest rate based on economic indicators.
