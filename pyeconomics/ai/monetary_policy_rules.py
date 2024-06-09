@@ -5,12 +5,14 @@ import os
 import openai
 
 from pyeconomics.api.openai_api import load_prompt
+from pyeconomics.data.economic_indicators import EconomicIndicators
+from pyeconomics.data.model_parameters import MonetaryPolicyRulesParameters
 
 
 def monetary_policy_rules(
     estimates: dict,
-    current_fed_rate: float,
-    ai_dict: dict = None,
+    indicators: EconomicIndicators,
+    params: MonetaryPolicyRulesParameters,
 ) -> str:
     """
     Generate an AI-based analysis of the monetary policy rules calculation
@@ -19,13 +21,15 @@ def monetary_policy_rules(
     Args:
         estimates (dict): Dictionary containing the monetary policy rules
             estimates.
-        current_fed_rate (float): The current Federal Funds Rate.
-        ai_dict (dict): Dictionary containing the AI-parameters.
+        indicators (EconomicIndicators): Instance containing economic
+            indicators.
+        params (MonetaryPolicyRulesParameters): Instance containing the policy
+            rule parameters.
 
     Returns:
         str: AI-generated analysis paragraph.
     """
-    if ai_dict['adjusted']:
+    if params.rho > 0.0 or params.apply_elb:
         prompt_filepath = 'adjusted_monetary_policy_rules.txt'
     else:
         prompt_filepath = 'monetary_policy_rules.txt'
@@ -49,11 +53,11 @@ def monetary_policy_rules(
             estimates['Balanced Approach Shortfalls Rule (BASR)'], 2),
         first_difference_rule=round(
             estimates['First Difference Rule (FDR)'], 2),
-        current_fed_rate=round(current_fed_rate, 2)
+        current_fed_rate=round(indicators.current_fed_rate, 2)
     )
 
     response = openai.chat.completions.create(
-        model=ai_dict['model'],
+        model=params.model,
         messages=[
             {"role": "system",
              "content": "Act as the Federal Open Market Committee (FOMC) of "
@@ -62,7 +66,7 @@ def monetary_policy_rules(
                         "the growth of the United States money supply."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=ai_dict['max_tokens']
+        max_tokens=params.max_tokens
     )
 
     analysis = response.choices[0].message.content.strip()

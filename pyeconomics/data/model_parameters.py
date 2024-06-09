@@ -149,3 +149,4 @@ class MonetaryPolicyRulesParameters:
     include_ai_analysis: bool = False
     max_tokens: int = 500
     model: str = 'gpt-4o'
+    as_of_date: str = None

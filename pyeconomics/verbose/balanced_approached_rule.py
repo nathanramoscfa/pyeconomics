@@ -55,28 +55,28 @@ def verbose_balanced_approach_rule(data: dict):
     line_length = 67 + len(rule_acronym)
 
     print("\n==== Economic Indicators " + "=" * (line_length - 25))
-    print("Current Inflation:                               {:.2f}%".format(
+    print("  Current Inflation:                             {:.2f}%".format(
         data['current_inflation_rate']))
-    print("Target Inflation:                                {:.2f}%".format(
+    print("  Target Inflation:                              {:.2f}%".format(
         data['inflation_target']))
-    print("Current Unemployment Rate:                       {:.2f}%".format(
+    print("  Current Unemployment Rate:                     {:.2f}%".format(
         data['current_unemployment_rate']))
-    print("Natural Unemployment Rate:                       {:.2f}%".format(
+    print("  Natural Unemployment Rate:                     {:.2f}%".format(
         data['natural_unemployment_rate']))
-    print("Long-Term Real Interest Rate:                    {:.2f}%".format(
+    print("  Long-Term Real Interest Rate:                  {:.2f}%".format(
         data['long_term_real_interest_rate']))
-    print("Current Fed Rate:                                {:.2f}%".format(
+    print("  Current Fed Rate:                              {:.2f}%".format(
         data['current_fed_rate']))
-    print("As of Date:                                      {}".format(
+    print("  As of Date:                                    {}".format(
         current_date))
     print("\n==== Gaps " + "=" * (line_length - 10))
-    print("Inflation Gap:                                   {:.2f}%".format(
+    print("  Inflation Gap:                                 {:.2f}%".format(
         data['inflation_gap']))
-    if data.get('use_shortfalls', False):
-        print("Unemployment Shortfall Gap:                      {:.2f}%".format(
+    if data['use_shortfalls_rule']:
+        print("  Unemployment Shortfall Gap:                    {:.2f}%".format(
             data['unemployment_gap']))
     else:
-        print("Unemployment Gap:                                {:.2f}%".format(
+        print("  Unemployment Gap:                              {:.2f}%".format(
             data['unemployment_gap']))
     print("\n==== {} ".format(rule_name) + "=" *
           (line_length - 6 - len(rule_name)))

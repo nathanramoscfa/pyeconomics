@@ -1,5 +1,6 @@
 # pyeconomics/models/monetary_policy/monetary_policy_rules.py
 
+import copy
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -53,13 +54,16 @@ def calculate_policy_rule_estimates(
         apply_elb=params.apply_elb
     )
 
-    params.beta = 2.0
     bar_params = BalancedApproachRuleParameters(
         inflation_target=params.inflation_target,
         rho=params.rho,
         elb=params.elb,
         apply_elb=params.apply_elb
     )
+
+    # Current Balanced Approach (Shortfalls) Rule calculation using FRED data
+    basr_params = copy.deepcopy(bar_params)  # Make a deep copy
+    basr_params.use_shortfalls_rule = True
 
     # Current Taylor Rule calculation using FRED data
     tr_estimate = taylor_rule(indicators, tr_params)
@@ -68,10 +72,7 @@ def calculate_policy_rule_estimates(
     bar_estimate = balanced_approach_rule(indicators, bar_params)
 
     # Current Balanced Approach (Shortfalls) Rule calculation using FRED data
-    basr_params = bar_params
-    basr_params.use_shortfalls_rule = True
-    basr_estimate = balanced_approach_rule(
-        indicators, bar_params)
+    basr_estimate = balanced_approach_rule(indicators, basr_params)
 
     # Current First Difference Rule calculation using FRED data
     fdr_estimate = first_difference_rule(indicators, fdr_params)
@@ -93,26 +94,8 @@ def calculate_policy_rule_estimates(
         ]
     )
 
-    # Compile dictionary for input into AI model
-    ai_dict = {}
-    if params.include_ai_analysis:
-        ai_dict['include_ai_analysis'] = params.include_ai_analysis
-        ai_dict['max_tokens'] = params.max_tokens
-        ai_dict['model'] = params.model
-        ai_dict['adjusted'] = params.rho > 0.0 or params.apply_elb
-
-    if params.verbose and (params.rho > 0.0 or params.apply_elb):
-        verbose_monetary_policy_rules(
-            estimates,
-            indicators.current_fed_rate,
-            ai_dict,
-            adjusted=True,
-            elb=params.elb,
-            rho=params.rho
-        )
-    elif params.verbose:
-        verbose_monetary_policy_rules(
-            estimates, indicators.current_fed_rate, ai_dict)
+    if params.verbose:
+        verbose_monetary_policy_rules(estimates, indicators, params)
     return estimates
 
 
