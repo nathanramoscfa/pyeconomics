@@ -1,11 +1,11 @@
 # pyeconomics/ai/balanced_approach_rule.py
 
-import base64
 import os
 
 import openai
 
 from pyeconomics.api.openai_api import load_prompt
+from pyeconomics.utils.utils import encode_image
 
 
 def balanced_approach_rule(
@@ -74,20 +74,6 @@ def balanced_approach_rule(
 
     analysis = response.choices[0].message.content.strip()
     return analysis
-
-
-def encode_image(image_path):
-    """
-    Encode the image to base64 format.
-
-    Args:
-        image_path (str): Path to the image file.
-
-    Returns:
-        str: Base64 encoded image.
-    """
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
 
 
 def plot_interpretation(

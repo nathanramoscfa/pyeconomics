@@ -2,6 +2,7 @@
 
 from unittest.mock import patch
 import pandas as pd
+import os
 import pytest
 
 from pyeconomics.data.economic_indicators import EconomicIndicators
@@ -151,7 +152,13 @@ def test_historical_balanced_approach_rule(
 
 
 @patch('pyeconomics.models.monetary_policy.balanced_approach_rule.plt.show')
-def test_plot_historical_bar_basr_rule(mock_show):
+@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.'
+       'plot_interpretation', return_value="This is an AI interpretation.")
+@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.utils.'
+       'wrap_text', return_value="Wrapped interpretation")
+def test_plot_historical_bar_basr_rule(
+    mock_wrap_text, mock_plot_interpretation, mock_show
+):
     historical_rates = pd.DataFrame({
         'BalancedApproachRule': [3.0, 3.1],
         'BalancedApproachShortfallsRule': [2.7, 2.8],
@@ -160,6 +167,10 @@ def test_plot_historical_bar_basr_rule(mock_show):
         'FedRate': [2.0, 2.1]
     }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
+    params = BalancedApproachRuleParameters(
+        include_ai_analysis=True, max_tokens=100, model='test-model'
+    )
+
     # Test unadjusted plot
     plot_historical_bar_basr_rule(historical_rates, adjusted=False)
     assert mock_show.called
@@ -167,6 +178,27 @@ def test_plot_historical_bar_basr_rule(mock_show):
     # Test adjusted plot
     plot_historical_bar_basr_rule(historical_rates, adjusted=True)
     assert mock_show.called
+
+    # Test with AI-generated analysis
+    plot_historical_bar_basr_rule(
+        historical_rates, adjusted=True, params=params
+    )
+    mock_plot_interpretation.assert_called_once()
+
+    # Extract the actual call argument and get its absolute path
+    actual_call_arg = os.path.abspath(mock_plot_interpretation.call_args[0][0])
+
+    # Get the absolute path of the expected file
+    expected_call_arg = os.path.abspath(os.path.join(
+        os.path.dirname(__file__),
+        '../media/bar_rule_plot.png'
+    ))
+
+    assert actual_call_arg == expected_call_arg
+
+    mock_wrap_text.assert_called_once_with(
+        "This is an AI interpretation.", 72, indent=2
+    )
 
 
 if __name__ == '__main__':
