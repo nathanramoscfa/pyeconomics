@@ -1,7 +1,9 @@
+# pyeconomics/utils/utils.py
+
 import base64
 import textwrap
 
-from ..api import fred_client
+from datetime import datetime
 
 
 def wrap_text(text: str, width: int, indent: int = 2):
@@ -35,37 +37,26 @@ def encode_image(image_path):
         return base64.b64encode(image_file.read()).decode('utf-8')
 
 
-def print_fred_series_names(
-    inflation_series_id: str = 'PCETRIM12M159SFRBDAL',
-    unemployment_rate_series_id: str = 'UNRATE',
-    natural_unemployment_series_id: str = 'NROU',
-    real_interest_rate_series_id: str = 'DFII10'
-) -> None:
+def halving_dates_list() -> list[datetime]:
     """
-    Print the FRED series IDs and their corresponding names for various
-    economic indicators.
-
-    Args:
-        inflation_series_id (str): FRED Series ID for inflation data.
-        unemployment_rate_series_id (str): FRED Series ID for unemployment rate.
-        natural_unemployment_series_id (str): FRED Series ID for natural
-            unemployment rate.
-        real_interest_rate_series_id (str): FRED Series ID for long-term real
-            interest rate.
+    Return the Bitcoin halving dates.
 
     Returns:
-        None
+        list[datetime]: List of Bitcoin halving dates.
     """
-    # Print the series names and their IDs
-    print(
-        f"Inflation Series ID:               "
-        f"{fred_client.get_series_name(inflation_series_id)}")
-    print(
-        f"Unemployment Rate Series ID:       "
-        f"{fred_client.get_series_name(unemployment_rate_series_id)}")
-    print(
-        f"Natural Unemployment Series ID:    "
-        f"{fred_client.get_series_name(natural_unemployment_series_id)}")
-    print(
-        f"Real Interest Rate Series ID:      "
-        f"{fred_client.get_series_name(real_interest_rate_series_id)}")
+    return [
+        datetime(2012, 11, 28),
+        datetime(2016, 7, 9),
+        datetime(2020, 5, 11),
+        datetime(2024, 4, 19),
+        datetime(2028, 3, 27),
+        datetime(2032, 2, 29),
+    ]
+
+
+def months_until_next_halving(date: datetime, halving_dates: list[datetime]):
+    for halving_date in halving_dates:
+        if date < halving_date:
+            delta = halving_date - date
+            return delta.days // 30  # Approximate months
+    return 0

@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from pyeconomics.api.fred_data import fetch_historical_fed_funds_rate
+from pyeconomics.utils.fred import fetch_historical_fed_funds_rate
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def mock_fred_data():
     return dfedtar, dfedtaru
 
 
-@patch('pyeconomics.api.fred_data.fred_client')
+@patch('pyeconomics.api.fred_api.fred_client')
 def test_fetch_historical_fed_funds_rate(mock_fred_client, mock_fred_data):
     dfedtar, dfedtaru = mock_fred_data
     mock_fred_client.fetch_data.side_effect = [dfedtar, dfedtaru]

@@ -7,11 +7,11 @@ import pandas as pd
 from typing import Optional
 
 from pyeconomics.ai.balanced_approach_rule import plot_interpretation
-from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
+from pyeconomics.api import fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import BalancedApproachRuleParameters
 from pyeconomics.verbose import verbose_balanced_approach_rule
-from pyeconomics.utils import utils
+from pyeconomics.utils import fred, utils
 
 
 def balanced_approach_rule(
@@ -140,7 +140,7 @@ def historical_balanced_approach_rule(
         indicators.natural_unemployment_series_id)
     real_interest_rate = fred_client.fetch_data(
         indicators.real_interest_rate_series_id)
-    fed_rate = fetch_historical_fed_funds_rate()
+    fed_rate = fred.fetch_historical_fed_funds_rate()
 
     # Combine into a DataFrame
     data = pd.DataFrame({

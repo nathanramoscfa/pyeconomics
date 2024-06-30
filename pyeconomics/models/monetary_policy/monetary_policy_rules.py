@@ -9,7 +9,7 @@ from .balanced_approach_rule import (
 from .taylor_rule import taylor_rule, historical_taylor_rule
 from .first_difference_rule import (
     first_difference_rule, historical_first_difference_rule)
-from ...api import fetch_historical_fed_funds_rate, fred_client
+from ...api import fred_client
 from ...data.economic_indicators import EconomicIndicators
 from ...data.model_parameters import (
     BalancedApproachRuleParameters,
@@ -18,6 +18,7 @@ from ...data.model_parameters import (
     MonetaryPolicyRulesParameters
 )
 from ...verbose.monetary_policy_rules import verbose_monetary_policy_rules
+from ...utils.fred import fetch_historical_fed_funds_rate
 
 
 def calculate_policy_rule_estimates(

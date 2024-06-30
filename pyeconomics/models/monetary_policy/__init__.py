@@ -19,7 +19,7 @@ from .monetary_policy_rules import (
     calculate_historical_policy_rates, plot_historical_rule_estimates
 )
 
-from ...utils.utils import print_fred_series_names
+from ...utils.fred import print_fred_series_names
 
 __all__ = [
     'balanced_approach_rule',
@@ -34,6 +34,6 @@ __all__ = [
     'plot_historical_fdr',
     'plot_historical_taylor_rule',
     'print_fred_series_names',
-    'verbose_monetary_policy_rules',
     'taylor_rule',
+    'verbose_monetary_policy_rules'
 ]

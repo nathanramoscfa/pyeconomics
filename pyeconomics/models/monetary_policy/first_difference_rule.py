@@ -8,10 +8,11 @@ import pandas as pd
 from typing import Optional
 
 from pyeconomics.ai.first_difference_rule import plot_interpretation
-from pyeconomics.api import fetch_historical_fed_funds_rate, fred_client
+from pyeconomics.api import fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import FirstDifferenceRuleParameters
 from pyeconomics.verbose import verbose_first_difference_rule
+from pyeconomics.utils.fred import fetch_historical_fed_funds_rate
 from pyeconomics.utils.utils import wrap_text
 
 
