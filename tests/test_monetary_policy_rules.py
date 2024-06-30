@@ -13,7 +13,7 @@ from pyeconomics.models.monetary_policy.monetary_policy_rules import (
 
 from pyeconomics.verbose.monetary_policy_rules import \
     verbose_monetary_policy_rules
-from pyeconomics.utils.utils import print_fred_series_names
+from pyeconomics.utils.fred import print_fred_series_names
 from pyeconomics.data.model_parameters import MonetaryPolicyRulesParameters
 
 
