@@ -135,14 +135,15 @@ def historical_taylor_rule(
         pd.DataFrame: DataFrame with computed Taylor Rule rates.
     """
     # Fetch historical data for all series
-    inflation = fred_client.fetch_data(indicators.inflation_series_id)
+    inflation = fred_client.fetch_data(
+        indicators.inflation_series_id).squeeze()
     unemployment_rate = fred_client.fetch_data(
-        indicators.unemployment_rate_series_id)
+        indicators.unemployment_rate_series_id).squeeze()
     natural_unemployment = fred_client.fetch_data(
-        indicators.natural_unemployment_series_id)
+        indicators.natural_unemployment_series_id).squeeze()
     real_interest_rate = fred_client.fetch_data(
-        indicators.real_interest_rate_series_id)
-    fed_rate = fetch_historical_fed_funds_rate()
+        indicators.real_interest_rate_series_id).squeeze()
+    fed_rate = fetch_historical_fed_funds_rate().squeeze()
 
     # Combine into a DataFrame
     data = pd.DataFrame({

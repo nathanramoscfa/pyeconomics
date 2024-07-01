@@ -127,7 +127,7 @@ def verbose_first_difference_rule(data: dict):
               "============")
         print(wrapped_ai_analysis)
         print(f"\n  *Generated with {data['model']}. Use with caution. ChatGPT "
-              f"can make mistakes. Check important info.")
+              f"can make mistakes. \nCheck important info.")
         print("================================================================"
               "==========")
 

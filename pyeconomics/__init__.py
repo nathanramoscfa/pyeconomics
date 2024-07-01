@@ -1,3 +1,5 @@
+# pyeconomics/__init__.py
+
 # API imports
 from pyeconomics.api import (
     bitcoin_s2f_data,

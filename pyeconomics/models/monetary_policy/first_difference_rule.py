@@ -41,15 +41,21 @@ def first_difference_rule(
 
         # Fetch data if not provided
         indicators.current_inflation_rate = fred_client.get_data_or_fetch(
-            indicators.current_inflation_rate, indicators.inflation_series_id)
+            indicators.current_inflation_rate,
+            indicators.inflation_series_id
+        )
         indicators.current_unemployment_rate = fred_client.get_data_or_fetch(
             indicators.current_unemployment_rate,
-            indicators.unemployment_rate_series_id)
+            indicators.unemployment_rate_series_id
+        )
         indicators.natural_unemployment_rate = fred_client.get_data_or_fetch(
             indicators.natural_unemployment_rate,
-            indicators.natural_unemployment_series_id)
+            indicators.natural_unemployment_series_id
+        )
         indicators.current_fed_rate = fred_client.get_data_or_fetch(
-            indicators.current_fed_rate, 'DFEDTARU')
+            indicators.current_fed_rate,
+            series_id='DFEDTARU'
+        )
 
         indicators.lagged_unemployment_rate = fred_client.get_data_or_fetch(
             indicators.lagged_unemployment_rate,
@@ -136,14 +142,15 @@ def historical_first_difference_rule(
     """
     try:
         # Fetch historical data for all series
-        inflation = fred_client.fetch_data(indicators.inflation_series_id)
+        inflation = fred_client.fetch_data(
+            indicators.inflation_series_id).squeeze()
         unemployment_rate = fred_client.fetch_data(
-            indicators.unemployment_rate_series_id)
+            indicators.unemployment_rate_series_id).squeeze()
         lagged_unemployment_rate = unemployment_rate.shift(12)
         natural_unemployment = fred_client.fetch_data(
-            indicators.natural_unemployment_series_id)
+            indicators.natural_unemployment_series_id).squeeze()
         lagged_natural_unemployment = natural_unemployment.shift(4)
-        fed_rate = fetch_historical_fed_funds_rate()
+        fed_rate = fetch_historical_fed_funds_rate().squeeze()
 
         # Check for missing data
         if (inflation is None or

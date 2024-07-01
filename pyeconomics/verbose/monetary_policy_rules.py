@@ -30,8 +30,6 @@ def verbose_monetary_policy_rules(
     Returns:
         None
     """
-    print("verbose_monetary_policy_rules called")  # Add this line for debugging
-
     # Formatting and printing the verbose output
     width = 89  # Total width of the box
     as_of_date = params.as_of_date or datetime.now().strftime("%B %d, %Y")
@@ -89,7 +87,7 @@ def verbose_monetary_policy_rules(
             print("│ " + line.ljust(width - 4) + " │")
 
         caution = (f"*Generated with {params.model}. Use with caution. "
-                   f"ChatGPT can make mistakes. Check important info.")
+                   f"ChatGPT can make mistakes. \nCheck important info.")
 
         print("|" + " " * (width - 2) + "|")
         caution = wrap_text(caution, width=width - 4, indent=3)

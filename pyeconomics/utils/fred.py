@@ -1,4 +1,4 @@
-# pyeconomics/utils/fred.py
+# utils/fred.py
 
 import pandas as pd
 
@@ -63,6 +63,6 @@ def fetch_historical_fed_funds_rate() -> pd.DataFrame:
         dfedtar[dfedtar.index <= '2008-12-15'],
         dfedtaru[dfedtaru.index > '2008-12-15']
     ])
-    df.index.name = 'FedRate'
-    df.name = 'FedRate'
+    df =  df.to_frame(name='FedRate')
+    df.index.name = 'DATE'
     return df

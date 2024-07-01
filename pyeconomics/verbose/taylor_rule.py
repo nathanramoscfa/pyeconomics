@@ -118,7 +118,7 @@ def verbose_taylor_rule(data: dict):
               "          ")
         caution_text = (
             f"*Generated with {data['model']}. Use with caution. ChatGPT "
-            f"can make mistakes. Check important info.")
+            f"can make mistakes. \nCheck important info.")
         caution_text = wrap_text(caution_text, 72, indent=2)
         print(caution_text)
         print("================================================================"

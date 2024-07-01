@@ -1,3 +1,5 @@
+# pyeconomics/api/fred_api.py
+
 import os
 import logging
 import datetime
@@ -198,7 +200,8 @@ class FredClient(DataSource):
 
     @classmethod
     def get_data_or_fetch(
-        cls, default: Any,
+        cls,
+        default: Any,
         series_id: str,
         periods: int = 0
     ) -> Any:

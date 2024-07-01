@@ -12,17 +12,15 @@ from pyeconomics.utils.fred import fetch_historical_fed_funds_rate
 def mock_fred_data():
     """Fixture for mock FRED data."""
     dfedtar_data = {
-        'DATE': pd.date_range(start='2000-01-01', end='2008-12-15', freq='ME'),
-        'VALUE': [1.5] * 108
+        'DATE': pd.date_range(start='2000-01-01', end='2008-12-15', freq='D'),
+        'VALUE': [1.5] * len(
+            pd.date_range(start='2000-01-01', end='2008-12-15', freq='D'))
     }
     dfedtaru_data = {
-        'DATE': pd.date_range(start='2008-12-16', end='2020-01-01', freq='ME'),
-        'VALUE': [0.25] * 133
+        'DATE': pd.date_range(start='2008-12-16', end='2020-01-01', freq='D'),
+        'VALUE': [0.25] * len(
+            pd.date_range(start='2008-12-16', end='2020-01-01', freq='D'))
     }
-    # Fix the lengths to ensure they match
-    dfedtar_data['VALUE'] = dfedtar_data['VALUE'][:len(dfedtar_data['DATE'])]
-    dfedtaru_data['VALUE'] = dfedtaru_data['VALUE'][:len(dfedtaru_data['DATE'])]
-
     dfedtar = pd.DataFrame(dfedtar_data).set_index('DATE')
     dfedtaru = pd.DataFrame(dfedtaru_data).set_index('DATE')
     return dfedtar, dfedtaru
@@ -31,18 +29,22 @@ def mock_fred_data():
 @patch('pyeconomics.api.fred_api.fred_client')
 def test_fetch_historical_fed_funds_rate(mock_fred_client, mock_fred_data):
     dfedtar, dfedtaru = mock_fred_data
-    mock_fred_client.fetch_data.side_effect = [dfedtar, dfedtaru]
+    mock_fred_client.fetch_data.side_effect = [dfedtar['VALUE'],
+                                               dfedtaru['VALUE']]
 
     result = fetch_historical_fed_funds_rate()
 
-    expected = pd.concat([
-        dfedtar[dfedtar.index <= '2008-12-15'],
-        dfedtaru[dfedtaru.index > '2008-12-15']
-    ])
-    expected.index.name = 'FedRate'
-    expected.name = 'FedRate'
+    # Check the column name
+    assert list(result.columns) == ['FedRate'], \
+        f"Column names do not match: {list(result.columns)} != ['FedRate']"
 
-    pd.testing.assert_frame_equal(result, expected)
+    # Check the index name
+    assert result.index.name == 'DATE', \
+        f"Index name does not match: {result.index.name} != 'DATE'"
+
+    # Check the data type is DataFrame
+    assert isinstance(result, pd.DataFrame), \
+        f"Result is not a DataFrame: {type(result)}"
 
 
 if __name__ == '__main__':

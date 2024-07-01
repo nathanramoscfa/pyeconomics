@@ -100,10 +100,7 @@ def test_balanced_approach_rule(mock_fred_client, mock_fred_data):
 
 
 @patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
-@patch(
-    'pyeconomics.models.monetary_policy.'
-    'balanced_approach_rule.fetch_historical_fed_funds_rate'
-)
+@patch('pyeconomics.utils.fred.fetch_historical_fed_funds_rate')
 def test_historical_balanced_approach_rule(
     mock_fetch_historical_fed_funds_rate,
     mock_fred_client,

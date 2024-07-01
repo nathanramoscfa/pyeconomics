@@ -80,7 +80,7 @@ def test_first_difference_rule(mock_fred_client, sample_fred_data):
 
 
 def test_historical_first_difference_rule(mock_fred_client, sample_fred_data):
-    mock_fred_client.side_effect = lambda series_id: sample_fred_data
+    mock_fred_client.side_effect = lambda series_id: sample_fred_data.squeeze()
 
     indicators = EconomicIndicators(
         inflation_series_id='PCETRIM12M159SFRBDAL',
