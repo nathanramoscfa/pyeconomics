@@ -52,7 +52,9 @@ jobs:
 
     # Print environment variables for debugging
     - name: Print environment variables
-      run: echo "FRED_API_KEY=${{ env.FRED_API_KEY }} && echo "OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}"
+      run: |
+        echo "FRED_API_KEY=${{ env.FRED_API_KEY }}"
+        echo "OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}"
 
     # Lint with flake8
     - name: Lint with flake8
