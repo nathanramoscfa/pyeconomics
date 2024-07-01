@@ -34,6 +34,10 @@ jobs:
     - name: Set PYTHONPATH
       run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
 
+    # Print PYTHONPATH for debugging
+    - name: Print PYTHONPATH
+      run: echo "PYTHONPATH=${{ env.PYTHONPATH }}"
+
     # Install the package in editable mode
     - name: Install Package
       run: pip install -e .
@@ -45,6 +49,10 @@ jobs:
     # Set OpenAI API Key environment variable
     - name: Set OpenAI API Key environment variable
       run: echo "OPENAI_API_KEY=dummy_openai_api_key" >> $GITHUB_ENV
+
+    # Print environment variables for debugging
+    - name: Print environment variables
+      run: echo "FRED_API_KEY=${{ env.FRED_API_KEY }} && echo "OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}"
 
     # Lint with flake8
     - name: Lint with flake8

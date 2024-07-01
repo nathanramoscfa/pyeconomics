@@ -29,6 +29,9 @@ def mock_fred_data():
 
 @patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
 def test_balanced_approach_rule(mock_fred_client, mock_fred_data):
+    print("\nMocking fred_client in balanced_approach_rule")
+    print(f"mock_fred_client: {mock_fred_client}")
+
     mock_fred_client.get_data_or_fetch.side_effect = (
         lambda default, series_id, periods=0: mock_fred_data.get(series_id)
     )
