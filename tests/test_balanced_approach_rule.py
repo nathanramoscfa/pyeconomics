@@ -109,6 +109,12 @@ def test_historical_balanced_approach_rule(
     mock_fred_client,
     mock_fred_data
 ):
+    print("Mocking fred_client and fetch_historical_fed_funds_rate in "
+          "historical_balanced_approach_rule")
+    print(f"mock_fred_client: {mock_fred_client}")
+    print(f"mock_fetch_historical_fed_funds_rate: "
+          f"{mock_fetch_historical_fed_funds_rate}")
+
     mock_fred_client.fetch_data.side_effect = (
         lambda series_id: pd.Series([mock_fred_data[series_id]] * 10)
     )
@@ -159,6 +165,12 @@ def test_historical_balanced_approach_rule(
 def test_plot_historical_bar_basr_rule(
     mock_wrap_text, mock_plot_interpretation, mock_show
 ):
+    print("Mocking plt.show, plot_interpretation, and utils.wrap_text in "
+          "test_plot_historical_bar_basr_rule")
+    print(f"mock_wrap_text: {mock_wrap_text}")
+    print(f"mock_plot_interpretation: {mock_plot_interpretation}")
+    print(f"mock_show: {mock_show}")
+
     historical_rates = pd.DataFrame({
         'BalancedApproachRule': [3.0, 3.1],
         'BalancedApproachShortfallsRule': [2.7, 2.8],
