@@ -1,6 +1,6 @@
 # tests/test_balanced_approach_rule.py
 
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import pandas as pd
 import os
 import pytest
@@ -27,7 +27,9 @@ def mock_fred_data():
     }
 
 
-@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
+# @patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
+@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.'
+       'fred_client', new_callable=MagicMock)
 def test_balanced_approach_rule(mock_fred_client, mock_fred_data):
     print("\nMocking fred_client in balanced_approach_rule")
     print(f"mock_fred_client: {mock_fred_client}")
@@ -109,7 +111,7 @@ def test_historical_balanced_approach_rule(
     mock_fred_client,
     mock_fred_data
 ):
-    print("Mocking fred_client and fetch_historical_fed_funds_rate in "
+    print("\nMocking fred_client and fetch_historical_fed_funds_rate in "
           "historical_balanced_approach_rule")
     print(f"mock_fred_client: {mock_fred_client}")
     print(f"mock_fetch_historical_fed_funds_rate: "
@@ -165,7 +167,7 @@ def test_historical_balanced_approach_rule(
 def test_plot_historical_bar_basr_rule(
     mock_wrap_text, mock_plot_interpretation, mock_show
 ):
-    print("Mocking plt.show, plot_interpretation, and utils.wrap_text in "
+    print("\nMocking plt.show, plot_interpretation, and utils.wrap_text in "
           "test_plot_historical_bar_basr_rule")
     print(f"mock_wrap_text: {mock_wrap_text}")
     print(f"mock_plot_interpretation: {mock_plot_interpretation}")
