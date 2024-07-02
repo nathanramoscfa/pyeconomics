@@ -1,6 +1,6 @@
 # tests/test_balanced_approach_rule.py
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pandas as pd
 import os
 import pytest
@@ -27,9 +27,7 @@ def mock_fred_data():
     }
 
 
-# @patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
-@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.'
-       'fred_client', new_callable=MagicMock)
+@patch('pyeconomics.models.monetary_policy.balanced_approach_rule.fred_client')
 def test_balanced_approach_rule(mock_fred_client, mock_fred_data):
     print("\nMocking fred_client in balanced_approach_rule")
     print(f"mock_fred_client: {mock_fred_client}")
