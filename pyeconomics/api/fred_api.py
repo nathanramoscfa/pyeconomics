@@ -73,8 +73,25 @@ class FredClient(DataSource):
             if cls._instance is None:
                 logging.debug("Creating new FredClient instance")
                 cls._instance = object.__new__(cls)
-                cls._instance.api_key = api_key
-                cls._instance.client = None
+                api_key_retrieved = api_key or os.getenv('FRED_API_KEY')
+                logging.debug(f"API key from environment variable: "
+                              f"{api_key_retrieved}")
+                if not api_key_retrieved and KEYRING_AVAILABLE:
+                    logging.debug("Attempting to retrieve API key from keyring")
+                    try:
+                        api_key_retrieved = keyring.get_password(
+                            "fred", "api_key")
+                        logging.debug(f"API key from keyring: "
+                                      f"{api_key_retrieved}")
+                    except Exception as e:
+                        logging.debug(f"Keyring not available: {e}")
+                if not api_key_retrieved:
+                    logging.debug("API Key not found, raising ValueError.")
+                    raise ValueError(
+                        "API Key for FRED must be provided "
+                        "or retrievable from keyring.")
+                logging.debug(f"Using API Key: {api_key_retrieved}")
+                cls._instance.client = Fred(api_key=api_key_retrieved)
             return cls._instance
 
     @classmethod
@@ -85,21 +102,6 @@ class FredClient(DataSource):
         with cls._lock:
             cls._instance = None
             logging.debug("FredClient instance reset")
-
-    def _initialize_client(self):
-        if self.client is None:
-            api_key_retrieved = self.api_key or os.getenv('FRED_API_KEY')
-            if not api_key_retrieved and KEYRING_AVAILABLE:
-                try:
-                    api_key_retrieved = keyring.get_password(
-                        "fred", "api_key")
-                except Exception as e:
-                    logging.debug(f"Keyring not available: {e}")
-            if not api_key_retrieved:
-                raise ValueError(
-                    "API Key for FRED must be provided "
-                    "or retrievable from keyring.")
-            self.client = Fred(api_key=api_key_retrieved)
 
     def fetch_data(self, series_id: str) -> pd.Series:
         """
@@ -115,8 +117,6 @@ class FredClient(DataSource):
             ValueError: If no data is found for series ID.
             Exception: For fetch operation errors.
         """
-        self._initialize_client()
-
         cache_key = f"fred_series_{series_id}"
         data = load_from_cache(cache_key)
 
