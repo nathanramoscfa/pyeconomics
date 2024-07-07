@@ -20,22 +20,22 @@ def plot_residuals(exog: pd.DataFrame, model: sm.RegressionResults) -> None:
         model (sm.RegressionResults): The fitted statsmodels model.
     """
     if not isinstance(exog, pd.DataFrame) or exog.empty:
-        raise ValueError("Input 'df_exog' is not a valid non-empty DataFrame.")
+        raise ValueError("Input 'exog' is not a valid non-empty DataFrame.")
 
     residuals = model.resid_deviance if (
         isinstance(model, GLMResultsWrapper)
     ) else model.resid
-    num_plots = exog.shape[1]
+    num_plots = exog.shape[1] - 1  # Exclude the constant term
 
     if num_plots == 0:
-        raise ValueError("The DataFrame does not contain any columns.")
+        raise ValueError("The DataFrame does not contain any predictor columns.")
 
     fig, axs = plt.subplots(
-        max(1, num_plots), 1, figsize=(5, 3 * max(1, num_plots))
+        num_plots, 1, figsize=(5, 3 * num_plots)
     )
     axs = axs.flatten() if num_plots > 1 else [axs]
 
-    for ax, column in zip(axs, exog.columns[1:]):
+    for ax, column in zip(axs, exog.columns[1:]):  # Skip the constant term
         ax.scatter(exog[column], residuals, alpha=0.5)
         ax.set_xlabel(f'Log Predictor: {column}')
         ax.set_ylabel('Residuals')
