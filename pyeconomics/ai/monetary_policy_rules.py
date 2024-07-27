@@ -53,17 +53,19 @@ def monetary_policy_rules(
             estimates['Balanced Approach Shortfalls Rule (BASR)'], 2),
         first_difference_rule=round(
             estimates['First Difference Rule (FDR)'], 2),
-        current_fed_rate=round(indicators.current_fed_rate, 2)
+        current_fed_rate=round(indicators.current_fed_rate, 2),
+        rho=params.rho
     )
 
     response = openai.chat.completions.create(
         model=params.model,
         messages=[
             {"role": "system",
-             "content": "Act as the Federal Open Market Committee (FOMC) of "
-                        "the Federal Reserve System (the Fed) that is charged "
-                        "with making key decisions about interest rates and "
-                        "the growth of the United States money supply."},
+             "content": "You are the Federal Open Market Committee (FOMC) of "
+                        "the Federal Reserve System. Your task is to analyze "
+                        "monetary policy rule estimates and provide a policy "
+                        "prescription based on the given data."
+             },
             {"role": "user", "content": prompt}
         ],
         max_tokens=params.max_tokens

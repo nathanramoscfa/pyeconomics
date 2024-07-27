@@ -87,7 +87,7 @@ def verbose_monetary_policy_rules(
             print("│ " + line.ljust(width - 4) + " │")
 
         caution = (f"*Generated with {params.model}. Use with caution. "
-                   f"ChatGPT can make mistakes. \nCheck important info.")
+                   f"ChatGPT can make mistakes. Check important info.")
 
         print("|" + " " * (width - 2) + "|")
         caution = wrap_text(caution, width=width - 4, indent=3)
