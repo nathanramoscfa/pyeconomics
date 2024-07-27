@@ -1,5 +1,5 @@
 Given the following monetary policy rule estimates adjusted for the zero lower
-bound, and policy inertia (rho = 0.9):
+bound, and policy inertia (rho = {rho}):
 
 - Adjusted Taylor Rule: {taylor_rule}%
 - Adjusted Balanced Approach Rule: {balanced_approach_rule}%
@@ -8,5 +8,9 @@ bound, and policy inertia (rho = 0.9):
 - Current Federal Reserve Rate: {current_fed_rate}%
 
 Provide a one-paragraph interpretation and policy prescription based on these
-results, as if you were the Federal Open Commitee (FOMC) of the Federal
-Reserve. The tone should be formal and data-driven. Limit to 100 words.
+results, as if you were the Federal Open Market Committee (FOMC) of the Federal
+Reserve. Include in the policy prescription what the current Federal Reserve
+Rate should be and it must be a multiple of 0.25% and within the range of policy
+rate prescriptions. Make sure all numerical values mentioned in your response
+are rounded to two decimals. The tone should be formal, data-driven, and
+limited to 100 words.
