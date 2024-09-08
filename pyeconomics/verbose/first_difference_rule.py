@@ -36,7 +36,7 @@ def verbose_first_difference_rule(data: dict):
             - include_ai_analysis (bool): Whether to include AI-generated
               analysis.
             - max_tokens (int): Maximum number of tokens for the AI response.
-            - model (str): The OpenAI model to use for the analysis.
+            - ai_model (str): The OpenAI ai_model to use for the analysis.
 
     Returns:
         None
@@ -44,7 +44,7 @@ def verbose_first_difference_rule(data: dict):
     current_date = datetime.now().strftime("%B %d, %Y")
     print(
         "\n==== Economic Indicators ==========================================="
-        "=")
+        "======")
     print("  Current Inflation:                               {:.2f}%".format(
         data['current_inflation_rate']))
     print("  Target Inflation:                                {:.2f}%".format(
@@ -64,7 +64,7 @@ def verbose_first_difference_rule(data: dict):
 
     print(
         "\n==== Gaps =========================================================="
-        "=")
+        "======")
     print("  Inflation Gap:                                   {:.2f}%".format(
         data['inflation_gap']))
     print("  Current Unemployment Gap:                        {:.2f}%".format(
@@ -74,60 +74,63 @@ def verbose_first_difference_rule(data: dict):
 
     print(
         "\n==== First Difference Rule (FDR) ==================================="
-        "=")
-    print("  Last Fed Rate:                                 {:.2f}%".format(
+        "======")
+    print("  Last Fed Rate:                                   {:.2f}%".format(
         data['current_fed_rate']))
-    print("  Alpha * Inflation Gap:                         "
+    print("  Alpha * Inflation Gap:                           "
           "+ {:.2f} * {:.2f}%".format(
             data['alpha'], data['inflation_gap']))
-    print("  Current Unemployment Gap Adjustment:           + {:.2f}%".format(
+    print("  Current Unemployment Gap Adjustment:             + {:.2f}%".format(
         data['current_unemployment_gap']))
-    print("  Last Year Unemployment Gap Adjustment:         - {:.2f}%".format(
+    print("  Last Year Unemployment Gap Adjustment:           - {:.2f}%".format(
         data['lagged_unemployment_gap']))
     print(
-        "---------------------------------------------------------------------")
-    print("  Unadjusted FDR Estimate:                       {:.2f}%".format(
+        "---------------------------------------------------------------------"
+        "-----")
+    print("  Unadjusted FDR Estimate:                         {:.2f}%".format(
         data['unadjusted_fdr_rule']))
 
     print(
         "\n==== Adjusted First Difference Rule ================================"
-        "=")
+        "======")
     if data['apply_elb']:
         print("  Effective Lower Bound (ELB) Adjustment:")
         print(
-            "  Maximum of FDR or ELB:                         "
+            "  Maximum of FDR or ELB:                           "
             "max({:.2f}%, {:.2f}%)".format(
                 data['unadjusted_fdr_rule'], data['elb']))
-        print(
-            "------------------------------------------------------------------"
-            "---")
-        print("  FDR Adjusted for ELB:                          {:.2f}%".format(
-            data['adjusted_fdr_rule_after_elb']))
+        print("----------------------------------------------------------------"
+              "----------")
+        print("  FDR Adjusted for ELB:                            "
+              "{:.2f}%".format(data['adjusted_fdr_rule_after_elb']))
 
     print("\n  Policy Inertia Adjustment:")
-    print("  Policy Inertia Coefficient (rho):              {:.2f}".format(
+    print("  Policy Inertia Coefficient (rho):                {:.2f}".format(
         data['rho']))
-    print("  Last Fed Rate:                                 * {:.2f}%".format(
+    print("  Last Fed Rate:                                   * {:.2f}%".format(
         data['current_fed_rate']))
-    print("  Adjustment Coefficient (1 - rho):              "
+    print("  Adjustment Coefficient (1 - rho):                "
           "+ (1 - {:.2f})".format(data['rho']))
-    print(f"  FDR Adjusted for ELB:                         "
+    print(f"  FDR Adjusted for ELB:                           "
           f" * {data['adjusted_fdr_rule_after_elb']:.2f}%")
-    print(
-        "---------------------------------------------------------------------")
-    print("  Adjusted FDR Estimate:                         {:.2f}%".format(
+    print("--------------------------------------------------------------------"
+          "------")
+    print("  Adjusted FDR Estimate:                           {:.2f}%".format(
         data['adjusted_fdr_rule_after_inertia']))
 
     # Optionally add AI-generated analysis
     if data['include_ai_analysis']:
         ai_analysis = first_difference_rule(
-            data, max_tokens=data['max_tokens'], model=data['model'])
+            data, max_tokens=data['max_tokens'], model=data['ai_model'])
         wrapped_ai_analysis = wrap_text(ai_analysis, 72, indent=2)
         print("\n==== AI-Generated Analysis ==================================="
               "============")
         print(wrapped_ai_analysis)
-        print(f"\n  *Generated with {data['model']}. Use with caution. ChatGPT "
-              f"can make mistakes. \nCheck important info.")
+        caution_text = (
+            f"*Generated with {data['ai_model']}. Use with caution. ChatGPT "
+            f"can make mistakes. \nCheck important info.")
+        caution_text = wrap_text(caution_text, 72, indent=2)
+        print(caution_text)
         print("================================================================"
               "==========")
 

@@ -23,7 +23,7 @@ def test_hypothesis_test_slope_significant(mock_model, capsys):
     assert "Hypothesis Test for the Slope:" in captured.out
     assert "t-statistic: 5.000000" in captured.out
     assert "p-value: 2.513578e-06" in captured.out
-    assert ("Decision: Reject the null hypothesis. The model is statistically "
+    assert ("Decision: Reject the null hypothesis. The ai_model is statistically "
             "significant.") in captured.out
     assert ("Interpretation: The relationship between the predictor and the "
             "response variable is statistically significant.") in captured.out
@@ -39,7 +39,7 @@ def test_hypothesis_test_slope_not_significant(mock_model, capsys):
     assert "Hypothesis Test for the Slope:" in captured.out
     assert "t-statistic: 0.100000" in captured.out
     assert "p-value: 9.205486e-01" in captured.out
-    assert ("Decision: Fail to reject the null hypothesis. The model is not "
+    assert ("Decision: Fail to reject the null hypothesis. The ai_model is not "
             "statistically significant.") in captured.out
     assert (("Interpretation: There is no statistically significant "
             "relationship between the predictor and the response variable.") in

@@ -29,7 +29,7 @@ def mock_data():
         'adjusted_fdr_rule_after_inertia': 0.75,
         'include_ai_analysis': False,
         'max_tokens': 500,
-        'model': 'chatgpt-4o'
+        'ai_model': 'chatgpt-4o'
     }
 
 

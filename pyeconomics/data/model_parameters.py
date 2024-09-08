@@ -6,7 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class TaylorRuleParameters:
     """
-    Data class for storing Taylor Rule model parameters.
+    Data class for storing Taylor Rule ai_model parameters.
 
     Attributes:
         inflation_target (float): Target inflation rate.
@@ -25,7 +25,7 @@ class TaylorRuleParameters:
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -65,7 +65,7 @@ class BalancedApproachRuleParameters:
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -102,7 +102,7 @@ class FirstDifferenceRuleParameters:
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -121,7 +121,7 @@ class FirstDifferenceRuleParameters:
 @dataclass
 class MonetaryPolicyRulesParameters:
     """
-    Data class for storing
+    Data class for storing monetary policy rules parameters.
 
     Attributes:
         inflation_target (float): Target inflation rate.
@@ -136,7 +136,7 @@ class MonetaryPolicyRulesParameters:
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -150,3 +150,24 @@ class MonetaryPolicyRulesParameters:
     max_tokens: int = 500
     model: str = 'gpt-4o'
     as_of_date: str = None
+
+
+@dataclass
+class ChatGPTParameters:
+    """
+    Data class for storing ChatGPT model parameters.
+
+    Attributes:
+        ai_model (str): The OpenAI model to use for the analysis. Defaults to
+            'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
+            'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
+            more information.
+        max_tokens (int): Maximum number of tokens for the AI response. Defaults
+            to 500 which may cost a few cents per call. Adjust as needed. See
+            https://openai.com/api/pricing/ for details.
+        markdown (bool): Whether to format the response in Markdown. Defaults to
+            False.
+    """
+    ai_model: str = 'gpt-4o'
+    max_tokens: int = 1000
+    markdown: bool = False

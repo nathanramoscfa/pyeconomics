@@ -46,18 +46,52 @@ def verbose_monetary_policy_rules(
     print("│" + title.center(width - 2) + "│")
     print("├" + "─" * (width - 2) + "┤")
 
+    # Print estimates as in the original code
     for rule, row in estimates.iterrows():
         line = f"    {rule:70} {row['Estimate (%)']:.2f}%"
         print(f"│{line:<{width - 2}}│")
     print("├" + "─" * (width - 2) + "┤")
 
-    ffr_description = "Federal Funds Rate (FFR)"
-    ffr_value = f"{indicators.current_fed_rate:.2f}%"
-    line = f"    {ffr_description:<64} {ffr_value:>11}"
+    # Add more detailed information on economic indicators
+    print(f"│{' Economic Indicators ':^{width - 2}}│")
+    print("├" + "─" * (width - 2) + "┤")
+    line = (f"    Expected Inflation Rate:                                     "
+            f"          {indicators.current_inflation_rate:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Target Inflation Rate:                                       "
+            f"          {params.inflation_target:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Expected Unemployment Rate:                                  "
+            f"          {indicators.current_unemployment_rate:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Natural Unemployment Rate:                                   "
+            f"          {indicators.natural_unemployment_rate:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Long-Term Real Interest Rate:                                "
+            f"          {indicators.long_term_real_interest_rate:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Current Federal Funds Rate (FFR):                            "
+            f"          {indicators.current_fed_rate:.2f}%")
     print(f"│{line:<{width - 2}}│")
 
     print("├" + "─" * (width - 2) + "┤")
 
+    # Display gaps
+    inflation_gap = indicators.current_inflation_rate - params.inflation_target
+    unemployment_gap = (indicators.natural_unemployment_rate -
+                        indicators.current_unemployment_rate)
+    print(f"│{' Gaps ':^{width - 2}}│")
+    print("├" + "─" * (width - 2) + "┤")
+    line = (f"    Inflation Gap:                                               "
+            f"          {inflation_gap:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+    line = (f"    Unemployment Gap:                                            "
+            f"          {unemployment_gap:.2f}%")
+    print(f"│{line:<{width - 2}}│")
+
+    print("├" + "─" * (width - 2) + "┤")
+
+    # Show adjustment parameters if applicable
     if adjusted:
         print(f"│{' Adjustment Parameters ':^{width - 2}}│")
         print("├" + "─" * (width - 2) + "┤")

@@ -10,8 +10,8 @@ def breusch_pagan_test(residuals: pd.Series, exog: pd.DataFrame) -> None:
     Perform Breusch-Pagan test for heteroskedasticity.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
-        exog (pd.DataFrame): Exogenous variables used in the model.
+        residuals (pd.Series): Residuals of the ai_model.
+        exog (pd.DataFrame): Exogenous variables used in the ai_model.
     """
     lm_stat, lm_pvalue, f_stat, f_pvalue = het_breuschpagan(residuals, exog)
     bp_test_results: Dict[str, float] = {

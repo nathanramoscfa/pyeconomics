@@ -20,8 +20,8 @@ def run_breusch_pagan_test(model: Any, exog: Any) -> None:
     Run Breusch-Pagan test for heteroskedasticity.
 
     Args:
-        model (Any): The fitted statsmodels model.
-        exog (Any): Exogenous variables used in the model.
+        model (Any): The fitted statsmodels ai_model.
+        exog (Any): Exogenous variables used in the ai_model.
     """
     residuals = get_residuals(model)
     breusch_pagan_test(residuals, exog)
@@ -32,7 +32,7 @@ def run_durbin_watson_test(model: Any) -> None:
     Run Durbin-Watson test for autocorrelation.
 
     Args:
-        model (Any): The fitted statsmodels model.
+        model (Any): The fitted statsmodels ai_model.
     """
     residuals = get_residuals(model)
     durbin_watson_test(residuals)
@@ -43,17 +43,17 @@ def run_vif_test(exog: Any) -> None:
     Run Variance Inflation Factor (VIF) test for multicollinearity.
 
     Args:
-        exog (Any): Exogenous variables used in the model.
+        exog (Any): Exogenous variables used in the ai_model.
     """
     variance_inflation_factor_test(exog)
 
 
 def run_ramsey_reset_test(model: Any) -> None:
     """
-    Run Ramsey RESET test for model specification.
+    Run Ramsey RESET test for ai_model specification.
 
     Args:
-        model (Any): The fitted statsmodels model.
+        model (Any): The fitted statsmodels ai_model.
     """
     ramsey_reset_test(model)
 
@@ -63,7 +63,7 @@ def run_jarque_bera_test(model: Any) -> None:
     Run Jarque-Bera test for normality of residuals.
 
     Args:
-        model (Any): The fitted statsmodels model.
+        model (Any): The fitted statsmodels ai_model.
     """
     residuals = get_residuals(model)
     jarque_bera_test(residuals)
@@ -71,13 +71,13 @@ def run_jarque_bera_test(model: Any) -> None:
 
 def get_residuals(model: Any) -> Any:
     """
-    Get residuals from the model.
+    Get residuals from the ai_model.
 
     Args:
-        model (Any): The fitted statsmodels model.
+        model (Any): The fitted statsmodels ai_model.
 
     Returns:
-        Any: Residuals of the model.
+        Any: Residuals of the ai_model.
     """
     if isinstance(model, GLMResultsWrapper):
         return model.resid_deviance
@@ -90,17 +90,17 @@ def verbose_model_diagnostics(
     show_plots: bool = False
 ) -> None:
     """
-    Print verbose output for the model diagnostics.
+    Print verbose output for the ai_model diagnostics.
 
     Args:
-        model (Any): The fitted statsmodels model.
-        exog (Any): Exogenous variables used in the model.
+        model (Any): The fitted statsmodels ai_model.
+        exog (Any): Exogenous variables used in the ai_model.
         show_plots (bool): Whether to display diagnostic plots.
     """
     print("\n==== Model Diagnostics ==========================================="
           "============")
 
-    # Print model summary
+    # Print ai_model summary
     print_model_summary(model)
 
     # Perform and print diagnostics
@@ -125,7 +125,7 @@ def verbose_model_diagnostics(
         plot_qq_plot(get_residuals(model))
         plot_residuals_histogram(get_residuals(model))
 
-        # Check if the model has the get_influence method
+        # Check if the ai_model has the get_influence method
         if hasattr(model, 'get_influence'):
             plot_residuals_vs_leverage(model, get_residuals(model))
             plot_residuals_vs_cooks_distance(model)

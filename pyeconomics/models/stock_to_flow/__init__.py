@@ -3,7 +3,9 @@
 from .bitcoin import (
     bitcoin_s2f_forecast,
     calculate_model_values,
-    fit_model,
+    fit_regression_model,
+    plot_s2f_model,
+    plot_s2f_prediction_model,
     power_law_function,
 )
 
@@ -11,6 +13,8 @@ from .bitcoin import (
 __all__ = [
     'bitcoin_s2f_forecast',
     'calculate_model_values',
-    'fit_model',
+    'fit_regression_model',
+    'plot_s2f_model',
+    'plot_s2f_prediction_model',
     'power_law_function',
 ]

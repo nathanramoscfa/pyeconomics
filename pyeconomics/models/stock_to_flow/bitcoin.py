@@ -4,7 +4,14 @@ from datetime import timedelta
 
 import pandas as pd
 import numpy as np
-from scipy.optimize import curve_fit
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import statsmodels.api as sm
+from typing import Union
+
+from pyeconomics.utils.utils import halving_dates_list
+from pyeconomics.utils.utils import months_until_next_halving
 
 
 def power_law_function(x, a, b):
@@ -14,16 +21,30 @@ def power_law_function(x, a, b):
     return np.exp(a) * (x ** b)
 
 
-def fit_model(data: pd.DataFrame):
-    params, cov, _, _, _ = curve_fit(
-        power_law_function,
-        data.StocktoFlow.values,
-        data.CapMrktCurUSD.values
-    )
-    return params
+def fit_regression_model(
+    endog: Union[pd.Series, pd.DataFrame],
+    exog: Union[pd.Series, pd.DataFrame],
+    **kwargs
+) -> sm.regression.linear_model.RegressionResults:
+    """
+    Fit a linear regression model using the statsmodels package.
+
+    Args:
+        endog (Union[pd.Series, pd.DataFrame]): The dependent variable.
+        exog (Union[pd.Series, pd.DataFrame]): The independent variable(s).
+        **kwargs: Additional keyword arguments to pass to the OLS function.
+
+    Returns:
+        sm.regression.linear_model.RegressionResults: The fitted regression
+            model.
+    """
+    return sm.OLS(endog, exog).fit(**kwargs)
 
 
-def calculate_model_values(data: pd.DataFrame, params) -> pd.DataFrame:
+def calculate_model_values(
+    data: pd.DataFrame,
+    params: Union[tuple, np.array]
+) -> pd.DataFrame:
     data['ModelCapMrktCurUSD'] = (
             np.exp(params[0]) * (data['StocktoFlow'] ** params[1])
     ).round(4)
@@ -34,21 +55,24 @@ def calculate_model_values(data: pd.DataFrame, params) -> pd.DataFrame:
 
 def bitcoin_s2f_forecast(
     data: pd.DataFrame,
-    params: tuple,
+    params: Union[tuple, np.array],
     years_to_project: int = 6
 ) -> pd.DataFrame:
     """
-    Projects future Bitcoin stock-to-flow data and calculates future model
+    Projects future Bitcoin stock-to-flow data and calculates future ai_model
     values.
 
     Args:
         data (pd.DataFrame): The historical Bitcoin data.
-        params (tuple): The fitted model parameters.
+        params (tuple): The fitted ai_model parameters.
         years_to_project (int): The number of years to project into the future.
 
     Returns:
         pd.DataFrame: The combined historical and projected data.
     """
+    # Compute historical ai_model forecast
+    data = calculate_model_values(data, params)
+
     # Calculate mean BlkCnt from April 19, 2024
     start_date = '2024-04-19'
     annual_average_mined = data.loc[start_date:]['Flow'].mean()
@@ -98,7 +122,7 @@ def bitcoin_s2f_forecast(
     # Correct any potential NaNs
     combined_data['StocktoFlow'] = combined_data['StocktoFlow'].ffill()
 
-    # Apply the model to future data
+    # Apply the ai_model to future data
     future_data['StocktoFlow'] = combined_data['StocktoFlow'].loc[
         future_data.index
     ]
@@ -113,3 +137,222 @@ def bitcoin_s2f_forecast(
     full_data = pd.concat([data, future_data])
 
     return full_data
+
+
+def plot_s2f_model(
+    data: pd.DataFrame,
+    model: sm.regression.linear_model.RegressionResults,
+    gold_silver_s2f: pd.Series = None
+):
+    """
+    Plot the Bitcoin Stock-to-Flow ai_model.
+
+    Args:
+        data (pd.DataFrame): The Bitcoin data.
+        model (sm.regression.linear_model.RegressionResults): The fitted model.
+        gold_silver_s2f (pd.Series): The stock-to-flow values for gold and
+            silver.
+
+    Returns:
+        None: The plot is displayed
+    """
+    # Compute the months until the next halving date
+    halving_dates = halving_dates_list()
+    data['MonthsUntilHalving'] = data.index.to_series().apply(
+        lambda date: months_until_next_halving(date, halving_dates))
+
+    # Extract the ai_model parameters
+    slope = model.params['StocktoFlow']
+    intercept = model.params['const']
+    r_squared = model.rsquared
+
+    # Create the plot
+    fig = px.scatter(
+        data,
+        x='StocktoFlow',
+        y='CapMrktCurUSD',
+        color='MonthsUntilHalving',
+        color_continuous_scale=px.colors.sequential.Rainbow,
+        title='Bitcoin Stock-to-Flow Model',
+        labels={'StocktoFlow': 'Stock-to-Flow (scarcity)',
+                'CapMrktCurUSD': 'Market Value (USD)'},
+        log_x=True,
+        log_y=True,
+        template='plotly_dark'
+    )
+
+    # Add gold and silver data if provided
+    if gold_silver_s2f is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=[gold_silver_s2f.loc['gold_s2f']],
+                y=[gold_silver_s2f.loc['gold_market_value']],
+                mode='markers', name='Gold',
+                marker=dict(color='gold', symbol='circle', size=20),
+                zorder=10
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=[gold_silver_s2f.loc['silver_s2f']],
+                y=[gold_silver_s2f.loc['silver_market_value']],
+                mode='markers', name='Silver',
+                marker=dict(color='silver', symbol='circle', size=20),
+                zorder=10
+            )
+        )
+
+    # Add the trendline
+    x_vals = np.linspace(data['StocktoFlow'].min(),
+                         data['StocktoFlow'].max() * 2.5, 100)
+    y_vals = np.exp(slope * np.log(x_vals) + intercept)
+
+    # Ensure the trendline is plotted last
+    trendline = go.Scatter(x=x_vals, y=y_vals, mode='lines', name='Trendline',
+                           line=dict(color='white', width=2))
+
+    # Add the trendline equation and R^2 value as an annotation
+    fig.add_annotation(
+        x=0.05, y=0.95,
+        text=f'ln(y) = {slope:.4f} ln(x) + {intercept:.4f}<br>R² = '
+             f'{r_squared:.3f}',
+        showarrow=False,
+        xref='paper', yref='paper',
+        font=dict(color='white', size=12),
+        bgcolor='rgba(0, 0, 0, 0.5)'
+    )
+
+    # Update the layout
+    height = 600
+    width = 900
+    colormap_len = height * 0.5
+    fig.update_layout(
+        height=height,
+        width=width,
+        xaxis=dict(title='Stock-to-Flow (Scarcity)', type='log', tickformat='d',
+                   showgrid=True),
+        yaxis=dict(title='Market Value (USD)', type='log', showgrid=True),
+        coloraxis_colorbar=dict(
+            title=dict(
+                text='Months until halving',
+                side='right',
+                font=dict(size=12)
+            ),
+            tickvals=np.arange(0, 51, 10),
+            ticks="outside",
+            ticktext=[f"{i}" for i in range(0, 51, 10)],
+            lenmode='pixels',
+            len=colormap_len
+        )
+    )
+
+    # Add trendline after layout update to ensure it's on top
+    fig.add_trace(trendline)
+
+    fig.show()
+
+
+def plot_s2f_prediction_model(
+    data: pd.DataFrame,
+    model: sm.regression.linear_model.RegressionResults
+):
+    """
+    Plot the Bitcoin Stock-to-Flow ai_model with future projections.
+
+    Args:
+        data (pd.DataFrame): The Bitcoin data.
+        model (sm.regression.linear_model.RegressionResults): The fitted model.
+
+    Returns:
+        None: The plot is displayed
+    """
+    # Compute the months until the next halving date
+    halving_dates = halving_dates_list()
+    data['MonthsUntilHalving'] = data.index.to_series().apply(
+        lambda date: months_until_next_halving(date, halving_dates))
+
+    # Extract the ai_model parameters
+    slope = model.params['StocktoFlow']
+    intercept = model.params['const']
+    rsquared = model.rsquared
+
+    # Create a figure with secondary y-axis
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # Add ai_model price trace
+    fig.add_trace(
+        go.Scatter(x=data.index, y=data['ModelPriceUSD'],
+                   mode='lines', name='Model Price',
+                   line=dict(color='orange', dash='dash')),
+        secondary_y=True
+    )
+
+    # Add stock-to-flow trace
+    fig.add_trace(
+        go.Scatter(x=data.index, y=data['StocktoFlow'], mode='lines',
+                   name='Stock-to-Flow', line=dict(color='green')),
+        secondary_y=False
+    )
+
+    # Add the trendline equation and R^2 value as an annotation
+    fig.add_annotation(
+        x=0.90, y=0.10,
+        text=f'ln(y) = {slope:.4f} ln(x) + {intercept:.4f}<br>R² = '
+             f'{rsquared:.3f}',
+        showarrow=False,
+        xref='paper', yref='paper',
+        font=dict(color='white', size=12),
+        bgcolor='rgba(0, 0, 0, 0.5)'
+    )
+
+    # Create scatter plot with color mapped to MonthsUntilHalving
+    scatter = go.Scatter(
+        x=data.index,
+        y=data['PriceUSD'],
+        mode='markers',
+        marker=dict(
+            color=data['MonthsUntilHalving'],
+            colorscale=px.colors.sequential.Rainbow,
+            colorbar=dict(
+                title='Months until halving',
+                titleside='right',
+                tickvals=np.arange(0, 51, 10),
+                ticktext=[f"{i}" for i in range(0, 51, 10)],
+                lenmode='pixels',
+                len=300
+            ),
+        ),
+        name='PriceUSD'
+    )
+
+    # Add scatter plot to the figure
+    fig.add_trace(scatter, secondary_y=True)
+
+    # Update the layout
+    fig.update_layout(
+        height=600,
+        width=900,
+        title='Bitcoin Stock-to-Flow Model',
+        xaxis_title='Date',
+        yaxis_title='Stock-to-Flow',
+        yaxis_type='log',
+        yaxis2=dict(title='Price (USD)', type='log'),
+        legend=dict(x=0.01, y=0.98, traceorder='normal'),
+        template="plotly_dark",
+        margin=dict(l=40, r=40, t=80, b=40),
+        xaxis=dict(range=[data.index.min() - timedelta(days=365),
+                          data.index.max()])
+    )
+
+    # Update x-axis and y-axis to be visible
+    fig.update_xaxes(showline=True, linewidth=1, linecolor='white', mirror=True)
+    fig.update_yaxes(showline=True, linewidth=1, linecolor='white', mirror=True)
+    fig.update_yaxes(showline=True, linewidth=1, linecolor='white', mirror=True,
+                     secondary_y=True)
+
+    # Ensure minor ticks are enabled and follow the default behavior
+    fig.update_yaxes(minor=dict(ticklen=4, showgrid=True), secondary_y=False)
+
+    # Show the plot
+    fig.show()

@@ -112,7 +112,7 @@ def taylor_rule(
             'okun_factor': params.okun_factor,
             'include_ai_analysis': params.include_ai_analysis,
             'max_tokens': params.max_tokens,
-            'model': params.model
+            'ai_model': params.model
         }
         verbose_taylor_rule(data)
 

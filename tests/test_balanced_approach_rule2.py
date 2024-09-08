@@ -163,7 +163,7 @@ def test_plot_historical_bar_basr_rule(
     }, index=pd.to_datetime(['2020-01-01', '2020-02-01']))
 
     params = BalancedApproachRuleParameters(
-        include_ai_analysis=True, max_tokens=100, model='test-model'
+        include_ai_analysis=True, max_tokens=100, model='test-ai_model'
     )
 
     # Test unadjusted plot

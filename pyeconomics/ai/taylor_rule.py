@@ -4,7 +4,7 @@ import os
 
 import openai
 
-from pyeconomics.api.openai_api import load_prompt
+from pyeconomics.api.openai_api import load_prompt, initialize_openai_client
 from pyeconomics.utils.utils import encode_image
 
 
@@ -21,7 +21,7 @@ def taylor_rule(
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -29,6 +29,9 @@ def taylor_rule(
     Returns:
         str: AI-generated analysis paragraph.
     """
+    # Ensure the OpenAI client is initialized only when this function is called
+    initialize_openai_client()
+
     # Construct the full path to the prompt file
     prompt_file_path = os.path.join(
         os.path.dirname(__file__),
@@ -54,7 +57,8 @@ def taylor_rule(
         adjusted_taylor_rule_after_elb=round(
             data['adjusted_taylor_rule_after_elb'], 2),
         adjusted_taylor_rule_after_inertia=round(
-            data['adjusted_taylor_rule_after_inertia'], 2)
+            data['adjusted_taylor_rule_after_inertia'], 2),
+        rho=round(data['rho'], 2),
     )
 
     response = openai.chat.completions.create(
@@ -64,7 +68,8 @@ def taylor_rule(
              "content": "Act as the Federal Open Market Committee (FOMC) of "
                         "the Federal Reserve System (the Fed) that is charged "
                         "with making key decisions about interest rates and "
-                        "the growth of the United States money supply."},
+                        "the growth of the United States money supply."
+             },
             {"role": "user", "content": prompt}
         ],
         max_tokens=max_tokens
@@ -87,7 +92,7 @@ def plot_interpretation(
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.

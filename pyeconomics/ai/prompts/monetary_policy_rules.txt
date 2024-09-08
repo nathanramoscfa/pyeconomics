@@ -1,5 +1,6 @@
 Given the following monetary policy rule estimates and the current Federal
-Funds Rate:
+Funds Rate, analyze the data to provide a detailed policy prescription. Ensure
+your response is formal, data-driven, and references all provided indicators:
 
 - Taylor Rule: {taylor_rule}%
 - Balanced Approach Rule: {balanced_approach_rule}%
@@ -7,6 +8,37 @@ Funds Rate:
 - First Difference Rule: {first_difference_rule}%
 - Current Federal Reserve Rate: {current_fed_rate}%
 
-Provide a one-paragraph policy prescription as if you were the Federal Open
-Commitee (FOMC) of the Federal Reserve. The tone should be formal and
-data-driven. Limit to 100 words.
+Economic Indicators:
+- Expected Inflation Rate: {current_inflation_rate}%
+- Target Inflation Rate: {inflation_target}%
+- Expected Unemployment Rate: {current_unemployment_rate}%
+- Natural Unemployment Rate: {natural_unemployment_rate}%
+- Long-Term Real Interest Rate: {long_term_real_interest_rate}%
+
+Calculated Gaps:
+- Inflation Gap: {inflation_gap}%
+- Unemployment Gap: {unemployment_gap}%
+
+Adjustment Parameters:
+- Policy Inertia Coefficient (rho): {rho}
+
+Policy Recommendation:
+
+If the difference between the Adjusted Policy Rule Estimate and the current
+Federal Funds Rate is greater than 0.13%, recommend a change in the Federal
+Funds Rate to the average Adjusted Interest Rate Policy Estimate rounded down
+to the nearest 0.25%. Ensure all numerical values in the response are rounded
+to two decimals. Keep the response within 100 words.
+
+Please ensure the response follows the structure shown below:
+
+The indicators currently indicate [[brief analysis of economic conditions
+based on economic indicators]]. The current policy rate of
+[[current_fed_rate]]% is [[higher/lower]] than the Adjusted Policy Rule
+Estimate of [[adjusted_policy_rule_estimate]]%. This difference of
+[[difference_between_current_fed_rate_and_adjusted_policy_rule]]% suggests
+that the Federal Reserve should [[policy action based on the Adjusted Policy
+Rule Estimate, rounding down to the nearest 0.25%]]. This decision reflects
+the Committee’s view that [[rationale for policy action based on economic
+indicators, for example, "...Committee’s view that the current policy rate is
+appropriate/overly restrictive/overly accommodative"]].

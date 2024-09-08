@@ -109,7 +109,7 @@ def balanced_approach_rule(
             'use_shortfalls_rule': params.use_shortfalls_rule,
             'include_ai_analysis': params.include_ai_analysis,
             'max_tokens': params.max_tokens,
-            'model': params.model
+            'ai_model': params.model
         }
         verbose_balanced_approach_rule(data)
 
@@ -216,7 +216,7 @@ def plot_historical_bar_basr_rule(
             along with their adjusted versions if applicable.
         adjusted (bool): A flag to determine whether to plot the adjusted or
             unadjusted rates.
-        params (BalancedApproachRuleParameters): Balanced Approach Rule model
+        params (BalancedApproachRuleParameters): Balanced Approach Rule ai_model
             parameters data class.
 
     Returns:

@@ -117,7 +117,7 @@ def first_difference_rule(
             'apply_elb': params.apply_elb,
             'include_ai_analysis': params.include_ai_analysis,
             'max_tokens': params.max_tokens,
-            'model': params.model
+            'ai_model': params.model
         }
         verbose_first_difference_rule(data)
 

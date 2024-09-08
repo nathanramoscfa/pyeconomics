@@ -1,11 +1,14 @@
 # pyeconomics/__init__.py
 
+# AI imports
+from pyeconomics.ai import ai_regression_analysis
+
 # API imports
 from pyeconomics.api import (
-    bitcoin_s2f_data,
-    load_bitcoin_data,
     FredClient,
+    bitcoin_s2f_data,
     fred_client,
+    load_bitcoin_data,
     load_from_cache,
     save_to_cache
 )
@@ -13,6 +16,7 @@ from pyeconomics.api import (
 # Data imports
 from pyeconomics.data import (
     BalancedApproachRuleParameters,
+    ChatGPTParameters,
     EconomicIndicators,
     FirstDifferenceRuleParameters,
     TaylorRuleParameters,
@@ -55,7 +59,9 @@ from pyeconomics.models.monetary_policy import (
 from pyeconomics.models.stock_to_flow import (
     bitcoin_s2f_forecast,
     calculate_model_values,
-    fit_model,
+    fit_regression_model,
+    plot_s2f_model,
+    plot_s2f_prediction_model,
     power_law_function
 )
 
@@ -73,10 +79,12 @@ from pyeconomics.utils.fred import (
     fetch_historical_fed_funds_rate,
     print_fred_series_names
 )
+from pyeconomics.utils.utils import get_forecast_tickers
 
 # Exported symbols
 __all__ = [
     'BalancedApproachRuleParameters',
+    'ChatGPTParameters',
     'EconomicIndicators',
     'FirstDifferenceRuleParameters',
     'TaylorRuleParameters',
@@ -94,15 +102,18 @@ __all__ = [
     'historical_balanced_approach_rule',
     'historical_first_difference_rule',
     'historical_taylor_rule',
+    'ai_regression_analysis',
     'plot_historical_rule_estimates',
     'plot_historical_bar_basr_rule',
     'plot_historical_fdr',
     'plot_historical_taylor_rule',
+    'plot_s2f_model',
+    'plot_s2f_prediction_model',
     'verbose_monetary_policy_rules',
     'taylor_rule',
     'bitcoin_s2f_forecast',
     'calculate_model_values',
-    'fit_model',
+    'fit_regression_model',
     'power_law_function',
     'verbose_balanced_approach_rule',
     'verbose_first_difference_rule',
@@ -121,5 +132,6 @@ __all__ = [
     'variance_inflation_factor_test',
     'verbose_model_diagnostics',
     'fetch_historical_fed_funds_rate',
-    'print_fred_series_names'
+    'print_fred_series_names',
+    'get_forecast_tickers'
 ]

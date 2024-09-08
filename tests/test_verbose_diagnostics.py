@@ -22,10 +22,10 @@ def mock_model():
     model.params = MagicMock()
     model.params.index = ['const', 'predictor']
 
-    # Mock the model's internal model representation
+    # Mock the ai_model's internal ai_model representation
     internal_model = MagicMock(spec=OLS)
 
-    # Mock the data attribute within the internal model
+    # Mock the data attribute within the internal ai_model
     data_mock = MagicMock()
     data_mock.endog = np.random.normal(0, 1, 100)
     internal_model.data = data_mock
@@ -38,7 +38,7 @@ def mock_model():
     fit_result = MagicMock(spec=RegressionResultsWrapper)
     fit_result.resid = model.resid
 
-    # Mock the fit method on the internal model to return the fit_result mock
+    # Mock the fit method on the internal ai_model to return the fit_result mock
     internal_model.fit = MagicMock(return_value=fit_result)
 
     model.model = internal_model

@@ -12,12 +12,12 @@ from typing import Any
 
 def plot_residuals(exog: pd.DataFrame, model: sm.RegressionResults) -> None:
     """
-    Plot the residuals of the model against all predictor variables in the
+    Plot the residuals of the ai_model against all predictor variables in the
     DataFrame.
 
     Args:
         exog (pd.DataFrame): DataFrame containing the exogenous variables.
-        model (sm.RegressionResults): The fitted statsmodels model.
+        model (sm.RegressionResults): The fitted statsmodels ai_model.
     """
     if not isinstance(exog, pd.DataFrame) or exog.empty:
         raise ValueError("Input 'exog' is not a valid non-empty DataFrame.")
@@ -52,7 +52,7 @@ def plot_residuals_histogram(residuals: pd.Series) -> None:
     Plot the histogram of the residuals with an overlaid normal distribution.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     plt.figure(figsize=(5, 3))
 
@@ -80,7 +80,7 @@ def plot_qq_plot(residuals: pd.Series) -> None:
     Plot the Q-Q plot of the residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     plt.figure(figsize=(5, 3))
     stats.probplot(residuals, dist='norm', plot=plt)
@@ -96,8 +96,8 @@ def plot_residuals_vs_leverage(
     Plot residuals vs leverage.
 
     Args:
-        model (Any): The fitted statsmodels model.
-        residuals (pd.Series): Residuals of the model.
+        model (Any): The fitted statsmodels ai_model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     influence = model.get_influence()
     leverage = influence.hat_matrix_diag
@@ -117,7 +117,7 @@ def plot_residuals_vs_cooks_distance(model: Any) -> None:
     Plot residuals vs Cook's distance.
 
     Args:
-        model (Any): The fitted statsmodels model.
+        model (Any): The fitted statsmodels ai_model.
     """
     influence = model.get_influence()
     cooks_d2 = influence.cooks_distance[0]

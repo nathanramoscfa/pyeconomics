@@ -10,10 +10,10 @@ def hypothesis_test_slope(
     predictor: str, n: int
 ) -> None:
     """
-    Perform hypothesis test for the slope of the model.
+    Perform hypothesis test for the slope of the ai_model.
 
     Args:
-        model (sm.RegressionResults): The fitted statsmodels model.
+        model (sm.RegressionResults): The fitted statsmodels ai_model.
         predictor (str): The name of the predictor variable.
         n (int): Number of observations.
     """
@@ -27,12 +27,12 @@ def hypothesis_test_slope(
     print(f"  t-statistic: {t_statistic:.6f}")
     print(f"  p-value: {p_value:.6e}")
     if p_value < alpha:
-        print("  Decision: Reject the null hypothesis. The model is "
+        print("  Decision: Reject the null hypothesis. The ai_model is "
               "statistically significant.")
         print("  Interpretation: The relationship between the predictor and "
               "the response variable is statistically significant.")
     else:
-        print("  Decision: Fail to reject the null hypothesis. The model is "
+        print("  Decision: Fail to reject the null hypothesis. The ai_model is "
               "not statistically significant.")
         print("  Interpretation: There is no statistically significant "
               "relationship between the predictor and the response variable.")

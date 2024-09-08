@@ -32,7 +32,7 @@ def test_ramsey_reset_test_significant(mock_model, mock_linear_reset, capsys):
     assert "Ramsey RESET test F-statistic: 10.00" in captured.out
     assert "p-value: 0.0100" in captured.out
     assert ("Interpretation: There might be omitted variables or incorrect "
-            "functional form in the model.") in captured.out
+            "functional form in the ai_model.") in captured.out
 
 
 def test_ramsey_reset_test_not_significant(
@@ -50,7 +50,7 @@ def test_ramsey_reset_test_not_significant(
     assert "Ramsey RESET test F-statistic: 1.00" in captured.out
     assert "p-value: 0.5000" in captured.out
     assert ("Interpretation: No evidence of omitted variables or incorrect "
-            "functional form in the model.") in captured.out
+            "functional form in the ai_model.") in captured.out
 
 
 if __name__ == '__main__':

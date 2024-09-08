@@ -5,11 +5,13 @@ from .model_parameters import TaylorRuleParameters
 from .model_parameters import BalancedApproachRuleParameters
 from .model_parameters import FirstDifferenceRuleParameters
 from .model_parameters import MonetaryPolicyRulesParameters
+from .model_parameters import ChatGPTParameters
 
 __all__ = [
     'EconomicIndicators',
     'TaylorRuleParameters',
     'BalancedApproachRuleParameters',
     'FirstDifferenceRuleParameters',
-    'MonetaryPolicyRulesParameters'
+    'MonetaryPolicyRulesParameters',
+    'ChatGPTParameters'
 ]

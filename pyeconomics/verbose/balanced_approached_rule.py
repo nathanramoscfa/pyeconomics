@@ -36,7 +36,7 @@ def verbose_balanced_approach_rule(data: dict):
             - include_ai_analysis (bool): Whether to include AI-generated
               analysis.
             - max_tokens (int): Maximum number of tokens for the AI response.
-            - model (str): The OpenAI model to use for the analysis.
+            - ai_model (str): The OpenAI ai_model to use for the analysis.
 
     Returns:
         None
@@ -54,7 +54,7 @@ def verbose_balanced_approach_rule(data: dict):
     # Calculate the length of the line based on the rule name
     line_length = 67 + len(rule_acronym)
 
-    print("\n==== Economic Indicators " + "=" * (line_length - 25))
+    print("\n==== Economic Indicators " + "=" * (line_length - 22))
     print("  Current Inflation:                             {:.2f}%".format(
         data['current_inflation_rate']))
     print("  Target Inflation:                              {:.2f}%".format(
@@ -69,7 +69,7 @@ def verbose_balanced_approach_rule(data: dict):
         data['current_fed_rate']))
     print("  As of Date:                                    {}".format(
         current_date))
-    print("\n==== Gaps " + "=" * (line_length - 10))
+    print("\n==== Gaps " + "=" * (line_length - 7))
     print("  Inflation Gap:                                 {:.2f}%".format(
         data['inflation_gap']))
     if data['use_shortfalls_rule']:
@@ -79,7 +79,7 @@ def verbose_balanced_approach_rule(data: dict):
         print("  Unemployment Gap:                              {:.2f}%".format(
             data['unemployment_gap']))
     print("\n==== {} ".format(rule_name) + "=" *
-          (line_length - 6 - len(rule_name)))
+          (line_length - 3 - len(rule_name)))
     print("  Long-Term Real Interest Rate:                  {:.2f}%".format(
         data['long_term_real_interest_rate']))
     print("  Current Inflation:                             + {:.2f}%".format(
@@ -90,17 +90,17 @@ def verbose_balanced_approach_rule(data: dict):
     print("  Beta * Unemployment Gap:                       "
           "+ {:.2f} * {:.2f}%".format(
             data['beta'], data['unemployment_gap']))
-    print("-" * line_length)
+    print("-" * (line_length + 3))
     print("  Unadjusted {} Estimate:".format(rule_acronym).ljust(49) +
           "{:.2f}%".format(data['unadjusted_rate']))
     print("\n==== Adjusted {} ".format(rule_name) + "=" *
-          (line_length - 15 - len(rule_name)))
+          (line_length - 12 - len(rule_name)))
     if data['apply_elb']:
         print("  Effective Lower Bound (ELB) Adjustment: ")
         print("  Maximum of {} or ELB:".format(rule_acronym).ljust(49) +
               "max({:.2f}%, {:.2f}%)".format(
                 data['unadjusted_rate'], data['elb']))
-        print("-" * line_length)
+        print("-" * (line_length + 3))
         print("  {} Adjusted for ELB:".format(rule_acronym).ljust(49) +
               "{:.2f}%".format(data['adjusted_rate_after_elb']))
     print("\n  Policy Inertia Adjustment:              ")
@@ -112,22 +112,25 @@ def verbose_balanced_approach_rule(data: dict):
           "+ (1 - {:.2f})".format(data['rho']))
     print(f"  {rule_acronym} Adjusted for ELB:".ljust(49) +
           f"* {data['adjusted_rate_after_elb']:.2f}%")
-    print("-" * line_length)
+    print("-" * (line_length + 3))
     print("  Adjusted {} Estimate:".format(rule_acronym).ljust(49) +
           "{:.2f}%".format(data['adjusted_rate_after_inertia']))
 
     # Optionally add AI-generated analysis
     if data['include_ai_analysis']:
         ai_analysis = balanced_approach_rule(
-            data, max_tokens=data['max_tokens'], model=data['model'])
+            data, max_tokens=data['max_tokens'], model=data['ai_model'])
         wrapped_ai_analysis = wrap_text(ai_analysis, 72, indent=2)
-        print("\n==== AI-Generated Policy Prescription ========================"
-              "============")
+        print("\n==== AI-Generated Analysis " + "=" * (line_length - 24))
         print(wrapped_ai_analysis)
-        print(f"\n  *Generated with {data['model']}. Use with caution. ChatGPT "
-              f"can make mistakes. \nCheck important info.")
-        print("================================================================"
-              "==========")
+        print("                                                               "
+              "          ")
+        caution_text = (
+            f"*Generated with {data['ai_model']}. Use with caution. ChatGPT "
+            f"can make mistakes. \nCheck important info.")
+        caution_text = wrap_text(caution_text, 72, indent=2)
+        print(caution_text)
+        print("=" * (line_length + 3))
 
     else:
         # Policy Prescription section

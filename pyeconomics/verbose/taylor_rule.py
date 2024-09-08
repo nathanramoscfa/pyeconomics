@@ -36,7 +36,7 @@ def verbose_taylor_rule(data: dict):
             - include_ai_analysis (bool): Whether to include AI-generated
                 analysis.
             - max_tokens (int): Maximum number of tokens for the AI response.
-            - model (str): The OpenAI model to use for the analysis.
+            - ai_model (str): The OpenAI ai_model to use for the analysis.
 
     Returns:
         None
@@ -44,11 +44,11 @@ def verbose_taylor_rule(data: dict):
     current_date = datetime.now().strftime("%B %d, %Y")
     print("\n==== Economic Indicators ========================================="
           "========")
-    print("  Current Inflation:                             {:.2f}%".format(
+    print("  Expected Inflation:                            {:.2f}%".format(
         data['current_inflation_rate']))
     print("  Target Inflation:                              {:.2f}%".format(
         data['inflation_target']))
-    print("  Current Unemployment Rate:                     {:.2f}%".format(
+    print("  Expected Unemployment Rate:                    {:.2f}%".format(
         data['current_unemployment_rate']))
     print("  Natural Unemployment Rate:                     {:.2f}%".format(
         data['natural_unemployment_rate']))
@@ -68,7 +68,7 @@ def verbose_taylor_rule(data: dict):
           "========")
     print("  Long-Term Real Interest Rate:                  {:.2f}%".format(
         data['long_term_real_interest_rate']))
-    print("  Current Inflation:                             + {:.2f}%".format(
+    print("  Expected Inflation:                            + {:.2f}%".format(
         data['current_inflation_rate']))
     print("  Alpha * Inflation Gap:                         "
           "+ {:.2f} * {:.2f}%".format(
@@ -111,13 +111,13 @@ def verbose_taylor_rule(data: dict):
         print("\n==== AI-Generated Policy Prescription ========================"
               "============")
         analysis = taylor_rule(
-            data, max_tokens=data['max_tokens'], model=data['model'])
+            data, max_tokens=data['max_tokens'], model=data['ai_model'])
         analysis = wrap_text(analysis, 72, indent=2)
         print(analysis)
         print("                                                               "
               "          ")
         caution_text = (
-            f"*Generated with {data['model']}. Use with caution. ChatGPT "
+            f"*Generated with {data['ai_model']}. Use with caution. ChatGPT "
             f"can make mistakes. \nCheck important info.")
         caution_text = wrap_text(caution_text, 72, indent=2)
         print(caution_text)
@@ -147,3 +147,5 @@ def verbose_taylor_rule(data: dict):
             print("  The Adjusted Taylor Rule Estimate is equal to the Current "
                   "Fed Rate.\n  The Fed should maintain the current interest "
                   "rate.")
+        print("================================================================"
+              "==========")

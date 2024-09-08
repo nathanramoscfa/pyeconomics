@@ -107,7 +107,7 @@ def test_monetary_policy_rules_no_adjustments(
 
 def test_monetary_policy_rules_invalid_model(mock_load_prompt):
     params = MonetaryPolicyRulesParameters(
-        model='invalid-model',
+        model='invalid-ai_model',
         max_tokens=100,
         rho=0.5,
         apply_elb=True
@@ -115,9 +115,9 @@ def test_monetary_policy_rules_invalid_model(mock_load_prompt):
 
     with patch(
         'openai.chat.completions.create',
-        side_effect=Exception("Invalid model")
+        side_effect=Exception("Invalid ai_model")
     ) as mock_openai_chat:
-        with pytest.raises(Exception, match="Invalid model"):
+        with pytest.raises(Exception, match="Invalid ai_model"):
             monetary_policy_rules(
                 {
                     'Taylor Rule (TR)': 2.5,

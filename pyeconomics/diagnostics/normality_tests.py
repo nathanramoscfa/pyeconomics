@@ -10,7 +10,7 @@ def shapiro_wilk_test(residuals: pd.Series) -> None:
     Perform Shapiro-Wilk test for normality of residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     sw_test_stat, sw_test_p = shapiro(residuals[:5000])
     print("\nShapiro-Wilk Test for Normality of Residuals:")
@@ -27,7 +27,7 @@ def kolmogorov_smirnov_test(residuals: pd.Series) -> None:
     Perform Kolmogorov-Smirnov test for normality of residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     ks_test_stat, ks_test_p = kstest(
         residuals, 'norm', args=(residuals.mean(), residuals.std())
@@ -46,7 +46,7 @@ def anderson_darling_test(residuals: pd.Series) -> None:
     Perform Anderson-Darling test for normality of residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     ad_test = anderson(residuals)
     print("\nAnderson-Darling Test for Normality of Residuals:")
@@ -65,7 +65,7 @@ def jarque_bera_test(residuals: pd.Series) -> None:
     Perform Jarque-Bera test for normality of residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     jb_test_stat, jb_test_p, _, _ = sm.stats.jarque_bera(residuals)
     print("\nJarque-Bera Test for Normality of Residuals:")
@@ -82,7 +82,7 @@ def dagostino_k_squared_test(residuals: pd.Series) -> None:
     Perform D'Agostino's K-squared test for normality of residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     dagostino_test_stat, dagostino_test_p = normaltest(residuals)
     print("\nD'Agostino's K-squared Test for Normality of Residuals:")
@@ -99,7 +99,7 @@ def normality_tests(residuals: pd.Series) -> None:
     Perform all normality tests for residuals.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     shapiro_wilk_test(residuals)
     kolmogorov_smirnov_test(residuals)

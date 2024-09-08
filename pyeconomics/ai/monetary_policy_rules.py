@@ -4,7 +4,7 @@ import os
 
 import openai
 
-from pyeconomics.api.openai_api import load_prompt
+from pyeconomics.api.openai_api import load_prompt, initialize_openai_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import MonetaryPolicyRulesParameters
 
@@ -29,6 +29,9 @@ def monetary_policy_rules(
     Returns:
         str: AI-generated analysis paragraph.
     """
+    # Ensure the OpenAI client is initialized only when this function is called
+    initialize_openai_client()
+
     if params.rho > 0.0 or params.apply_elb:
         prompt_filepath = 'adjusted_monetary_policy_rules.txt'
     else:
@@ -46,14 +49,31 @@ def monetary_policy_rules(
 
     # Format the prompt with data
     prompt = prompt_template.format(
-        taylor_rule=round(estimates['Taylor Rule (TR)'], 2),
+        taylor_rule=round(
+            estimates['Taylor Rule (TR)'], 2),
         balanced_approach_rule=round(
             estimates['Balanced Approach Rule (BAR)'], 2),
         balanced_approach_shortfalls_rule=round(
             estimates['Balanced Approach Shortfalls Rule (BASR)'], 2),
         first_difference_rule=round(
             estimates['First Difference Rule (FDR)'], 2),
-        current_fed_rate=round(indicators.current_fed_rate, 2),
+        current_fed_rate=round(
+            indicators.current_fed_rate, 2),
+        current_inflation_rate=round(
+            indicators.current_inflation_rate, 2),
+        inflation_target=round(
+            params.inflation_target, 2),
+        current_unemployment_rate=round(
+            indicators.current_unemployment_rate, 2),
+        natural_unemployment_rate=round(
+            indicators.natural_unemployment_rate, 2),
+        long_term_real_interest_rate=round(
+            indicators.long_term_real_interest_rate, 2),
+        inflation_gap=round(
+            indicators.current_inflation_rate - params.inflation_target, 2),
+        unemployment_gap=round(
+            indicators.natural_unemployment_rate -
+            indicators.current_unemployment_rate, 2),
         rho=params.rho
     )
 
@@ -61,10 +81,10 @@ def monetary_policy_rules(
         model=params.model,
         messages=[
             {"role": "system",
-             "content": "You are the Federal Open Market Committee (FOMC) of "
-                        "the Federal Reserve System. Your task is to analyze "
-                        "monetary policy rule estimates and provide a policy "
-                        "prescription based on the given data."
+             "content": "Act as the Federal Open Market Committee (FOMC) of "
+                        "the Federal Reserve System (the Fed) that is charged "
+                        "with making key decisions about interest rates and "
+                        "the growth of the United States money supply."
              },
             {"role": "user", "content": prompt}
         ],

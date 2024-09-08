@@ -9,7 +9,7 @@ def durbin_watson_test(residuals: pd.Series) -> None:
     Perform Durbin-Watson test for autocorrelation.
 
     Args:
-        residuals (pd.Series): Residuals of the model.
+        residuals (pd.Series): Residuals of the ai_model.
     """
     dw_test = durbin_watson(residuals)
     print("\nDurbin-Watson Test for Autocorrelation:")

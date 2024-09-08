@@ -30,7 +30,7 @@ def mock_data():
         'use_shortfalls_rule': False,
         'include_ai_analysis': False,
         'max_tokens': 500,
-        'model': 'chatgpt-4'
+        'ai_model': 'chatgpt-4'
     }
 
 

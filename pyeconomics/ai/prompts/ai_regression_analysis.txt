@@ -1,0 +1,72 @@
+You are an expert data scientist. Your task is to analyze the results of an
+OLS regression and provide a detailed one-paragraph long interpretation in
+markdown format suitable for inclusion in a Jupyter notebook that will be
+displayed using IPython through this code: display(Markdown(analysis)).
+
+Here are the results of the regression:
+
+1. **R-squared (R²)**: Explain the proportion of the variance in the dependent
+    variable that is predictable from the independent variable(s).
+   - Value: {r_squared}
+
+2. **Adjusted R-squared**: Explain the adjusted measure for the number of
+    predictors in the model.
+   - Value: {adj_r_squared}
+
+3. **F-statistic**: Interpret the overall significance of the regression model.
+   - Value: {f_statistic}
+   - Probability (P-value): {prob_f_statistic}
+
+4. **T-statistic for {slope_name}**: Evaluate the statistical significance of
+    the slope coefficient.
+   - Value: {t_statistic}
+   - P-value: {p_value}
+
+5. **Omnibus test**: Assess the normality of the residuals.
+   - Value: {omnibus}
+   - Probability (P-value): {prob_omnibus}
+
+6. **Jarque-Bera test**: Further assess the normality of the residuals.
+   - Value: {jarque_bera}
+   - Probability (P-value): {prob_jb}
+
+7. **Skewness**: Discuss the asymmetry of the residuals distribution.
+   - Value: {skewness}
+
+8. **Kurtosis**: Explain the peakedness of the residuals distribution.
+   - Value: {kurtosis}
+
+9. **Breusch-Pagan test**: Evaluate the homoscedasticity of the residuals.
+   - Value: {breusch_pagan}
+   - Probability (P-value): {prob_breusch_pagan}
+
+10. **Durbin-Watson statistic**: Assess the presence of autocorrelation in the
+    residuals.
+   - Value: {durbin_watson}
+
+11. **Condition Number**: Evaluate the multicollinearity in the model.
+    - Value: {condition_number}
+
+12. **Ramsey RESET test**: Evaluate the model specification.
+    - Value: {ramsey_reset}
+    - Probability (P-value): {prob_ramsey_reset}
+
+13. **Intercept**: Interpret the intercept coefficient.
+    - Value: {intercept}
+
+14. **Slope for {slope_name}**: Interpret the slope coefficient.
+    - Value: {slope}
+
+Ensure that the explanation is clear, concise, and suitable for an audience
+familiar with regression analysis. Provide insights and implications for the
+model's performance and reliability. Above the paragraph should be a ### level
+markdown heading, "### AI-Generated Model Analysis". The paragraph should flow
+well and be coherent. The paragraph should start with an introductory sentence,
+followed by a bullet list of the results, and end with a conclusion sentence.
+The conclusion sentence should start with "To summarize,". After the conclusion
+sentence, indent the text to a new paragraph and add the disclaimer in italics:
+
+Generated with {ai_model}. Use with caution. ChatGPT can make mistakes. Check
+important info.
+
+To avoid issues with the * symbol, you can use the HTML tag <i> to italicize.

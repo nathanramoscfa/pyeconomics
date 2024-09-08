@@ -4,7 +4,7 @@ import os
 
 import openai
 
-from pyeconomics.api.openai_api import load_prompt
+from pyeconomics.api.openai_api import load_prompt, initialize_openai_client
 from pyeconomics.utils.utils import encode_image
 
 
@@ -23,7 +23,7 @@ def balanced_approach_rule(
         max_tokens (int): Maximum number of tokens for the AI response.
             Defaults to 500 which may cost a few cents per call. Adjust as
             needed. See https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
@@ -31,6 +31,9 @@ def balanced_approach_rule(
     Returns:
         str: AI-generated analysis paragraph.
     """
+    # Ensure the OpenAI client is initialized only when this function is called
+    initialize_openai_client()
+
     # Construct the full path to the prompt file
     prompt_file_path = os.path.join(
         os.path.dirname(__file__),
@@ -89,7 +92,7 @@ def plot_interpretation(
         max_tokens (int): Maximum number of tokens for the AI response. Defaults
             to 500 which may cost a few cents per call. Adjust as needed. See
             https://openai.com/api/pricing/ for details.
-        model (str): The OpenAI model to use for the analysis. Defaults to
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
             more information.
