@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
 
-from pyeconomics.ai.taylor_rule import plot_interpretation
+from pyeconomics.ai.taylor_rule import plot_interpretation, gaps_interpretation
 from pyeconomics.api import fred_client
 from pyeconomics.data.economic_indicators import EconomicIndicators
 from pyeconomics.data.model_parameters import TaylorRuleParameters
@@ -254,3 +254,72 @@ def plot_historical_taylor_rule(
               "important info.")
         print("================================================================"
               "==========")
+
+
+def plot_historical_gaps(
+    historical_rule_estimates: pd.DataFrame,
+    params: TaylorRuleParameters
+) -> None:
+    """
+    Extract the time range from the data, plot the Inflation and
+    Unemployment Gaps, and return the date range.
+
+    Args:
+        historical_rule_estimates (pd.DataFrame): DataFrame containing the
+            historical estimates including Inflation and Unemployment Gaps.
+        params (TaylorRuleParameters): Taylor Rule parameters data class.
+
+    Returns:
+        None
+    """
+    # Extracting the time range from the data
+    start_date = historical_rule_estimates.dropna().index.min()
+    end_date = historical_rule_estimates.dropna().index.max()
+    date_range = (f"{start_date.strftime('%B %d, %Y')} to "
+                  f"{end_date.strftime('%B %d, %Y')}")
+
+    # Plotting Inflation Gap and Unemployment Gap
+    historical_rule_estimates[[
+        'InflationGap',
+        'UnemploymentGap'
+    ]].dropna().plot(
+        figsize=(10, 5),  # Specifies the figure size
+        grid=True  # Enables grid lines for better readability
+    )
+
+    plt.title(f'Inflation and Unemployment Gaps\n{date_range}')
+    plt.xlabel('Year')
+    plt.ylabel('Gap (%)')
+    plt.legend(['Inflation Gap', 'Unemployment Gap'])
+
+    # Adding the citation as a footnote
+    plt.figtext(
+        x=0.25,
+        y=-0.01,
+        s="Data Source: Federal Reserve Economic Data (FRED)",
+        ha="center"
+    )
+
+    # Save the plot as an image in the media directory
+    plot_image_path = os.path.join(
+        os.path.dirname(__file__),
+        '../../../media', 'gaps_plot.png'
+    )
+    plt.savefig(plot_image_path, bbox_inches='tight')
+
+    plt.show()  # Display the plot
+
+    # Optionally add AI-generated analysis
+    if params.include_ai_analysis:
+        interpretation = gaps_interpretation(
+            plot_image_path, params.max_tokens, params.model)
+        wrapped_interpretation = wrap_text(interpretation, 72, indent=2)
+        print(
+            "\n==== AI-Generated Analysis ==================================="
+            "============")
+        print(wrapped_interpretation)
+        print("\n  *Use with caution. ChatGPT can make mistakes. Check "
+              "important info.")
+        print(
+            "================================================================"
+            "==========")

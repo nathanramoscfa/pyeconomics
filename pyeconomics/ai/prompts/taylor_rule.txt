@@ -21,7 +21,7 @@ Policy Inertia Coefficient (rho): {rho}
 
 If the difference between the Adjusted Taylor Rule Estimate and the current
 Federal Funds Rate is greater than 0.13%, recommend a change in the Federal
-Funds Rate to the Adjusted Taylor Rule Estimate rounded down to the nearest
+Funds Rate to the Adjusted Taylor Rule Estimate rounded to the nearest
 0.25%. Ensure all numerical values in the response are rounded to two decimals.
 Keep the response within 100 words.
 
@@ -33,7 +33,7 @@ on economic indicators]]. The current policy rate of [[current_fed_rate]]% is
 [[adjusted_taylor_rule_after_inertia]]%. This difference of
 [[difference_between_current_fed_rate_and_adjusted_taylor_rule]]%
 suggests that the Federal Reserve should [[policy action based on the Adjusted
-Taylor Rule Estimate, rounding down to the nearest 0.25%]]. This decision
+Taylor Rule Estimate, rounding to the nearest 0.25%]]. This decision
 reflects the Committee’s view that [[rationale for policy action based on
 economic indicators based on if the difference is positive/negative, for
 example, "...Committee’s view that the current policy rate is

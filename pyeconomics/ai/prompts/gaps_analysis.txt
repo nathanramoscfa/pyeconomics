@@ -1,0 +1,5 @@
+You are a member of the Federal Open Market Committee (FOMC) tasked with
+analyzing the gaps between inflation and unemployment. Using the visual plot
+provided, discuss the implications of the inflation gap and unemployment gap
+on monetary policy decisions. What can be inferred about the state of the
+economy and the appropriate policy measures?

@@ -136,3 +136,62 @@ def plot_interpretation(
 
     interpretation = response.choices[0].message.content.strip()
     return interpretation
+
+
+def gaps_interpretation(
+    image_path: str,
+    max_tokens: int = 500,
+    model: str = 'gpt-4o'
+) -> str:
+    """
+    Generate an AI-based interpretation of the plot data.
+
+    Args:
+        image_path (str): Path to the plot image file.
+        max_tokens (int): Maximum number of tokens for the AI response. Defaults
+            to 500 which may cost a few cents per call. Adjust as needed. See
+            https://openai.com/api/pricing/ for details.
+        model (str): The OpenAI ai_model to use for the analysis. Defaults to
+            'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
+            'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
+            more information.
+
+    Returns:
+        str: AI-generated interpretation paragraph.
+    """
+    # Encode the image to base64
+    base64_image = encode_image(image_path)
+
+    # Load the prompt from the file
+    prompt_file_path = os.path.join(
+        os.path.dirname(__file__),
+        'prompts',
+        'gaps_analysis.txt'
+    )
+    user_prompt = load_prompt(prompt_file_path)
+
+    prompt = [
+        {"type": "text", "text": user_prompt},
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/png;base64,{base64_image}"
+            }
+        }
+    ]
+
+    response = openai.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system",
+             "content": "Act as the Federal Open Market Committee (FOMC) of "
+                        "the Federal Reserve System (the Fed) that is charged "
+                        "with making key decisions about interest rates and "
+                        "the growth of the United States money supply."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=max_tokens
+    )
+
+    interpretation = response.choices[0].message.content.strip()
+    return interpretation

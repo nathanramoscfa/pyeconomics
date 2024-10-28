@@ -1,7 +1,12 @@
 # pyeconomics/__init__.py
 
 # AI imports
-from pyeconomics.ai import ai_regression_analysis
+from pyeconomics.ai import (
+    ai_regression_analysis,
+    gaps_interpretation,
+    plot_interpretation,
+    taylor_rule,
+)
 
 # API imports
 from pyeconomics.api import (
@@ -49,9 +54,10 @@ from pyeconomics.models.monetary_policy import (
     historical_balanced_approach_rule,
     historical_first_difference_rule,
     historical_taylor_rule,
-    plot_historical_rule_estimates,
     plot_historical_bar_basr_rule,
     plot_historical_fdr,
+    plot_historical_gaps,
+    plot_historical_rule_estimates,
     plot_historical_taylor_rule,
     verbose_monetary_policy_rules,
     taylor_rule
@@ -133,5 +139,8 @@ __all__ = [
     'verbose_model_diagnostics',
     'fetch_historical_fed_funds_rate',
     'print_fred_series_names',
-    'get_forecast_tickers'
+    'get_forecast_tickers',
+    'gaps_interpretation',
+    'plot_interpretation',
+    'plot_historical_gaps'
 ]

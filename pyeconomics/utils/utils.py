@@ -85,7 +85,7 @@ def get_forecast_tickers() -> Tuple[str, str, str]:
 
     # Construct the Bloomberg tickers for 4 quarters ahead
     core_pce_future_ticker = \
-        f"ECPCUS Q{future_quarter}{future_year % 100:02d} INDEX"
+        f"ECCCUS Q{future_quarter}{future_year % 100:02d} INDEX"
     unemployment_future_ticker = \
         f"ECUPUS Q{future_quarter}{future_year % 100:02d} INDEX"
 
