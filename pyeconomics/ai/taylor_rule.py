@@ -2,8 +2,6 @@
 
 import os
 
-import openai
-
 from pyeconomics.api.openai_api import load_prompt, initialize_openai_client
 from pyeconomics.utils.utils import encode_image
 
@@ -18,9 +16,9 @@ def taylor_rule(
 
     Args:
         data (dict): Dictionary containing the Taylor Rule calculation data.
-        max_tokens (int): Maximum number of tokens for the AI response. Defaults
-            to 500 which may cost a few cents per call. Adjust as needed. See
-            https://openai.com/api/pricing/ for details.
+        max_tokens (int): Maximum number of tokens for the AI response. 
+            Defaults to 500 which may cost a few cents per call. Adjust as 
+            needed. See https://openai.com/api/pricing/ for details.
         model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
@@ -30,7 +28,7 @@ def taylor_rule(
         str: AI-generated analysis paragraph.
     """
     # Ensure the OpenAI client is initialized only when this function is called
-    initialize_openai_client()
+    client = initialize_openai_client()
 
     # Construct the full path to the prompt file
     prompt_file_path = os.path.join(
@@ -61,7 +59,7 @@ def taylor_rule(
         rho=round(data['rho'], 2),
     )
 
-    response = openai.chat.completions.create(
+    response = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system",
@@ -75,8 +73,8 @@ def taylor_rule(
         max_tokens=max_tokens
     )
 
-    analysis = response.choices[0].message.content.strip()
-    return analysis
+    analysis = response.choices[0].message.content
+    return analysis if analysis else ""
 
 
 def plot_interpretation(
@@ -89,9 +87,9 @@ def plot_interpretation(
 
     Args:
         image_path (str): Path to the plot image file.
-        max_tokens (int): Maximum number of tokens for the AI response. Defaults
-            to 500 which may cost a few cents per call. Adjust as needed. See
-            https://openai.com/api/pricing/ for details.
+        max_tokens (int): Maximum number of tokens for the AI response. 
+            Defaults to 500 which may cost a few cents per call. Adjust as 
+            needed. See https://openai.com/api/pricing/ for details.
         model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
@@ -100,6 +98,9 @@ def plot_interpretation(
     Returns:
         str: AI-generated interpretation paragraph.
     """
+    # Initialize OpenAI client
+    client = initialize_openai_client()
+    
     # Encode the image to base64
     base64_image = encode_image(image_path)
 
@@ -111,31 +112,60 @@ def plot_interpretation(
     )
     user_prompt = load_prompt(prompt_file_path)
 
-    prompt = [
-        {"type": "text", "text": user_prompt},
-        {
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/png;base64,{base64_image}"
-            }
-        }
-    ]
-
-    response = openai.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system",
-             "content": "Act as the Federal Open Market Committee (FOMC) of "
-                        "the Federal Reserve System (the Fed) that is charged "
-                        "with making key decisions about interest rates and "
-                        "the growth of the United States money supply."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_tokens
+    system_content = (
+        "Act as the Federal Open Market Committee (FOMC) of the Federal "
+        "Reserve System (the Fed) that is charged with making key decisions "
+        "about interest rates and the growth of the US money supply."
     )
 
-    interpretation = response.choices[0].message.content.strip()
-    return interpretation
+    # For gpt-4-vision models, we need specific formatting
+    if 'vision' in model or 'gpt-4o' in model:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_content
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=max_tokens
+        )
+    else:
+        # Fallback to text-only models
+        no_image_msg = (
+            f"{user_prompt}\n\n"
+            "[Note: Unable to process image with this model. "
+            "Please use a vision-capable model for image analysis.]"
+        )
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_content
+                },
+                {
+                    "role": "user", 
+                    "content": no_image_msg
+                }
+            ],
+            max_tokens=max_tokens
+        )
+
+    interpretation = response.choices[0].message.content
+    return interpretation if interpretation else ""
 
 
 def gaps_interpretation(
@@ -148,9 +178,9 @@ def gaps_interpretation(
 
     Args:
         image_path (str): Path to the plot image file.
-        max_tokens (int): Maximum number of tokens for the AI response. Defaults
-            to 500 which may cost a few cents per call. Adjust as needed. See
-            https://openai.com/api/pricing/ for details.
+        max_tokens (int): Maximum number of tokens for the AI response. 
+            Defaults to 500 which may cost a few cents per call. Adjust as 
+            needed. See https://openai.com/api/pricing/ for details.
         model (str): The OpenAI ai_model to use for the analysis. Defaults to
             'gpt-4o'. Other models are available, such as 'gpt-4-turbo' and
             'gpt-3.5-turbo'. See https://platform.openai.com/docs/models for
@@ -159,6 +189,9 @@ def gaps_interpretation(
     Returns:
         str: AI-generated interpretation paragraph.
     """
+    # Initialize OpenAI client
+    client = initialize_openai_client()
+    
     # Encode the image to base64
     base64_image = encode_image(image_path)
 
@@ -170,28 +203,57 @@ def gaps_interpretation(
     )
     user_prompt = load_prompt(prompt_file_path)
 
-    prompt = [
-        {"type": "text", "text": user_prompt},
-        {
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/png;base64,{base64_image}"
-            }
-        }
-    ]
-
-    response = openai.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system",
-             "content": "Act as the Federal Open Market Committee (FOMC) of "
-                        "the Federal Reserve System (the Fed) that is charged "
-                        "with making key decisions about interest rates and "
-                        "the growth of the United States money supply."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=max_tokens
+    system_content = (
+        "Act as the Federal Open Market Committee (FOMC) of the Federal "
+        "Reserve System (the Fed) that is charged with making key decisions "
+        "about interest rates and the growth of the US money supply."
     )
 
-    interpretation = response.choices[0].message.content.strip()
-    return interpretation
+    # For gpt-4-vision models, we need specific formatting
+    if 'vision' in model or 'gpt-4o' in model:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_content
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=max_tokens
+        )
+    else:
+        # Fallback to text-only models
+        no_image_msg = (
+            f"{user_prompt}\n\n"
+            "[Note: Unable to process image with this model. "
+            "Please use a vision-capable model for image analysis.]"
+        )
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_content
+                },
+                {
+                    "role": "user", 
+                    "content": no_image_msg
+                }
+            ],
+            max_tokens=max_tokens
+        )
+
+    interpretation = response.choices[0].message.content
+    return interpretation if interpretation else ""

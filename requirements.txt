@@ -13,3 +13,4 @@ setuptools~=68.2.2
 sphinx~=7.3.7
 sphinx-rtd-theme~=2.0.0
 statsmodels~=0.14.2
+git+https://github.com/PaulMest/tia.git

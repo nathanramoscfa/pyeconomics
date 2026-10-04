@@ -1,9 +1,9 @@
 # pyeconomics/api/openai_api.py
 
-import openai
 import os
 import keyring
 from typing import Optional
+from openai import OpenAI
 
 
 def get_openai_api_key() -> Optional[str]:
@@ -24,13 +24,16 @@ def get_openai_api_key() -> Optional[str]:
     return api_key
 
 
-def initialize_openai_client(api_key: Optional[str] = None) -> None:
+def initialize_openai_client(api_key: Optional[str] = None) -> OpenAI:
     """
     Initializes the OpenAI client with the provided API key.
 
     Args:
         api_key (Optional[str]): The OpenAI API key. If not provided, it tries
             to retrieve one.
+
+    Returns:
+        OpenAI: The initialized OpenAI client.
 
     Raises:
         ValueError: If no API key is provided or found.
@@ -42,7 +45,8 @@ def initialize_openai_client(api_key: Optional[str] = None) -> None:
         raise ValueError("API Key for OpenAI must be provided either in "
                          "keyring or as an environment variable.")
 
-    openai.api_key = api_key
+    # Create and return a client instance
+    return OpenAI(api_key=api_key)
 
 
 def load_prompt(file_path: str) -> str:

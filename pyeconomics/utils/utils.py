@@ -63,33 +63,37 @@ def months_until_next_halving(date: datetime, halving_dates: list[datetime]):
     return 0
 
 
-def get_forecast_tickers() -> Tuple[str, str, str]:
+def get_forecast_tickers(quarters_ahead: int = 2) -> Tuple[str, str, str]:
     """
     Generate the Bloomberg tickers for the consensus Core PCE (yoy%) forecast
-    and unemployment forecast for 4 quarters ahead, as well as for the current
-    quarter.
+    and unemployment forecast for the specified number of quarters ahead,
+    as well as for the current quarter.
+
+    Args:
+        quarters_ahead (int): The number of quarters ahead to use for forecast.
+            Default is 2 quarters.
 
     Returns:
-        Tuple[str, str, str]: The tickers for 4-quarter ahead Core PCE forecast,
-                                   4-quarter ahead unemployment forecast,
-                                   and current quarter unemployment forecast.
+        Tuple[str, str, str]: The tickers for Core PCE forecast for the
+            specified number of quarters ahead, unemployment forecast for the
+            specified quarters ahead, and the current quarter unemployment
+            forecast.
     """
     # Get current period
     current_year = datetime.now().year
     current_quarter = (datetime.now().month - 1) // 3 + 1
 
-    # Calculate the quarter 4 quarters ahead
-    future_quarter = (current_quarter + 3) % 4 + 1
-    # Calculate the year for the future quarter
-    future_year = current_year + (current_quarter + 3) // 4
+    # Calculate the future quarter and year based on quarters_ahead
+    future_quarter = (current_quarter + quarters_ahead - 1) % 4 + 1
+    future_year = current_year + (current_quarter + quarters_ahead - 1) // 4
 
-    # Construct the Bloomberg tickers for 4 quarters ahead
+    # Construct the Bloomberg tickers for the specified quarters ahead
     core_pce_future_ticker = \
         f"ECCCUS Q{future_quarter}{future_year % 100:02d} INDEX"
     unemployment_future_ticker = \
         f"ECUPUS Q{future_quarter}{future_year % 100:02d} INDEX"
 
-    # Construct the Bloomberg tickers for the current quarter
+    # Construct the Bloomberg ticker for the current quarter
     unemployment_current_ticker = \
         f"ECUPUS Q{current_quarter}{current_year % 100:02d} INDEX"
 
