@@ -136,3 +136,8 @@ cython_debug/
 # dotenv
 .env
 .env.*
+
+# roadmodel planning kit: personal posture, never commit
+planning/user-context.md
+# git worktrees (ROADMAP §5 "Worktree strategy")
+.worktrees/
