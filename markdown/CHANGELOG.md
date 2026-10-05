@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - Unreleased
+### Security
+- The FRED API key is no longer written to the log. Versions 0.2.5 and
+  earlier logged the key at DEBUG level whenever `FredClient` was created,
+  including the client created when `pyeconomics` is imported, whether the
+  key came from the `api_key` argument, the `FRED_API_KEY` environment
+  variable or the system keyring. If you ran pyeconomics with DEBUG logging
+  enabled and those logs were stored or shared, rotate your FRED API key at
+  https://fredaccount.stlouisfed.org/apikeys.
+- A regression test now fails if the key reaches any log record.
+- Releases are published from GitHub Actions through PyPI Trusted Publishing,
+  with attestations; no long-lived PyPI token exists.
+
+### Deprecated
+- 0.2.x receives security fixes only and reaches end-of-life when
+  pyeconomics 1.0.0 is released.
+
 ## [0.2.5] - 2024-05-30
 ### Added
 - Establishment of the first stable and tested version of PyEconomics.
