@@ -700,7 +700,7 @@ declared-parallelism case does not arise in this phase.
 > `pyeconomics/utils/utils.py`, the `tia` line in `requirements.txt` and
 > the two regenerated plots — to a new `archive/0.2-dev-wip` branch; tag
 > `origin/dev` and `origin/legacy-dev-0.2.6` as `archive/dev-2024-10` and
-> `archive/legacy-dev-0.2.6`; and add `archive-immutable` rulesets that
+> `archive/legacy-dev-0.2.6`; and add `archive-immutable-*` rulesets that
 > forbid updating or deleting any `archive/` branch or tag. Then land
 > `docs/roadmap/ROADMAP.md`, this file and the roadmodel planning kit
 > (`planning/`, without the personal `planning/user-context.md`) on
@@ -1147,9 +1147,9 @@ hygiene.
         restrictions null, required_linear_history true,
         allow_force_pushes false, allow_deletions false,
         required_conversation_resolution true.
-      - Two rulesets named `archive-immutable`: one with
+      - Two rulesets (names must be unique per repository): `archive-immutable-branches` with
         target `branch` including `refs/heads/archive/**`,
-        one with target `tag` including
+        `archive-immutable-tags` with target `tag` including
         `refs/tags/archive/**`; rules `deletion`,
         `non_fast_forward` and `update`; no bypass actors;
         enforcement `active`. Verify through
@@ -1203,7 +1203,7 @@ hygiene.
   peeling to `d4a692d7c76c75119c98dbc980d0ec5454a8fa05` and
   `archive/legacy-dev-0.2.6` peeling to
   `2b7e8a6e1dd3dbc11b4a8e395e8679fe31487d15`.
-- Both `archive-immutable` rulesets are active, and `gh api
+- Both `archive-immutable-*` rulesets (`-branches`, `-tags`) are active, and `gh api
   repos/OWNER/REPO/rules/branches/archive/0.2-dev-wip` lists `deletion`,
   `non_fast_forward` and `update`.
 - `main` carries `docs/roadmap/ROADMAP.md`,
@@ -5455,7 +5455,7 @@ per phase-boundary hygiene.
       exist for the current owner (Step 2; replaced in
       Step 6 if the repository moved). Environments
       `testpypi` and `pypi` (maintainer review) and the
-      `release-tags` and `archive-immutable` rulesets exist.
+      `release-tags`, `archive-immutable-branches` and `archive-immutable-tags` rulesets exist.
     - pyproject.toml version is 1.0.0.dev1. CODECOV_TOKEN is
       still a repository secret. ADR-0010 puts CI on 3.12,
       3.13 and 3.14, plus 3.15 once final (due
@@ -6780,7 +6780,7 @@ workflow above maps directly to the corresponding row below.
 | V1.1 | Static checks 1–5 all PASS (roadmaps and kit tracked, user-context ignored, archive tags and branch exact). | `phase-verify.yml` runs `verify-phase01.sh --fast` on every push/PR. |
 | V1.2 | `main` requires a PR, enforces admins and linear history, and forbids force-push and deletion. | `--live` (`gh api .../branches/main/protection`).                  |
 | V1.3 | Squash-only merges titled by the PR title; merged branches deleted. | `--live` (`gh api repos/OWNER/REPO`).                                     |
-| V1.4 | Both `archive-immutable` rulesets are active.                      | `--live` (`gh api .../rulesets`).                                         |
+| V1.4 | Both `archive-immutable-*` rulesets (`-branches`, `-tags`) are active. | `--live` (`gh api .../rulesets`).                                         |
 
 ### V2 — Legacy credential-logging fix and hardened pipeline
 
