@@ -284,7 +284,8 @@ Astra on the ChatGPT Pro 5x pool as the cross-provider backup.
   hardened Trusted Publishing one (1.5), and publish 0.2.6 — a number PyPI
   never received. The release also restarts the no-release clock in PEP
   541's test for abandoned names, which 0.2.x currently meets.
-- Publish a GitHub security advisory: affected versions ≤ 0.2.5, the fixed
+- Publish a GitHub security advisory: affected versions 0.2.0–0.2.5 (0.1.0
+  never logged the key; the 0.2.6 readiness gate read every sdist), the fixed
   version, and the advice to rotate a FRED key if DEBUG logs were stored or
   shared. Declare 0.2.x end-of-life at the 1.0.0 release.
 - Commit the uncommitted working tree (Bloomberg forecast tickers, OpenAI
