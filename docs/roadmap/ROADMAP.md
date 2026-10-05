@@ -243,7 +243,7 @@ sources with vintages and retrieval times, and a hash.
 
 ### Phase 1 — Reset & Foundation
 
-**Status:** Not started
+**Status:** In progress — phase01-roadmap.md
 
 **Goal:** Patch and preserve 0.2.x, then stand up a clean, secure,
 production-grade skeleton — packaging, toolchain, security gate, CI/CD and
@@ -2489,7 +2489,7 @@ The following are deliberately deferred to a future version, or excluded:
 
 | Phase | Description                                            | Complexity | Status      |
 |-------|--------------------------------------------------------|------------|-------------|
-| 1     | Reset & Foundation                                     | Medium     | Not started |
+| 1     | Reset & Foundation                                     | Medium     | In progress |
 | 2     | Model Engine & Core Catalog                            | High       | Not started |
 | 3     | Data Platform & Free Sources                           | High       | Not started |
 | 4     | Programmatic Surfaces: CLI, REST API, MCP & Exports    | High       | Not started |

@@ -1,6 +1,6 @@
 # Phase 1 Roadmap — Reset & Foundation
 
-**Status:** Not started
+**Status:** In progress
 
 ## Overview
 
@@ -689,9 +689,9 @@ declared-parallelism case does not arise in this phase.
 
 ---
 
-## Step 1 — Preserve 0.2.x and Land the Roadmaps
+## Step 1 — Preserve 0.2.x and Land the Roadmaps ✅
 
-**Status:** Not started
+**Status:** Complete — PR #46 (2026-10-04)
 
 > **Goal:** Preserve every byte of 0.2.x before anything moves, then make
 > `main` the ledger. Commit the uncommitted work in progress — the OpenAI
@@ -6917,7 +6917,7 @@ workflow above maps directly to the corresponding row below.
 
 | Step    | Scope                          | Model             | Platform     | Reasoning dial  | Thinking | Conv | Status      |
 | ------- | ------------------------------ | ----------------- | ------------ | --------------- | -------- | ---- | ----------- |
-| 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #46 |
 | 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
