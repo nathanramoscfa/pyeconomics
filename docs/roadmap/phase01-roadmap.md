@@ -1798,9 +1798,9 @@ New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 3 — 0.2.6 Readiness Gate
+## Step 3 — 0.2.6 Readiness Gate ✅
 
-**Status:** Not started
+**Status:** Complete — PR #49 (2026-10-05)
 
 > **Goal:** Decide, with evidence, that publishing 0.2.6 to PyPI is safe —
 > the rebuild's first irreversible cutover, which ROADMAP §5 "Promotion
@@ -6954,7 +6954,7 @@ workflow above maps directly to the corresponding row below.
 | ------- | ------------------------------ | ----------------- | ------------ | --------------- | -------- | ---- | ----------- |
 | 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #46 |
 | 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #48 |
-| 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
