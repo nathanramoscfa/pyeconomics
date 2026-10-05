@@ -2627,9 +2627,22 @@ phase-boundary hygiene.
       origin/legacy/0.2.x`; set __version__.py to '0.2.6';
       date the CHANGELOG entry (`## [0.2.6] - YYYY-MM-DD`);
       link the advisory from the README notice (the GHSA URL
-      is fixed by the draft id). Open the PR against
-      legacy/0.2.x as `chore(release): 0.2.6` and
-      squash-merge it once the legacy CI is green.
+      is fixed by the draft id). Step 3's gate also requires,
+      in the same PR: (a) the CHANGELOG entry and the README
+      notice name the affected versions as "0.2.0 to 0.2.5",
+      not "0.2.5 and earlier" — 0.1.0 never logged the key
+      (readiness §4); (b) if decision D2 shipped the pins
+      unchanged, a `### Known issues` subsection in the 0.2.6
+      entry listing the pinned jupyterlab, pytest and
+      setuptools advisories, that installing pyeconomics
+      downgrades setuptools to 68.2.x, and the advice to
+      install it in its own virtual environment (readiness
+      §5); (c) if decision D1 shipped as is, a `### Removed`
+      line: `pyeconomics/__version__.py`, written at build
+      time by the old release workflow, is no longer shipped;
+      use `importlib.metadata.version("pyeconomics")`. Open
+      the PR against legacy/0.2.x as `chore(release): 0.2.6`
+      and squash-merge it once the legacy CI is green.
     </requirement>
 
     <requirement>
@@ -2651,7 +2664,12 @@ phase-boundary hygiene.
       https://pypi.org/integrity/pyeconomics/0.2.6/<file>/provenance`
       returns an attestation naming this repository's
       release.yml for both files; and confirm an unpinned
-      `pip install pyeconomics` resolves 0.2.6.
+      `pip install pyeconomics` resolves 0.2.6. Install with
+      `pip --isolated` or `uv … --no-config`: the operator's
+      user-level uv configuration adds a package-firewall
+      index ahead of the one named on the command line, so a
+      plain `uv pip install --index-url …` can resolve from
+      it instead (Step 3 hit this).
     </requirement>
 
     <requirement>
