@@ -1,61 +1,64 @@
-name: pytest
+# .github/workflows/tests.yml
+#
+# Legacy CI for the 0.2.x line: flake8 and pytest on Python 3.11 and 3.12.
+# Runs on pull requests to and pushes on legacy/0.2.x, and release.yml calls
+# it as its `test` job.
+
+name: legacy-ci
 
 on:
-  push:
-    branches: [ main, dev ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [legacy/0.2.x]
+  push:
+    branches: [legacy/0.2.x]
+  workflow_call:
+
+permissions: {}
+
+concurrency:
+  group: legacy-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
+    name: test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.11', '3.12']
+    env:
+      # Not a FRED key: the package builds a client at import, and the
+      # credential-logging test checks that no key reaches a log record.
+      FRED_API_KEY: ci-placeholder-not-a-fred-key
+      MPLBACKEND: Agg
 
     steps:
-    - uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
+      - name: Harden the runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
 
-    # Set up Python
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5  # Ensure to use the latest version for Node.js 20 support
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-    # Install dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install flake8 pytest-cov keyrings.alt
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    # Set PYTHONPATH
-    - name: Set PYTHONPATH
-      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt flake8==7.4.1
+          python -m pip install -e .
 
-    # Install the package in editable mode
-    - name: Install Package
-      run: pip install -e .
+      - name: Lint with flake8
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=80
 
-    # Set FRED API Key environment variable
-    - name: Set FRED API Key
-      run: echo "FRED_API_KEY=dummy_fred_api_key" >> $GITHUB_ENV
-
-    # Lint with flake8
-    - name: Lint with flake8
-      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=80
-
-    # Run tests with coverage
-    - name: Run tests with coverage
-      run: |
-        pytest --cov=./pyeconomics --cov-report=xml
-
-    # Upload coverage reports to Codecov
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4  # Ensure the latest version for Node.js 20 support
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
+      - name: Run tests
+        run: pytest
