@@ -2162,10 +2162,27 @@ price, and is taken on its higher Artificial Analysis Intelligence Index
       their members and contents. Expected differences only:
       pyeconomics/api/fred_api.py, the version metadata, the
       long description, and — in the sdist, through
-      MANIFEST.in — the CHANGELOG, README, new test, new
-      script and workflows. `Requires-Dist` and
-      `Requires-Python` must be identical. Any other
-      difference is a FAIL.
+      MANIFEST.in — the CHANGELOG, README, new test and
+      workflows (docs.yml gone). Step 2 found four more,
+      each expected: (a) build-backend metadata — 0.2.5 was
+      built by setuptools of 2024 (Metadata-Version 2.1),
+      0.2.6.dev1 by current setuptools under `uv build`
+      (Metadata-Version 2.4, `Dynamic:` fields, LICENSE under
+      `.dist-info/licenses/`, a newer WHEEL generator); (b)
+      the wheel also gains tests/test_credential_logging.py,
+      because `find_packages()` has always shipped `tests/`;
+      (c) the sdist does NOT contain scripts/ — MANIFEST.in
+      never included it; (d) both 0.2.5 artifacts contain a
+      `pyeconomics/__version__.py` that 0.2.6.dev1 lacks: the
+      old release.yml wrote it at build time and it was never
+      in git. (d) removes an importable module, so the
+      Decision section records the maintainer's call on it
+      (ship as is, or restore the file — a package change
+      that needs `0.2.6.dev2`). `Requires-Dist` and
+      `Requires-Python` must be identical as parsed
+      requirements (`packaging.requirements.Requirement`);
+      their text differs (`fredapi ~=0.5.1` against
+      `fredapi~=0.5.1`). Any other difference is a FAIL.
     </requirement>
 
     <requirement>
