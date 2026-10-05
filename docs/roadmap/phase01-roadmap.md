@@ -1229,9 +1229,9 @@ hygiene.
 
 ---
 
-## Step 2 — Legacy Credential-Logging Fix and Hardened Release Pipeline
+## Step 2 — Legacy Credential-Logging Fix and Hardened Release Pipeline ✅
 
-**Status:** Not started
+**Status:** Complete — PR #48 (2026-10-05)
 
 > **Goal:** Cut `legacy/0.2.x` from `v0.2.5` and protect it, then fix and
 > re-plumb it on `fix/legacy-0.2.6-credential-logging`. Delete the three
@@ -6935,7 +6935,7 @@ workflow above maps directly to the corresponding row below.
 | Step    | Scope                          | Model             | Platform     | Reasoning dial  | Thinking | Conv | Status      |
 | ------- | ------------------------------ | ----------------- | ------------ | --------------- | -------- | ---- | ----------- |
 | 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #46 |
-| 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
+| 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #48 |
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
