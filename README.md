@@ -4,13 +4,15 @@
 
 # PyEconomics
 
-> **Security notice:** pyeconomics 0.2.5 and earlier write your FRED API key
+> **Security notice:** pyeconomics 0.2.0 to 0.2.5 write your FRED API key
 > to the log at DEBUG level. 0.2.6 fixes this; upgrade with
 > `pip install --upgrade pyeconomics`. If you ran an earlier version with
 > DEBUG logging enabled and those logs were stored or shared, rotate your
 > key at https://fredaccount.stlouisfed.org/apikeys. 0.2.x receives
 > security fixes only and reaches end-of-life when pyeconomics 1.0.0 is
 > released. See the
+> [security advisory](https://github.com/nathanramoscfa/pyeconomics/security/advisories/GHSA-j6rp-vwwv-jrr8)
+> and the
 > [CHANGELOG](https://github.com/nathanramoscfa/pyeconomics/blob/legacy/0.2.x/markdown/CHANGELOG.md).
 
 **PyEconomics** is a Python library for economic and financial analysis,
