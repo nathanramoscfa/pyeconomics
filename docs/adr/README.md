@@ -1,0 +1,49 @@
+# Architecture Decision Records
+
+These records hold the decisions every phase of the pyeconomics 1.0 rebuild
+builds on: what the project is, how it is packaged, versioned and licensed,
+how data licences are enforced, which web and documentation stacks it uses,
+what it is called, and which Python versions it supports. Each one starts
+from the recommended default in [ROADMAP §4 1.6](../roadmap/ROADMAP.md#16-architecture-decision-records)
+and from the §5 section it implements.
+
+## Index
+
+| ADR | Title | Status | Date |
+|-----|-------|--------|------|
+| [0001](0001-product-boundaries.md) | Product boundaries | Proposed | 2026-10-05 |
+| [0002](0002-distributions-and-extras.md) | Distributions and extras | Proposed | 2026-10-05 |
+| [0003](0003-versioning-and-deprecation.md) | Versioning and deprecation | Proposed | 2026-10-05 |
+| [0004](0004-licence-and-contributions.md) | Licence and contributions | Proposed | 2026-10-05 |
+| [0005](0005-data-licence-model.md) | Data-licence model | Proposed | 2026-10-05 |
+| [0006](0006-web-stack-and-hosting.md) | Web stack and hosting | Proposed | 2026-10-05 |
+| [0007](0007-documentation-tooling.md) | Documentation tooling | Proposed | 2026-10-05 |
+| 0008 | Numerical conventions | Reserved for Phase 2 | — |
+| [0009](0009-name-domains-and-trademark.md) | Name, domains and trademark | Proposed | 2026-10-05 |
+| [0010](0010-python-support-policy.md) | Python support policy | Proposed | 2026-10-05 |
+
+ADR-0008 is reserved for the numerical conventions (decimal rates, units,
+compounding and day-count enums, tolerances, seeds) that Phase 2 writes when
+it first needs them (ROADMAP §4 2.1).
+
+## Lifecycle
+
+1. **Proposed.** A new ADR is copied from [template.md](template.md), takes
+   the next free number, and opens in a pull request reading
+   `Status: Proposed`.
+2. **Amended in place.** Until it is accepted, the maintainer's changes are
+   made directly in the file, and each one is noted under "More
+   information".
+3. **Accepted.** The maintainer accepts each ADR explicitly in its pull
+   request. Only then does its status line read `Status: Accepted`, with
+   the acceptance date on its `Date:` line and in this index.
+4. **Superseded, never edited.** Once accepted, an ADR's decision does not
+   change. A new ADR supersedes it: the new one says `Supersedes
+   ADR-NNNN`, and the old one's status becomes `Superseded by ADR-MMMM`.
+   That status change, broken links and typos are the only edits an
+   accepted ADR takes.
+
+Each ADR's "Confirmation" section names the check that enforces it and the
+roadmap step that builds that check. Facts that move, such as release
+dates, version floors, licences, prices and name availability, carry a
+source and an access date, or read TBD.
