@@ -4582,6 +4582,10 @@ conversation per phase-boundary hygiene.
       0.2.x requirements.txt and Dockerfile that Step 7
       deletes); confirm they have closed, and dismiss any
       left on a deleted manifest as such.
+    - Repository webhooks (Step 5 audit): Read the Docs
+      (keep), Code Climate (id 479620223, a 0.2.x leftover:
+      remove it unless this step adopts the service), and
+      Snyk until the operator disconnects it in Step 5.
       2FA on GitHub and PyPI is unconfirmed for Phase 1.
     - Local tools: gitleaks 8.30.1 (winget), uv 0.12.x;
       prek is not installed yet; whether semgrep runs
