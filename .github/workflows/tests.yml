@@ -15,7 +15,7 @@ jobs:
         python-version: ['3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
+    - uses: actions/checkout@v7  # Ensure to use the latest version for Node.js 20 support
 
     # Set up Python
     - name: Set up Python ${{ matrix.python-version }}

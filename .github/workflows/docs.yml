@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4  # Ensure to use the latest version for Node.js 20 support
+    - uses: actions/checkout@v7  # Ensure to use the latest version for Node.js 20 support
     - name: Set up Python
       uses: actions/setup-python@v5  # Ensure to use the latest version for Node.js 20 support
       with:
