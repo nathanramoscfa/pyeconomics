@@ -2288,9 +2288,9 @@ price, and is taken on its higher Artificial Analysis Intelligence Index
 
 ---
 
-## Step 4 — 0.2.6 Security Release and Advisory
+## Step 4 — 0.2.6 Security Release and Advisory ✅
 
-**Status:** Not started
+**Status:** Complete — PR #51 (2026-10-05)
 
 > **Goal:** Execute the GO recorded in `docs/releases/0.2.6-readiness.md`.
 > On `release/v0.2.6` (from `origin/legacy/0.2.x`) set `__version__.py` to
@@ -2724,8 +2724,13 @@ phase-boundary hygiene.
   naming this repository's `release.yml`; an unpinned `pip install
   pyeconomics` resolves 0.2.6.
 - The advisory is published with the gate's affected range, patched
-  version 0.2.6, CWE-532 and its CVSS vector, and shows a CVE id if the
-  gate asked for one.
+  version 0.2.6, CWE-532 and its CVSS vector, and the CVE is requested if
+  the gate asked for one; the id is recorded when GitHub assigns it
+  (issue #52).
+
+> Criterion amended 2026-10-05 by the maintainer: GitHub assigns CVE ids
+> after a manual review that outlasts the step, so the request closes the
+> step and issue #52 records the id.
 - Read the Docs `stable` serves 0.2.6 and `latest` builds from
   `legacy/0.2.x`; both URLs return 200.
 - The release record is appended to `docs/releases/0.2.6-readiness.md` on
@@ -3118,7 +3123,12 @@ New conversation per phase-boundary hygiene.
         0.2.6 needs to import and run on CPython 3.12 (for
         example a NumPy ceiling its matplotlib pin requires),
         each commented with its reason. Run it with `uv run
-        --script scripts/legacy/record_characterization.py`.
+        --no-config --script
+        scripts/legacy/record_characterization.py`: the
+        operator's user-level uv configuration adds a
+        package-firewall index ahead of PyPI (Steps 3 and 4).
+        A plain `uv venv` has no pip; add `--seed` when a
+        recipe calls `python -m pip`.
       - Before importing pyeconomics: replace socket.socket,
         socket.create_connection and socket.getaddrinfo with
         functions that raise; set FRED_API_KEY to a
@@ -6955,7 +6965,7 @@ workflow above maps directly to the corresponding row below.
 | 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #46 |
 | 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #48 |
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
-| 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
