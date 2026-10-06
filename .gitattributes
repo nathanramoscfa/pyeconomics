@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Byte-exact characterization fixtures and their recorder (manifest SHA-256s)
+tests/fixtures/legacy/** text eol=lf
+scripts/legacy/** text eol=lf

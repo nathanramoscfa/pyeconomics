@@ -2741,9 +2741,9 @@ phase-boundary hygiene.
 
 ---
 
-## Step 5 — Characterize and Archive 0.2.x
+## Step 5 — Characterize and Archive 0.2.x ✅
 
-**Status:** Not started
+**Status:** Complete — PR #53 (2026-10-05)
 
 > **Goal:** Finish preserving 0.2.x, then retire its leftovers. Write
 > `scripts/legacy/record_characterization.py`, a PEP 723 script that
@@ -4575,9 +4575,17 @@ conversation per phase-boundary hygiene.
       .github/dependabot.yml covers github-actions only,
       and no required status checks exist (Bootstrap
       rule).
-    - Repository security settings are all off: secret
-      scanning, push protection, Dependabot alerts and
-      security updates, private vulnerability reporting.
+    - Repository security settings are off: secret
+      scanning, push protection, Dependabot security
+      updates, private vulnerability reporting. Dependabot
+      alerts are on (Step 5 found 15 open, all raised by the
+      0.2.x requirements.txt and Dockerfile that Step 7
+      deletes); confirm they have closed, and dismiss any
+      left on a deleted manifest as such.
+    - Repository webhooks (Step 5 audit): Read the Docs
+      (keep), Code Climate (id 479620223, a 0.2.x leftover:
+      remove it unless this step adopts the service), and
+      Snyk until the operator disconnects it in Step 5.
       2FA on GitHub and PyPI is unconfirmed for Phase 1.
     - Local tools: gitleaks 8.30.1 (winget), uv 0.12.x;
       prek is not installed yet; whether semgrep runs
@@ -6966,7 +6974,7 @@ workflow above maps directly to the corresponding row below.
 | 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #48 |
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
-| 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |

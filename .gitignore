@@ -107,6 +107,8 @@ Thumbs.db
 # Miscellaneous files
 *.csv
 *.json
+# Characterization fixtures (Phase 1 Step 5); Step 7 drops the blanket *.json
+!tests/fixtures/**/*.json
 secrets.py
 render_readme.py
 output.html
