@@ -703,7 +703,7 @@ the classes before Phase 5 (§5 "Data licensing policy").
 | BIS (SDMX)                               | Policy rates, credit, property prices, effective FX rates    | hosted-safe, never paywalled            | Including BIS data may not add any charge                                                 |
 | OpenFIGI                                 | Identifier mapping                                           | hosted-safe                             | Public-domain FIGIs; rate-limited                                                         |
 | Damodaran Online                         | Industry aggregates (ERP, betas, multiples)                  | hosted display of aggregates, with credit | No bulk mirror                                                                          |
-| IMF (SDMX)                               | IFS, BOP, DOTS, WEO                                          | library-only until written permission   | Commercial reuse and bulk download need the IMF's permission                              |
+| IMF (SDMX)                               | IFS, BOP, DOTS, WEO                                          | library-only until permission granted   | Commercial reuse and bulk download need the IMF's permission                              |
 | FRED and ALFRED                          | 850k+ series and their vintages                              | library-only, on the user's own key     | Terms bar caching, databases, redistribution and ML training; per-series copyright tags (14,128 series need pre-approval); hosted use only with the St. Louis Fed's written consent |
 | Philadelphia Fed (RTDSM, SPF), Atlanta Fed (GDPNow), Cleveland Fed (inflation expectations) | Real-time vintages, forecasts, nowcasts | library-only | Research or non-commercial terms                                         |
 | Ken French Data Library                  | Factors and portfolios                                       | library-only                            | Copyright Fama and French; fetched at runtime, never bundled                              |
@@ -2257,8 +2257,8 @@ Engineering rules, not legal advice; counsel reviews them before the Phase
 - Yahoo data through yfinance is for personal use only: `library-only`.
 - Coin Metrics community data is CC BY-NC 4.0: `library-only`, never part
   of a paid feature.
-- IMF: commercial reuse and automated bulk download need written
-  permission — library-only until granted.
+- IMF: commercial reuse and automated bulk download need the IMF's
+  explicit permission — library-only until granted.
 - Philadelphia, Atlanta and Cleveland Fed products, Cboe VIX history,
   AQR, JKP (CC BY-NC) and Hou-Xue-Zhang data: research or non-commercial
   terms — library-only.
@@ -2338,7 +2338,8 @@ Distribution comes before revenue. pyeconomics starts from about 25–30
 downloads a month and 11 stars, and the strongest comparable shows the
 risk: OpenBB — 73.8k stars, venture-backed — said in August 2026 it
 "couldn't find the product-market fit needed to build a sustainable
-business" and open-sourced its whole suite. In this niche, money comes from
+business around this vision within the time we had" and open-sourced its
+whole suite. In this niche, money comes from
 gated professional tiers, freemium SaaS split by personal and commercial
 use, per-seat Excel add-ins and study products; donations alone pay little.
 
