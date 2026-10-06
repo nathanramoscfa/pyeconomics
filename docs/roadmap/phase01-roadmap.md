@@ -3278,9 +3278,9 @@ New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 6 — Architecture Decision Records
+## Step 6 — Architecture Decision Records ✅
 
-**Status:** Not started
+**Status:** Complete — PR #54 (2026-10-05)
 
 > **Goal:** Write the decisions every later phase builds on into
 > `docs/adr/`, each from the recommended default in ROADMAP §4 1.6 and the
@@ -6997,7 +6997,7 @@ workflow above maps directly to the corresponding row below.
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
-| 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
+| 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
