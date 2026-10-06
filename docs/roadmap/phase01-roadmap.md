@@ -3118,7 +3118,12 @@ New conversation per phase-boundary hygiene.
         0.2.6 needs to import and run on CPython 3.12 (for
         example a NumPy ceiling its matplotlib pin requires),
         each commented with its reason. Run it with `uv run
-        --script scripts/legacy/record_characterization.py`.
+        --no-config --script
+        scripts/legacy/record_characterization.py`: the
+        operator's user-level uv configuration adds a
+        package-firewall index ahead of PyPI (Steps 3 and 4).
+        A plain `uv venv` has no pip; add `--seed` when a
+        recipe calls `python -m pip`.
       - Before importing pyeconomics: replace socket.socket,
         socket.create_connection and socket.getaddrinfo with
         functions that raise; set FRED_API_KEY to a
