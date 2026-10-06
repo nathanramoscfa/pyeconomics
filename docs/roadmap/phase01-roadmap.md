@@ -2724,8 +2724,13 @@ phase-boundary hygiene.
   naming this repository's `release.yml`; an unpinned `pip install
   pyeconomics` resolves 0.2.6.
 - The advisory is published with the gate's affected range, patched
-  version 0.2.6, CWE-532 and its CVSS vector, and shows a CVE id if the
-  gate asked for one.
+  version 0.2.6, CWE-532 and its CVSS vector, and the CVE is requested if
+  the gate asked for one; the id is recorded when GitHub assigns it
+  (issue #52).
+
+> Criterion amended 2026-10-05 by the maintainer: GitHub assigns CVE ids
+> after a manual review that outlasts the step, so the request closes the
+> step and issue #52 records the id.
 - Read the Docs `stable` serves 0.2.6 and `latest` builds from
   `legacy/0.2.x`; both URLs return 200.
 - The release record is appended to `docs/releases/0.2.6-readiness.md` on
