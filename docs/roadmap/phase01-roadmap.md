@@ -3278,9 +3278,9 @@ New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 6 — Architecture Decision Records
+## Step 6 — Architecture Decision Records ✅
 
-**Status:** Not started
+**Status:** Complete — PR #54 (2026-10-05)
 
 > **Goal:** Write the decisions every later phase builds on into
 > `docs/adr/`, each from the recommended default in ROADMAP §4 1.6 and the
@@ -4643,7 +4643,13 @@ conversation per phase-boundary hygiene.
         the runtime closure from uv.lock (empty today) and
         each package's licence metadata from the synced
         environment, and fails on any licence outside the
-        ADR-0004 allowlist or with no licence metadata.
+        ADR-0004 allowlist or with no licence metadata. It
+        also fails on any package ADR-0004 excludes by name
+        (FinancePy, rateslib, getfactormodels, dbnomics,
+        full_fred), whatever its metadata says. ADR-0004's
+        only escape hatch is a reviewed exceptions file
+        beside the script, each entry naming the package,
+        its licence and why; it starts empty.
       - `no-commit-to-branch` with `--branch main`.
       `uv run prek run --all-files` must pass.
     </requirement>
@@ -5988,7 +5994,7 @@ S in planning. New conversation per phase-boundary hygiene.
       definition of done), "Defect handling & triage" (the
       label classes), "Monetization strategy & validation
       gates" (G1); §1 (similarly named projects).
-    - docs/adr/0003, 0004 and 0009.
+    - docs/adr/0001, 0003, 0004 and 0009.
     - The current root README.md, CHANGELOG.md,
       CODE_OF_CONDUCT.md, CONTRIBUTING.md, CITATION.cff,
       NOTICE and .github/pull_request_template.md.
@@ -6060,7 +6066,9 @@ S in planning. New conversation per phase-boundary hygiene.
       .github/CODEOWNERS (the maintainer for everything,
       explicitly for .github/ and docs/adr/); issue forms in
       .github/ISSUE_TEMPLATE/: bug.yml; model-request.yml
-      with a required citation field; data-source-request.yml
+      with a required citation field and a link to
+      docs/adr/0001-product-boundaries.md and ROADMAP §6
+      Out of Scope (ADR-0001's confirmation); data-source-request.yml
       with a required terms-of-use URL field; config.yml
       disabling blank issues and linking private
       vulnerability reporting. Labels with `gh label create`
@@ -6491,8 +6499,9 @@ phase-boundary hygiene.
     Step 6 (ADRs) — checks 17-18:
     17. docs/adr/ holds README.md, template.md and the nine
         ADR files.
-    18. Each of the nine reads `Status: Accepted`, and the
-        index lists 0008 as reserved.
+    18. Each of the nine reads `Status: Accepted`, the
+        index lists each as Accepted with its file's date,
+        and the index lists 0008 as reserved.
 
     Step 7 (reset and skeleton) — checks 19-25:
     19. No 0.2.x path is tracked: setup.py,
@@ -6505,7 +6514,10 @@ phase-boundary hygiene.
         through importlib.metadata, and py.typed exists.
     21. pyproject.toml has build-backend "uv_build",
         requires-python ">=3.12", license "Apache-2.0" and
-        a [dependency-groups] table.
+        a [dependency-groups] table; no package or module
+        path under src/, console-script entry point, project
+        URL, author email or extra name contains "cfa",
+        case-insensitive (ADR-0009).
     22. uv.lock and pylock.toml are tracked.
     23. .gitattributes sets eol=lf, and `git ls-files --eol`
         shows no CRLF text in the index.
@@ -6543,7 +6555,10 @@ phase-boundary hygiene.
     Step 10 (CI/CD) — checks 35-40:
     35. ci.yml's matrix names ubuntu, windows and macos and
         Python 3.12, 3.13 and 3.14, and runs
-        `uv sync --locked`.
+        `uv sync --locked`; pyproject.toml's
+        `Programming Language :: Python :: 3.N` classifiers
+        name exactly the matrix's Python versions
+        (ADR-0010).
     36. release.yml refuses v0.* tags and tags off main,
         compares the tag with `uv version`, uses the testpypi
         and pypi environments with `id-token: write` on the
@@ -6641,7 +6656,14 @@ phase-boundary hygiene.
         PyPI 0.2.6 and its attestations, TestPyPI
         1.0.0.dev1 and its attestations, the published
         advisory, Read the Docs stable and latest, the
-        Sponsors and thanks.dev URLs.
+        Sponsors and thanks.dev URLs; RDAP for the four
+        ADR-0009 domains (V6.2 — `.io` through
+        https://rdap.identitydigital.services/rdap/, since
+        the IANA bootstrap that rdap.org follows has no
+        `.io` entry); `gh repo view --json nameWithOwner`
+        naming ADR-0009's organization, and the old
+        `nathanramoscfa/pyeconomics` URL redirecting to it
+        (V6.3).
       - --all: --fast, --python and --security.
       - --post: --all, --live, the fixture re-record
         (`uv run --script
@@ -6975,7 +6997,7 @@ workflow above maps directly to the corresponding row below.
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
-| 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
+| 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
@@ -7221,6 +7243,20 @@ patched, and the step or phase that owns it. Phase 2's roadmap carries
 forward whatever is still open here.
 
 - None when this roadmap was written.
+- From Step 6 (ADRs). Patched: Steps 8, 11 and 12, for the checks the
+  ADRs' Confirmation sections name. Owned by Phase 2's roadmap:
+  - a Pyodide import smoke test of the core wheel (ADR-0002);
+  - the `FutureWarning`-based deprecation warning class, and
+    `registry.validate()` rejecting a released model id that is missing
+    or reused (ADR-0003);
+  - a docs build with warnings as errors, executed notebooks and Sybil
+    collecting Markdown examples (ADR-0007);
+  - every release step re-checking NumPy's and SciPy's `requires_python`
+    and raising the floor if either moved (ADR-0010). SPEC 0 already
+    drops Python 3.12 in 2026 Q4, so the move to `>=3.13` is expected
+    during the 1.0 pre-releases;
+  - every release step checking its tag against ADR-0003's milestone
+    table.
 
 ---
 

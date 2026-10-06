@@ -392,7 +392,7 @@ accepts or amends it before Phase 2 starts.
 | 0005 | Data-licence model        | The five source classes and their enforcement in §5 "Data licensing policy"                             |
 | 0006 | Web stack & hosting       | Astro (static output) with React islands, Tailwind and shadcn/ui; the static site on Cloudflare; FastAPI on Cloud Run (the maintainer's existing platform; Fly.io is the runner-up); Next.js only if a logged-in app ever becomes the main experience |
 | 0007 | Documentation tooling     | Sphinx with MyST-NB, sphinx-autoapi and sphinx-gallery on Read the Docs; Sybil for Markdown doctests; revisit Zensical when it reaches 1.0 (Material for MkDocs is in maintenance mode) |
-| 0009 | Name, domains & trademark | Register pyeconomics.com, .org, .io and .dev now — all appeared unregistered on 2026-10-03 — before any announcement. Commission a clearance search before filing: "PYECONOMICS" risks a merely-descriptive refusal, so a coined brand for the hosted product stays an option; a USPTO intent-to-use filing in classes 9 and 42 costs about $1,000 in government fees plus attorney fees (TBD). Move the repository to a neutral `pyeconomics` GitHub organization, because the personal handle contains the CFA mark |
+| 0009 | Name, domains & trademark | Register pyeconomics.com, .org, .io and .dev now — all appeared unregistered on 2026-10-03 — before any announcement. Commission a clearance search before filing: "PYECONOMICS" risks a merely-descriptive refusal, so a coined brand for the hosted product stays an option; a USPTO intent-to-use filing in classes 9 and 42 costs about $1,000 in government fees plus attorney fees (TBD). Move the repository to a neutral GitHub organization, `pyeconomics-dev` (`pyeconomics` belongs to a dormant account; ADR-0009), because the personal handle contains the CFA mark |
 | 0010 | Python support policy     | `requires-python >=3.12` (NumPy 2.5 and SciPy 1.18 already require it); CI on 3.12, 3.13 and 3.14, plus 3.15 once final (due 2026-10-09); raise the floor with NumPy and SciPy, following SPEC 0 |
 
 ADR-0008 (numerical conventions) is written in Phase 2, where it is first
@@ -703,7 +703,7 @@ the classes before Phase 5 (§5 "Data licensing policy").
 | BIS (SDMX)                               | Policy rates, credit, property prices, effective FX rates    | hosted-safe, never paywalled            | Including BIS data may not add any charge                                                 |
 | OpenFIGI                                 | Identifier mapping                                           | hosted-safe                             | Public-domain FIGIs; rate-limited                                                         |
 | Damodaran Online                         | Industry aggregates (ERP, betas, multiples)                  | hosted display of aggregates, with credit | No bulk mirror                                                                          |
-| IMF (SDMX)                               | IFS, BOP, DOTS, WEO                                          | library-only until written permission   | Commercial reuse and bulk download need the IMF's permission                              |
+| IMF (SDMX)                               | IFS, BOP, DOTS, WEO                                          | library-only until permission granted   | Commercial reuse and bulk download need the IMF's permission                              |
 | FRED and ALFRED                          | 850k+ series and their vintages                              | library-only, on the user's own key     | Terms bar caching, databases, redistribution and ML training; per-series copyright tags (14,128 series need pre-approval); hosted use only with the St. Louis Fed's written consent |
 | Philadelphia Fed (RTDSM, SPF), Atlanta Fed (GDPNow), Cleveland Fed (inflation expectations) | Real-time vintages, forecasts, nowcasts | library-only | Research or non-commercial terms                                         |
 | Ken French Data Library                  | Factors and portfolios                                       | library-only                            | Copyright Fama and French; fetched at runtime, never bundled                              |
@@ -2257,8 +2257,8 @@ Engineering rules, not legal advice; counsel reviews them before the Phase
 - Yahoo data through yfinance is for personal use only: `library-only`.
 - Coin Metrics community data is CC BY-NC 4.0: `library-only`, never part
   of a paid feature.
-- IMF: commercial reuse and automated bulk download need written
-  permission — library-only until granted.
+- IMF: commercial reuse and automated bulk download need the IMF's
+  explicit permission — library-only until granted.
 - Philadelphia, Atlanta and Cleveland Fed products, Cboe VIX history,
   AQR, JKP (CC BY-NC) and Hou-Xue-Zhang data: research or non-commercial
   terms — library-only.
@@ -2338,7 +2338,8 @@ Distribution comes before revenue. pyeconomics starts from about 25–30
 downloads a month and 11 stars, and the strongest comparable shows the
 risk: OpenBB — 73.8k stars, venture-backed — said in August 2026 it
 "couldn't find the product-market fit needed to build a sustainable
-business" and open-sourced its whole suite. In this niche, money comes from
+business around this vision within the time we had" and open-sourced its
+whole suite. In this niche, money comes from
 gated professional tiers, freemium SaaS split by personal and commercial
 use, per-seat Excel add-ins and study products; donations alone pay little.
 
