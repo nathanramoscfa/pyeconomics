@@ -2288,9 +2288,9 @@ price, and is taken on its higher Artificial Analysis Intelligence Index
 
 ---
 
-## Step 4 — 0.2.6 Security Release and Advisory
+## Step 4 — 0.2.6 Security Release and Advisory ✅
 
-**Status:** Not started
+**Status:** Complete — PR #51 (2026-10-05)
 
 > **Goal:** Execute the GO recorded in `docs/releases/0.2.6-readiness.md`.
 > On `release/v0.2.6` (from `origin/legacy/0.2.x`) set `__version__.py` to
@@ -6960,7 +6960,7 @@ workflow above maps directly to the corresponding row below.
 | 1       | Preserve 0.2.x, land roadmaps  | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #46 |
 | 2       | Legacy fix + hardened pipeline | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #48 |
 | 3       | 0.2.6 readiness gate           | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #49 |
-| 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
