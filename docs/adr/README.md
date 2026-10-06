@@ -41,7 +41,9 @@ it first needs them (ROADMAP §4 2.1).
    change. A new ADR supersedes it: the new one says `Supersedes
    ADR-NNNN`, and the old one's status becomes `Superseded by ADR-MMMM`.
    That status change, broken links and typos are the only edits an
-   accepted ADR takes.
+   accepted ADR takes, plus one exception: a dated record of an action
+   the ADR itself asks to be recorded. ADR-0009's domain registrar and
+   renewal month are an example.
 
 Each ADR's "Confirmation" section names the check that enforces it and the
 roadmap step that builds that check. Facts that move, such as release

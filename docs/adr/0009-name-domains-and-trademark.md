@@ -163,6 +163,11 @@ trademark spend until a clearance search says it is worth it.
 
 ### Consequences
 
+Executed:
+
+- The four domains are registered with Cloudflare Registrar, with
+  auto-renew on, and renew each October (registered 2026-10-06).
+
 Good:
 
 - The project's address no longer carries the CFA mark. Old URLs and git
