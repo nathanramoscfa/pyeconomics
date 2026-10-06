@@ -1,6 +1,6 @@
 # ADR-0005: Data-licence model
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Deciders: Nathan Ramos, CFA (maintainer)
 - Parent: ROADMAP §4 1.6; §5 "Data licensing policy" and "Data terms"

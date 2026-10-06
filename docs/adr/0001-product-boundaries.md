@@ -1,6 +1,6 @@
 # ADR-0001: Product boundaries
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Deciders: Nathan Ramos, CFA (maintainer)
 - Parent: ROADMAP §4 1.6; §1 "Where pyeconomics fits"; §6 Out of Scope

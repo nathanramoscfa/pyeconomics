@@ -1,6 +1,6 @@
 # ADR-0010: Python support policy
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Deciders: Nathan Ramos, CFA (maintainer)
 - Parent: ROADMAP §4 1.6 and 1.2; §2 gap 13

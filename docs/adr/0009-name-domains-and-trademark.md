@@ -1,6 +1,6 @@
 # ADR-0009: Name, domains and trademark
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Deciders: Nathan Ramos, CFA (maintainer)
 - Parent: ROADMAP §4 1.6 and 5.7; §5 "Legal & brand guardrails"; §1 note

@@ -11,16 +11,16 @@ and from the §5 section it implements.
 
 | ADR | Title | Status | Date |
 |-----|-------|--------|------|
-| [0001](0001-product-boundaries.md) | Product boundaries | Proposed | 2026-10-05 |
-| [0002](0002-distributions-and-extras.md) | Distributions and extras | Proposed | 2026-10-05 |
-| [0003](0003-versioning-and-deprecation.md) | Versioning and deprecation | Proposed | 2026-10-05 |
-| [0004](0004-licence-and-contributions.md) | Licence and contributions | Proposed | 2026-10-05 |
-| [0005](0005-data-licence-model.md) | Data-licence model | Proposed | 2026-10-05 |
-| [0006](0006-web-stack-and-hosting.md) | Web stack and hosting | Proposed | 2026-10-05 |
-| [0007](0007-documentation-tooling.md) | Documentation tooling | Proposed | 2026-10-05 |
+| [0001](0001-product-boundaries.md) | Product boundaries | Accepted | 2026-10-05 |
+| [0002](0002-distributions-and-extras.md) | Distributions and extras | Accepted | 2026-10-05 |
+| [0003](0003-versioning-and-deprecation.md) | Versioning and deprecation | Accepted | 2026-10-05 |
+| [0004](0004-licence-and-contributions.md) | Licence and contributions | Accepted | 2026-10-05 |
+| [0005](0005-data-licence-model.md) | Data-licence model | Accepted | 2026-10-05 |
+| [0006](0006-web-stack-and-hosting.md) | Web stack and hosting | Accepted | 2026-10-05 |
+| [0007](0007-documentation-tooling.md) | Documentation tooling | Accepted | 2026-10-05 |
 | 0008 | Numerical conventions | Reserved for Phase 2 | — |
-| [0009](0009-name-domains-and-trademark.md) | Name, domains and trademark | Proposed | 2026-10-05 |
-| [0010](0010-python-support-policy.md) | Python support policy | Proposed | 2026-10-05 |
+| [0009](0009-name-domains-and-trademark.md) | Name, domains and trademark | Accepted | 2026-10-05 |
+| [0010](0010-python-support-policy.md) | Python support policy | Accepted | 2026-10-05 |
 
 ADR-0008 is reserved for the numerical conventions (decimal rates, units,
 compounding and day-count enums, tolerances, seeds) that Phase 2 writes when

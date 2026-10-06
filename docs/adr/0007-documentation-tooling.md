@@ -1,6 +1,6 @@
 # ADR-0007: Documentation tooling
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-05
 - Deciders: Nathan Ramos, CFA (maintainer)
 - Parent: ROADMAP §4 1.6, 2.5 and 5.6
