@@ -1,0 +1,207 @@
+# .github/workflows/release.yml
+#
+# Release pipeline for the 1.x line, through PyPI Trusted Publishing (OIDC):
+# no stored credential can publish. A `v*` tag on main is verified, built
+# once, checked, and published with PEP 740 attestations: a `.devN` version to
+# TestPyPI through the `testpypi` environment, any other version to PyPI
+# through the `pypi` environment, which waits for the maintainer's approval.
+# release-smoke.yml then installs the exact version from the index it went to,
+# in a fresh venv. The 0.2.x line releases through its own workflow on
+# legacy/0.2.x; this one refuses `v0.*` tags. ci.yml is not repeated here: a
+# tag must be on main, and main's required checks have passed on that commit.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: verify tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      index: ${{ steps.version.outputs.index }}
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+
+      - name: Check the tag is on main and equals the project version
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$TAG" == v0.* ]]; then
+            echo "::error::${TAG} is a 0.x tag: 0.2.x releases through legacy/0.2.x's own workflow."
+            exit 1
+          fi
+          commit=$(git rev-parse "refs/tags/${TAG}^{commit}")
+          if ! git merge-base --is-ancestor "$commit" origin/main; then
+            echo "::error::${TAG} (${commit}) is not on main."
+            exit 1
+          fi
+          version=$(uv version --short)
+          if ! [[ "$version" =~ ^[1-9][0-9]*\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?(\.post[0-9]+)?(\.dev[0-9]+)?$ ]]; then
+            echo "::error::pyproject.toml holds '${version}', not a 1.x release version."
+            exit 1
+          fi
+          if [ "v${version}" != "$TAG" ]; then
+            echo "::error::Tag ${TAG} does not match the project version (${version})."
+            exit 1
+          fi
+          if [[ "$version" =~ \.dev[0-9]+$ ]]; then index=testpypi; else index=pypi; fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "index=${index}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${version} from ${commit} to ${index}."
+
+  build:
+    name: build
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+
+      - name: Build the sdist and wheel
+        run: uv build
+
+      - name: Check the distributions
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          uvx twine==7.0.0 check --strict dist/*
+          shopt -s nullglob
+          wheels=(dist/*.whl)
+          sdists=(dist/*.tar.gz)
+          if [ "${#wheels[@]}" -ne 1 ] || [ "${#sdists[@]}" -ne 1 ]; then
+            echo "::error::Expected one wheel and one sdist in dist/."
+            exit 1
+          fi
+          wheel_version=$(unzip -p "${wheels[0]}" '*.dist-info/METADATA' | sed -n 's/^Version: //p')
+          sdist_version=$(tar -xzOf "${sdists[0]}" --wildcards '*/PKG-INFO' | sed -n 's/^Version: //p' | head -n 1)
+          if [ "$wheel_version" != "$VERSION" ] || [ "$sdist_version" != "$VERSION" ]; then
+            echo "::error::Built ${wheel_version} (wheel) and ${sdist_version} (sdist), expected ${VERSION}."
+            exit 1
+          fi
+          uv run --no-project python scripts/checks/dist_contents.py dist
+          sha256sum dist/*
+
+      - name: Upload the distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish-testpypi:
+    name: publish to TestPyPI
+    needs: [verify, build]
+    if: needs.verify.outputs.index == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/pyeconomics/${{ needs.verify.outputs.version }}/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Download the distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          attestations: true
+
+  publish-pypi:
+    name: publish to PyPI
+    needs: [verify, build]
+    if: needs.verify.outputs.index == 'pypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pyeconomics/${{ needs.verify.outputs.version }}/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Download the distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          attestations: true
+
+  smoke:
+    name: smoke test the published release
+    needs: [verify, publish-testpypi, publish-pypi]
+    if: >-
+      !cancelled()
+      && (needs.publish-testpypi.result == 'success'
+          || needs.publish-pypi.result == 'success')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/release-smoke.yml
+    with:
+      version: ${{ needs.verify.outputs.version }}
+      index: ${{ needs.verify.outputs.index }}

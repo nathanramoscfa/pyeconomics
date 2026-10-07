@@ -1,0 +1,296 @@
+# .github/workflows/ci.yml
+# Continuous integration for pull requests and main (ROADMAP §4 1.5). The
+# lint, types and lockfile jobs run the .pre-commit-config.yaml hooks by id,
+# as security.yml does, so the checks a commit passes locally are the checks a
+# pull request passes here. `test` is the one aggregate status check that
+# branch protection requires for the whole matrix; ty is informational until
+# it reaches 1.0 and is never required. pyright is editor-only: its PyPI
+# wrapper fetches Node at first run.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: true
+      - name: File hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+          for hook in check-yaml check-toml end-of-file-fixer trailing-whitespace mixed-line-ending; do
+            uv run --locked prek run "$hook" --all-files --verbose
+          done
+      - name: ruff format
+        run: uv run --locked prek run ruff-format --all-files --verbose
+      - name: ruff check
+        run: uv run --locked prek run ruff-check --all-files --verbose
+
+  types:
+    name: types
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: true
+      - name: mypy
+        run: uv run --locked prek run mypy --all-files --verbose
+
+  ty:
+    name: ty (informational)
+    runs-on: ubuntu-latest
+    # ty is pre-1.0: it reports, and never blocks or gates a merge.
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: true
+      - name: ty
+        run: uv run --locked ty check
+
+  tests:
+    name: tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # ADR-0010: Python 3.15 joins at its final release, with its trove
+        # classifier.
+        python-version: ["3.12", "3.13", "3.14"]
+    env:
+      # tests/conftest.py: derandomized, no deadline, prints the blob.
+      HYPOTHESIS_PROFILE: ci
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install the locked environment
+        run: uv sync --locked
+      # `uv run pytest`, never `python -m pytest`, which puts the working
+      # directory on sys.path. The coverage report prints in the log and the
+      # 95% branch floor in pyproject.toml fails the job.
+      - name: Run the tests with coverage
+        run: uv run --locked pytest --cov
+      # The licence check skips runtime packages whose markers exclude the
+      # running platform, so each OS checks its own.
+      - name: Runtime licence allowlist
+        run: uv run --locked prek run licences --all-files --verbose
+
+  package:
+    name: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: true
+      - name: Build the sdist and wheel
+        run: uv build
+      - name: Check the distributions
+        run: uvx twine==7.0.0 check --strict dist/*
+      # The artifacts hold only allowlisted paths and the version in
+      # pyproject.toml (scripts/checks/dist_contents.py).
+      - name: Check the artifact allowlist
+        run: uv run --no-project python scripts/checks/dist_contents.py dist
+      # The venv and the working directory are outside the checkout, so the
+      # import reads the installed wheel and never the source tree.
+      - name: Install the wheel in a clean venv and import it
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected=$(uv version --short)
+          uv venv "$RUNNER_TEMP/clean"
+          uv pip install --python "$RUNNER_TEMP/clean/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          found=$("$RUNNER_TEMP/clean/bin/python" -c 'import pyeconomics; print(pyeconomics.__version__)')
+          echo "installed ${found}, pyproject.toml says ${expected}"
+          test "$found" = "$expected"
+
+  lockfile:
+    name: lockfile
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: true
+      - name: uv.lock matches pyproject.toml
+        run: uv run --locked prek run uv-lock --all-files --verbose
+      - name: pylock.toml is a fresh export of uv.lock
+        run: uv run --locked prek run pylock-fresh --all-files --verbose
+
+  pr-title:
+    name: pr-title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      # ADR-0003: the squash message is the PR title, so a Conventional
+      # Commits title marks breaking changes (`!`) in review and in history.
+      # The title is untrusted: it reaches the shell only through env.
+      - name: Check the title is a Conventional Commit
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: [^ ].*$'
+          if ! [[ "$TITLE" =~ $pattern ]]; then
+            echo "::error::The PR title is not a Conventional Commit: <type>(<scope>)!: <description>. Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert."
+            exit 1
+          fi
+          echo "Title is a Conventional Commit."
+
+  dco:
+    name: dco
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Developer Certificate of Origin (ADR-0004): every commit carries a
+      # Signed-off-by trailer naming its author (`git commit -s`).
+      # Dependabot's commits cannot carry one, so a pull request GitHub
+      # attributes to dependabot[bot] is exempt; the exemption reads the PR's
+      # authenticated author, never a commit's free-text author field.
+      - name: Check every commit carries its author's sign-off
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          set -euo pipefail
+          if [ "$PR_AUTHOR" = "dependabot[bot]" ]; then
+            echo "Dependabot pull request: exempt from the DCO check."
+            exit 0
+          fi
+          failed=0
+          for commit in $(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}"); do
+            author=$(git log -1 --format='%an <%ae>' "$commit")
+            if git log -1 --format=%B "$commit" | grep -Fxq "Signed-off-by: ${author}"; then
+              echo "ok      ${commit:0:12} ${author}"
+            else
+              echo "::error::${commit:0:12} lacks 'Signed-off-by: ${author}'. Amend with git commit -s (or git rebase --signoff)."
+              failed=1
+            fi
+          done
+          exit "$failed"
+
+  test:
+    name: test
+    # The single status check that branch protection requires for the whole
+    # matrix. ty is deliberately absent. A job skipped by design (pr-title and
+    # dco on a push) passes; a failed or cancelled one does not.
+    if: always()
+    needs: [lint, types, tests, package, lockfile, pr-title, dco]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Every required job succeeded or was skipped by design
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$NEEDS" | jq -e 'all(.[]; .result == "success" or .result == "skipped")' > /dev/null

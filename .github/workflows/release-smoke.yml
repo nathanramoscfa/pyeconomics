@@ -1,0 +1,108 @@
+# .github/workflows/release-smoke.yml
+# Post-release smoke test: the health signal for every 1.x release (ROADMAP §5
+# "Operations & observability strategy"). In a fresh venv outside any
+# checkout, it installs pyeconomics==<version> from the index the release went
+# to, with no dependencies, then installs its dependencies from PyPI only, and
+# asserts that the installed package reports the version that was released.
+# release.yml calls it after each publish; run it by hand to re-check a past
+# release.
+name: release-smoke
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: The released version, for example 1.0.0.dev1
+        required: true
+        type: string
+      index:
+        description: The index the version was published to (pypi or testpypi)
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The released version, for example 1.0.0.dev1
+        required: true
+        type: string
+      index:
+        description: The index the version was published to
+        required: true
+        type: choice
+        options: [testpypi, pypi]
+
+permissions: {}
+
+jobs:
+  smoke:
+    name: smoke test ${{ inputs.version }} from ${{ inputs.index }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ inputs.version }}
+      INDEX: ${{ inputs.index }}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      # The venv lives outside any checkout (there is none), so the version
+      # check imports the published package and never a source tree.
+      - name: Install the published version in a fresh venv
+        run: |
+          set -euo pipefail
+          case "$INDEX" in
+            testpypi) index_url=https://test.pypi.org/simple/ ;;
+            pypi) index_url=https://pypi.org/simple/ ;;
+            *)
+              echo "::error::The index must be pypi or testpypi, not '${INDEX}'."
+              exit 1
+              ;;
+          esac
+          python -m venv "$RUNNER_TEMP/smoke"
+          py="$RUNNER_TEMP/smoke/bin/python"
+          # The package alone from the index it was published to, retrying
+          # while the index propagates. Never an extra index: TestPyPI must
+          # not resolve a third-party name.
+          for attempt in $(seq 1 10); do
+            if "$py" -m pip install --no-cache-dir --no-deps \
+                --index-url "$index_url" "pyeconomics==${VERSION}"; then
+              break
+            fi
+            if [ "$attempt" -eq 10 ]; then
+              echo "::error::pyeconomics==${VERSION} did not install from ${index_url}."
+              exit 1
+            fi
+            sleep 30
+          done
+          # Its dependencies from PyPI only, read from the installed metadata.
+          # Extras' requirements carry markers that exclude them here.
+          "$py" -c 'import importlib.metadata as m; print("\n".join(m.requires("pyeconomics") or []))' > "$RUNNER_TEMP/requires.txt"
+          if [ -s "$RUNNER_TEMP/requires.txt" ]; then
+            "$py" -m pip install --no-cache-dir \
+                --index-url https://pypi.org/simple/ -r "$RUNNER_TEMP/requires.txt"
+          fi
+          "$py" -m pip check
+
+      - name: Check the installed version
+        run: |
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/smoke/bin/python" - <<'EOF'
+          import importlib.metadata
+          import os
+          import sys
+
+          import pyeconomics
+
+          expected = os.environ["VERSION"]
+          metadata = importlib.metadata.version("pyeconomics")
+          print(f"released {expected}; metadata {metadata}; module {pyeconomics.__version__}")
+          sys.exit(not (metadata == pyeconomics.__version__ == expected))
+          EOF
