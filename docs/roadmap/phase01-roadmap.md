@@ -3768,9 +3768,9 @@ model rated S in planning. New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 7 — Repository Reset and Package Skeleton
+## Step 7 — Repository Reset and Package Skeleton ✅
 
-**Status:** Not started
+**Status:** Complete — PR #59 (2026-10-07)
 
 > **Goal:** Replace 0.2.x on `main` with the 1.0 skeleton the accepted
 > ADRs describe. Remove the 0.2.x package, its tests (keeping
@@ -4191,9 +4191,15 @@ conversation per phase-boundary hygiene.
     </requirement>
 
     <requirement>
-      Lock and version: `uv lock`; `uv export --format
-      pylock.toml --output-file pylock.toml`; `uv version`
-      prints 1.0.0.dev1. Both lock files are committed.
+      Lock and version: `uv lock --no-config`; `uv export
+      --no-config --format pylock.toml --output-file
+      pylock.toml`; `uv version` prints 1.0.0.dev1. Both
+      lock files are committed and name no index but
+      https://pypi.org/simple. `--no-config` is required: the
+      operator's user-level uv configuration adds a
+      package-firewall index ahead of PyPI, and a plain
+      `uv lock` writes that private URL into both files
+      (found in this step).
     </requirement>
 
     <requirement>
@@ -4223,10 +4229,16 @@ conversation per phase-boundary hygiene.
       `uvx twine check --strict dist/*`; list both
       artifacts' members — the wheel holds pyeconomics/
       __init__.py and py.typed plus dist-info with LICENSE
-      and NOTICE; the sdist holds pyproject.toml, README.md,
-      LICENSE, NOTICE and src/pyeconomics/ only — and fail
-      on any other path; install the wheel into a clean venv
-      and print `pyeconomics.__version__` (1.0.0.dev1).
+      and NOTICE; the sdist holds PKG-INFO, pyproject.toml,
+      README.md, LICENSE, NOTICE and src/pyeconomics/ only,
+      plus the pyproject.toml.orig that uv_build 0.12 always
+      writes, allowed only when it is byte-identical to the
+      committed pyproject.toml — and fail on any other path;
+      install the wheel into a clean venv and, from a
+      directory outside the checkout (a stale
+      `pyeconomics.egg-info` at the repository root shadows
+      the wheel's metadata), print `pyeconomics.__version__`
+      (1.0.0.dev1).
     </requirement>
 
     <requirement>
@@ -4639,6 +4651,15 @@ conversation per phase-boundary hygiene.
       - pip-audit: `pip-audit --locked` over pylock.toml;
         osv-scanner on uv.lock is the fallback ROADMAP §5
         names.
+      - Lock index: a local hook (and its CI mirror) that
+        fails if uv.lock or pylock.toml names any index or
+        file URL outside https://pypi.org/simple and
+        https://files.pythonhosted.org. The operator's
+        user-level uv configuration adds a private
+        package-firewall index, so a `uv lock` or `uv add`
+        run without `--no-config` writes its URL into both
+        lock files (Step 7). Run every lock-changing uv
+        command with `--no-config`.
       - Licence allowlist: scripts/checks/licences.py reads
         the runtime closure from uv.lock (empty today) and
         each package's licence metadata from the synced
@@ -5108,7 +5129,10 @@ Thinking stays On. The backup is GPT-6 Sol on Codex under ChatGPT Pro
       dev = the test group plus ruff, mypy, pydantic (for
       the mypy plugin, until Phase 2 moves it to the runtime
       dependencies), pyright, ty and prek. Re-lock and
-      re-export pylock.toml.
+      re-export pylock.toml with `uv lock --no-config` and
+      `uv export --no-config …`: without it the operator's
+      package-firewall index lands in both lock files
+      (Step 7).
     </requirement>
 
     <requirement>
@@ -5561,8 +5585,12 @@ per phase-boundary hygiene.
         `uv run pytest --cov` with the coverage report
         printed.
       - package: `uv build`; `uvx twine check --strict
-        dist/*`; the Step 7 artifact allowlist; install the
-        wheel in a clean venv and import `__version__`.
+        dist/*`; the Step 7 artifact allowlist (it admits
+        the sdist's PKG-INFO, and the pyproject.toml.orig
+        uv_build 0.12 always writes only when it is
+        byte-identical to the committed pyproject.toml);
+        install the wheel in a clean venv and import
+        `__version__` from a directory outside the checkout.
       - lockfile: `uv lock --check` and a pylock.toml
         freshness diff.
       - pr-title (pull requests only): the title, passed via
@@ -6998,7 +7026,7 @@ workflow above maps directly to the corresponding row below.
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
-| 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
+| 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |

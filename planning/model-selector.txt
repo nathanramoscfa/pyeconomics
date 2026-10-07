@@ -456,7 +456,19 @@
       default. It also makes Opus 4.7+ and Fable default to a 1M context
       window on Bedrock, Vertex, Foundry and the Claude apps gateway. The
       `/effort` vocabulary and the extended-thinking controls are
-      unchanged.
+      unchanged. 2.1.288 fixes resumed sessions dropping the model's
+      earlier thinking, retries thinking-only responses after a
+      mid-response API timeout, and makes a plugin-defined agent spawned
+      by name run with its own effort instead of the default. 2.1.289 is a
+      plugin / mod / permission-rule bug-fix release. Neither changes the
+      `/effort` vocabulary or the extended-thinking controls. 2.1.290
+      makes three effort/thinking fixes. A flagged message retried on a
+      fallback model with a different saved level no longer changes the
+      effort level. A reply that the output content filter stopped while
+      Claude was still thinking is now retried once. `/effort` sent from
+      `claude agents` to a busy background session now applies right
+      away. 2.1.291 is a hotfix for two regressions. Neither release
+      changes the `/effort` vocabulary or the extended-thinking controls.
     - OpenAI (Codex, OpenAI API, ChatGPT advanced controls):
       `reasoning_effort` knob — `low`, `medium`, `high`, `xhigh`, `max`,
       `ultra`. Codex's plan-mode `plan_mode_reasoning_effort` variant
@@ -1240,9 +1252,9 @@
              tier-coding="A" tier-planning="A" tier-agentic="A"
              tier-multimodal="S" tier-long-context="A" tier-knowledge="A"
              tier-speed="S"
-             headline-benchmarks="AA Intelligence Index 40.9 (high); HLE 47.8% (high); Terminal-Bench 2.1 87.6; Output Speed 237.7 tokens/s"
+             headline-benchmarks="AA Intelligence Index 40.9 (high); HLE 47.8%; SciCode 56.6; Terminal-Bench 4.0 19.7; AA-LCR 0.813; Terminal-Bench 2.1 87.6; Output Speed 193.4 tokens/s"
              pricing-notes="-"
-             prose-generated="best-for"
+             prose-generated="best-for headline-benchmarks"
              best-for="Frontier-class multimodal input, plus strong coding, planning, agentic work, long context and knowledge, with very fast output, at a low price. Its AA Intelligence Index of 40.9 ranks 18th of 54 measured models." />
       <model id="gpt-5.6-luna" name="GPT-5.6 Luna"
              input-price-per-1m="$0.20" output-price-per-1m="$1.20"
@@ -1269,8 +1281,9 @@
              tier-coding="C" tier-planning="C" tier-agentic="D"
              tier-multimodal="B" tier-long-context="A" tier-knowledge="D"
              tier-speed="S"
-             headline-benchmarks="AA Intelligence Index 16.9 (reasoning); Output Speed 122.5 tokens/s; AA-Omniscience -4.2; latency leader among Claude family"
+             headline-benchmarks="AA Intelligence Index 16.9 (reasoning); HLE 10.4%; SciCode 42.2; Terminal-Bench 4.0 0.0; AA-LCR 0.743; Output Speed 98.7 tokens/s; AA-Omniscience -4.2; latency leader among Claude family"
              pricing-notes="Hidden by default; Bedrock/Vertex: regional endpoints +10% surcharge; Cache: writes 1.25x, reads 0.1x"
+             prose-generated="headline-benchmarks"
              best-for="Speed-optimized lowest-cost Claude model, ideal for simple completions, high-volume repetitive tasks, and latency-sensitive workflows where a lightweight capable response matters more than deep reasoning" />
       <model id="muse-spark-1.3" name="Muse Spark 1.3"
              input-price-per-1m="$1.25" output-price-per-1m="$4.25"
