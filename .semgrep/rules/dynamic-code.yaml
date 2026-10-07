@@ -5,8 +5,8 @@ rules:
     severity: ERROR
     message: >-
       eval and exec run arbitrary code, and pyeconomics forbids them (ROADMAP
-      §5 "Per-step security gate"). Parse literals with ast.literal_eval or
-      dispatch through an explicit mapping.
+      section 5, "Per-step security gate"). Parse literals with
+      ast.literal_eval or dispatch through an explicit mapping.
     metadata:
       category: security
       cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"

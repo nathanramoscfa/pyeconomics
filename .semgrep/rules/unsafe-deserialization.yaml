@@ -5,7 +5,7 @@ rules:
     severity: ERROR
     message: >-
       pickle, marshal and shelve run arbitrary code when they load data, and
-      pyeconomics forbids them (ROADMAP §5 "Per-step security gate"). Use
+      pyeconomics forbids them (ROADMAP section 5, "Per-step security gate"). Use
       JSON, Parquet or another data-only format.
     metadata:
       category: security
