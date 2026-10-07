@@ -1,0 +1,19 @@
+# .gitleaks.toml
+# gitleaks configuration for the per-step security gate (ROADMAP §5
+# "Per-step security gate"): gitleaks' default rules, plus a project rule for
+# FRED API keys, the credential 0.2.x leaked into its logs.
+title = "pyeconomics"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "fred-api-key"
+description = "FRED API key: 32 lower-case letters and digits assigned to a FRED key name"
+regex = '''(?i)fred[\w.-]{0,24}?(?:key|token)[^\n]{0,40}?(?:=|:|=>|,)\s*['"]?([a-z0-9]{32})\b'''
+secretGroup = 1
+entropy = 3.0
+keywords = ["fred"]
+
+# Allowlists: none. An allowlist entry may only name a path that holds nothing
+# but documented fake patterns, with a comment here saying why.

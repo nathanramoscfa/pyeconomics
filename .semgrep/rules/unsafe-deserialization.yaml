@@ -1,0 +1,30 @@
+# .semgrep/rules/unsafe-deserialization.yaml
+rules:
+  - id: unsafe-deserialization
+    languages: [python]
+    severity: ERROR
+    message: >-
+      pickle, marshal and shelve run arbitrary code when they load data, and
+      pyeconomics forbids them (ROADMAP section 5, "Per-step security gate"). Use
+      JSON, Parquet or another data-only format.
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+    pattern-either:
+      - pattern: import pickle
+      - pattern: import _pickle
+      - pattern: import cPickle
+      - pattern: import marshal
+      - pattern: import shelve
+      - pattern: from pickle import $NAME
+      - pattern: from _pickle import $NAME
+      - pattern: from marshal import $NAME
+      - pattern: from shelve import $NAME
+      - pattern: pickle.$FUNC(...)
+      - pattern: _pickle.$FUNC(...)
+      - pattern: cPickle.$FUNC(...)
+      - pattern: marshal.$FUNC(...)
+      - pattern: shelve.$FUNC(...)
+      # pickle under another name
+      - pattern: pandas.read_pickle(...)
+      - pattern: numpy.load(..., allow_pickle=True, ...)

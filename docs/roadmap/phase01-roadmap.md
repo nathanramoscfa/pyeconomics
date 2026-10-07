@@ -4279,9 +4279,9 @@ conversation per phase-boundary hygiene.
 
 ---
 
-## Step 8 — Per-Step Security Gate
+## Step 8 — Per-Step Security Gate ✅
 
-**Status:** Not started
+**Status:** Complete — PR #60 (2026-10-07)
 
 > **Goal:** Make security a gate on every commit, locally and in CI. Add
 > `.pre-commit-config.yaml`, run by prek from the `dev` dependency group
@@ -4684,8 +4684,13 @@ conversation per phase-boundary hygiene.
       reference a name matching
       key|token|secret|password|passwd|credential,
       case-insensitive) — and .semgrep/tests/ holds annotated
-      `ruleid:` and `ok:` cases for each; `semgrep --test
-      .semgrep/` passes.
+      `ruleid:` and `ok:` cases for each; the `semgrep-test`
+      hook passes. (Step 8 found that the bare `semgrep
+      --test .semgrep/` pairs nothing when rules and tests
+      sit in separate folders, and exits 0 on "No unit tests
+      found". The hook runs scripts/checks/semgrep_tests.py,
+      which runs `semgrep --test --config <rule> <test>` per
+      pair and fails on any rule without both cases.)
     </requirement>
 
     <requirement>
@@ -4757,7 +4762,10 @@ conversation per phase-boundary hygiene.
       Prove the gate on a throwaway branch that is never
       pushed (`git switch -c throwaway/gate-proof`): a
       commit adding a file with a documented fake AWS
-      access-key pattern is blocked by the gitleaks hook; a
+      access-key pattern is blocked by the gitleaks hook (use
+      the fake AKIA key in gitleaks' own test fixtures,
+      testdata/repos/nogit/main.go: gitleaks allowlists AWS's
+      documented `…EXAMPLE` key by design, so it passes); a
       commit adding `pickle.loads(b"")` under src/ is
       blocked by semgrep and bandit. Paste both redacted
       outputs into the PR body, then `git switch -` and
@@ -4787,8 +4795,10 @@ conversation per phase-boundary hygiene.
   documented portable twin on Windows), `pip-audit --locked`, the
   licence allowlist check and `no-commit-to-branch`, all pinned, and
   `uv run prek run --all-files` passes on Windows and in CI.
-- `semgrep --test .semgrep/` passes, with `ruleid:` and `ok:` cases for
-  each of the four project rules.
+- The `semgrep-test` hook (`scripts/checks/semgrep_tests.py`, which runs
+  `semgrep --test` per rule; the bare `semgrep --test .semgrep/` passes
+  vacuously) passes, with `ruleid:` and `ok:` cases for each of the four
+  project rules.
 - The throwaway-branch proof is in the PR body: the hook blocked the
   planted fake credential and the `pickle.loads` call, and neither commit
   was pushed.
@@ -5128,8 +5138,10 @@ Thinking stays On. The backup is GPT-6 Sol on Codex under ChatGPT Pro
       hypothesis, syrupy, pytest-benchmark, pytest-socket;
       dev = the test group plus ruff, mypy, pydantic (for
       the mypy plugin, until Phase 2 moves it to the runtime
-      dependencies), pyright, ty and prek. Re-lock and
-      re-export pylock.toml with `uv lock --no-config` and
+      dependencies), pyright, ty and prek, keeping Step 8's
+      `packaging` (scripts/checks/licences.py imports it).
+      Re-lock and re-export pylock.toml with `uv lock
+      --no-config` and
       `uv export --no-config …`: without it the operator's
       package-firewall index lands in both lock files
       (Step 7).
@@ -5142,6 +5154,23 @@ Thinking stays On. The backup is GPT-6 Sol on Codex under ChatGPT Pro
       docstring-convention pair, each commented; pydocstyle
       convention numpy; per-file ignores for tests (S101 and
       the D rules) only; the formatter at its defaults.
+      From Step 8: exclude `.semgrep/tests/` (deliberately
+      unsafe semgrep test cases) from ruff, mypy, pyright
+      and ty, as the bandit and semgrep hooks and CodeQL
+      already do. scripts/checks/*.py are CLI checks that
+      report with `print` (T201) and run semgrep through
+      `subprocess` (S404 and S603, already `# nosec` with a
+      reason). Give each a commented `# noqa` or a commented
+      per-file ignore for scripts/, never a blanket one.
+      GitHub's dependency graph classes uv.lock's dev groups
+      as runtime scope (PR #60 listed prek as `runtime`), so
+      security.yml's dependency-review applies ADR-0004's
+      allowlist to dev tools too. Add an
+      `allow-dependencies-licenses` purl, with a comment, for
+      each new dev-only package outside it (hypothesis and
+      mypy's pathspec are MPL-2.0). ADR-0004 keeps dev tools
+      outside the allowlist, and the `licences` hook still
+      checks the runtime closure.
     </requirement>
 
     <requirement>
@@ -5583,7 +5612,10 @@ per phase-boundary hygiene.
         issue to add it and its classifier at release, per
         ADR-0010), running `uv sync --locked` and
         `uv run pytest --cov` with the coverage report
-        printed.
+        printed, then `uv run prek run licences
+        --all-files`. Step 8's licence check skips runtime
+        packages whose markers exclude the running platform,
+        so each OS checks its own.
       - package: `uv build`; `uvx twine check --strict
         dist/*`; the Step 7 artifact allowlist (it admits
         the sdist's PKG-INFO, and the pyproject.toml.orig
@@ -6063,8 +6095,10 @@ S in planning. New conversation per phase-boundary hygiene.
 
     <requirement>
       CONTRIBUTING.md: setup (`uv sync`, `uv run prek
-      install`, installing gitleaks where its hook needs the
-      binary); DCO with `git commit -s`; Conventional
+      install`; no separate gitleaks install, because Step 8
+      verified on Windows that prek builds the pinned
+      gitleaks hook with its own Go toolchain on the first
+      run); DCO with `git commit -s`; Conventional
       Commits on PR titles; the six-stage step lifecycle and
       the Triage rule in brief; the model definition of done
       from ROADMAP §5 "Model quality & governance"; the
@@ -6670,11 +6704,17 @@ phase-boundary hygiene.
         allowlist.
       - --security: the gate for the phase's surface —
         `uv run prek run --all-files` (gitleaks, bandit,
-        semgrep, pip-audit, licences), `semgrep --test
-        .semgrep/`, and zizmor over main's workflows and
-        legacy/0.2.x's (extracted to a temporary directory
-        with `git show`). CI-safe on Ubuntu; exits non-zero
-        on any finding.
+        semgrep, semgrep-test, pip-audit, lock-index,
+        licences, zizmor), and zizmor over legacy/0.2.x's
+        workflows (extracted to a temporary directory with
+        `git show`). CI-safe on Ubuntu; exits non-zero on any
+        finding. From Step 8: the bare `semgrep --test
+        .semgrep/` is vacuous, so use the semgrep-test hook.
+        On a `main` checkout, set `SKIP=no-commit-to-branch`,
+        because that hook fails there by design. gitleaks'
+        hook scans staged changes only, so scan the whole
+        tree the way security.yml's gate-secrets does (stage
+        it on an orphan branch in a scratch clone).
       - --live: local only, with the maintainer's gh
         session — branch protection on main and
         legacy/0.2.x, rulesets, environments and the pypi
@@ -6960,8 +7000,8 @@ workflow above maps directly to the corresponding row below.
 | ID   | Check                                                              | Automation                                                                |
 | ---- | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
 | V8.1 | Static checks 26–30 PASS (hooks, semgrep rules and tests, security workflows with harden-runner, PR template, Dependabot ecosystems). | `phase-verify.yml --fast`.               |
-| V8.2 | `semgrep --test .semgrep/` passes and `prek run --all-files` is clean. | `phase-verify.yml` security job; `security.yml`.                      |
-| V8.3 | With the repository's configuration, gitleaks flags a planted fake credential and semgrep and bandit flag `pickle.loads`, in a temporary directory outside the repository (expected failures). | `--post`. |
+| V8.2 | The `semgrep-test` hook passes (the bare `semgrep --test .semgrep/` is vacuous) and `prek run --all-files` is clean (with `SKIP=no-commit-to-branch` on a `main` checkout). | `phase-verify.yml` security job; `security.yml`. |
+| V8.3 | With the repository's configuration, gitleaks flags a planted fake credential (the fake AKIA key in gitleaks' `testdata/repos/nogit/main.go`; gitleaks allowlists AWS's `…EXAMPLE` key) and semgrep and bandit flag `pickle.loads`, in a temporary directory outside the repository (expected failures). | `--post`. |
 | V8.4 | Secret scanning, push protection, Dependabot alerts and security updates, and private vulnerability reporting are on. | `--live`.                         |
 | V8.5 | The gate's checks are required on `main` with strict status checks. | `--live`.                                                                |
 
@@ -7027,7 +7067,7 @@ workflow above maps directly to the corresponding row below.
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
-| 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
+| 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
