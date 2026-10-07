@@ -4820,9 +4820,9 @@ conversation per phase-boundary hygiene.
 
 ---
 
-## Step 9 — Quality Toolchain
+## Step 9 — Quality Toolchain ✅
 
-**Status:** Not started
+**Status:** Complete — PR #63 (2026-10-07)
 
 > **Goal:** Give the skeleton the strict toolchain every later model is
 > held to. Complete the PEP 735 groups (`test`: pytest, pytest-cov,
@@ -7092,7 +7092,7 @@ workflow above maps directly to the corresponding row below.
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
-| 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
