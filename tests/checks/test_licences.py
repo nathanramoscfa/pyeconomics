@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-import email
 import importlib.util
 import sys
+from email.message import Message
 from importlib import metadata
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -29,8 +29,8 @@ LINUX = {"sys_platform": "linux", "platform_system": "Linux", "python_version": 
 WINDOWS = {"sys_platform": "win32", "platform_system": "Windows", "python_version": "3.12"}
 
 
-def meta(**fields: str | list[str]) -> email.message.Message:
-    message = email.message.Message()
+def meta(**fields: str | list[str]) -> Message:
+    message = Message()
     for field, value in fields.items():
         for item in value if isinstance(value, list) else [value]:
             message[field.replace("_", "-")] = item
@@ -59,7 +59,7 @@ def pkg(name: str, version: str = "1.0", deps=(), optional=None) -> dict:
     return entry
 
 
-def installed(**licence_metadata: email.message.Message):
+def installed(**licence_metadata: Message):
     def distribution(name: str) -> SimpleNamespace:
         if name not in licence_metadata:
             raise metadata.PackageNotFoundError(name)
