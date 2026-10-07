@@ -5530,7 +5530,8 @@ per phase-boundary hygiene.
       --no-verify.
     - Every workflow: top-level `permissions: {}`; per-job
       `contents: read` unless the job needs more;
-      `id-token: write` only on the two publish jobs;
+      `id-token: write` only on the two publish jobs (and
+      Scorecard's results-publishing job, Step 8);
       `persist-credentials: false` on every checkout; no
       `pull_request_target`; no secret reachable from a job
       a fork PR can trigger; the PR title and every other
@@ -5752,7 +5753,8 @@ per phase-boundary hygiene.
 - **Security gate clean** (always the final criterion): the prek gate and
   the security workflow are green on every commit of the PR; publishing
   used OIDC only; no long-lived publishing or coverage credential exists;
-  `id-token: write` appears only on the two publish jobs.
+  `id-token: write` appears only on the two publish jobs and on
+  `scorecard.yml`'s results-publishing job (Step 8).
 
 ---
 
@@ -7356,7 +7358,9 @@ forward whatever is still open here.
 - From Step 10 (CI/CD). Patched: Step 11 (CONTRIBUTING says the `dco`
   check exempts only Dependabot's pull requests) and Step 12 (static
   check 37 exempts `uses: ./...` local reusable workflows; V7.3 names
-  `scripts/checks/dist_contents.py`). Owned by issue #65: Python 3.15
+  `scripts/checks/dist_contents.py`); Step 10's own `id-token`
+  wording now names Scorecard's job beside the two publish jobs.
+  Owned by issue #65: Python 3.15
   joins `ci.yml`'s matrix, with its classifier, at its final release
   (expected 2026-10-09; ADR-0010).
 
