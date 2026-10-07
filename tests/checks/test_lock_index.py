@@ -1,13 +1,18 @@
 # tests/checks/test_lock_index.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
 """Unit tests for scripts/checks/lock_index.py, the PyPI-only lock guard."""
 
 from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from types import ModuleType
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 REPO = Path(__file__).resolve().parents[2]
 SCRIPT = REPO / "scripts" / "checks" / "lock_index.py"
@@ -18,7 +23,8 @@ PYPI_SOURCE = '{ registry = "https://pypi.org/simple" }'
 
 def load_script() -> ModuleType:
     spec = importlib.util.spec_from_file_location("lock_index_check", SCRIPT)
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

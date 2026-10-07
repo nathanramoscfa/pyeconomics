@@ -1,4 +1,6 @@
 # scripts/checks/lock_index.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
 """Fail if uv.lock or pylock.toml names a package source outside PyPI.
 
 The maintainer's user-level uv configuration adds a private package-firewall
@@ -44,6 +46,7 @@ def redact(url: str) -> str:
 
 
 def is_pypi_index(value: object) -> bool:
+    """Return whether a value is PyPI's simple index URL."""
     return isinstance(value, str) and value.rstrip("/") == INDEX_URL
 
 
@@ -59,12 +62,13 @@ def check_urls(name: str, text: str) -> list[str]:
 
 
 def is_project_checkout(source: dict[str, Any]) -> bool:
+    """Return whether a lock source is the project's own checkout."""
     return source in ({"editable": "."}, {"virtual": "."})
 
 
 def check_artifacts(name: str, package: str, entry: dict[str, Any]) -> list[str]:
     """Flag sdists and wheels named by a local path instead of a PyPI URL."""
-    artifacts = [entry.get("sdist")] + list(entry.get("wheels", []))
+    artifacts = [entry.get("sdist"), *entry.get("wheels", [])]
     return [
         f"{name}: {package} has a local file artifact, not a PyPI file"
         for artifact in artifacts
@@ -73,6 +77,7 @@ def check_artifacts(name: str, package: str, entry: dict[str, Any]) -> list[str]
 
 
 def check_uv_lock(data: dict[str, Any]) -> list[str]:
+    """Flag uv.lock packages whose source is not the PyPI index."""
     problems = []
     for package in data.get("package", []):
         label = f"{package.get('name', '?')} {package.get('version', '')}".strip()
@@ -87,6 +92,7 @@ def check_uv_lock(data: dict[str, Any]) -> list[str]:
 
 
 def check_pylock(data: dict[str, Any]) -> list[str]:
+    """Flag pylock.toml packages that do not come from the PyPI index."""
     problems = []
     for package in data.get("packages", []):
         label = f"{package.get('name', '?')} {package.get('version', '')}".strip()
@@ -94,14 +100,17 @@ def check_pylock(data: dict[str, Any]) -> list[str]:
             continue
         if not is_pypi_index(package.get("index")):
             problems.append(f"pylock.toml: {label} does not come from the PyPI index")
-        for kind in ("vcs", "archive", "directory"):
-            if kind in package:
-                problems.append(f"pylock.toml: {label} has a {kind} source")
+        problems.extend(
+            f"pylock.toml: {label} has a {kind} source"
+            for kind in ("vcs", "archive", "directory")
+            if kind in package
+        )
         problems += check_artifacts("pylock.toml", label, package)
     return problems
 
 
 def main(root: Path) -> int:
+    """Check both lock files under root; return the process exit status."""
     problems = []
     for name in LOCK_FILES:
         path = root / name
