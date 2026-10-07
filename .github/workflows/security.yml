@@ -170,8 +170,14 @@ jobs:
           # - GitHub's dependency graph files uv.lock's dependency groups
           #   under runtime scope, so dev and test packages land here too:
           #   hypothesis (test group) and pathspec (mypy's) are MPL-2.0.
+          # - typing-extensions is misread: its License-Expression is PSF-2.0
+          #   (allowed), but GitHub's scan of the PSF licence history reports
+          #   "Python-2.0 AND GPL-1.0-or-later AND ...". It stays exempt when
+          #   Phase 2 makes it a runtime dependency (through pydantic); the
+          #   licences hook reads its real metadata either way.
           allow-dependencies-licenses: >-
             pkg:githubactions/trufflesecurity/trufflehog,
             pkg:pypi/hypothesis,
-            pkg:pypi/pathspec
+            pkg:pypi/pathspec,
+            pkg:pypi/typing-extensions
           comment-summary-in-pr: never
