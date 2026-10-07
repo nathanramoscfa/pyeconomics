@@ -1,0 +1,17 @@
+# scripts/checks/licence_exceptions.toml
+# Reviewed exceptions to the ADR-0004 runtime licence allowlist, read by
+# scripts/checks/licences.py. This file is ADR-0004's only escape hatch, and
+# it starts empty.
+#
+# Add an entry only in a pull request that a maintainer reviews, for a runtime
+# dependency whose licence metadata is outside the allowlist, missing or
+# ambiguous but whose actual licence is acceptable: for example, a mislabelled
+# licence verified against the package's own LICENSE file. Name the package,
+# its licence exactly as licences.py reports it (an entry stops matching when
+# the metadata changes, which forces a fresh review), and why it is
+# acceptable. An entry never overrides an exclusion by name.
+#
+# [[exception]]
+# package = "example-package"
+# licence = "BSD License"
+# reason = "Classifier only; LICENSE in the 1.2.3 sdist is BSD-3-Clause (checked by <name>, <date>)."

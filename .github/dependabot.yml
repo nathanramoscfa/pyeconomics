@@ -1,6 +1,25 @@
+# .github/dependabot.yml
+# Weekly version updates for the uv lock and the workflows' actions (ROADMAP
+# §5 "Security controls by layer"). Security updates are on in the repository
+# settings. The prefixes keep Dependabot's pull request titles Conventional
+# Commits. When a pull request changes uv.lock but not pylock.toml,
+# regenerate pylock.toml on it with
+#   uv export --no-config --format pylock.toml --output-file pylock.toml
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/" # Check for GitHub Actions in all workflow files
+  - package-ecosystem: uv
+    directory: "/"
     schedule:
-      interval: "weekly" # Check for updates weekly
+      interval: weekly
+    groups:
+      uv-minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore(deps)
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore(ci)

@@ -1,0 +1,90 @@
+# .pre-commit-config.yaml
+# The per-step security gate (ROADMAP §5 "Per-step security gate"), run by
+# prek before every commit: secrets, SAST with the project's semgrep rules,
+# the dependency audit and the runtime licence allowlist. It is fail-closed:
+# never commit with SKIP or --no-verify. .github/workflows/security.yml runs
+# the same hooks by id, so local and CI cannot drift.
+#
+# Set up once per clone:   uv sync && uv run prek install
+# Run everything by hand:  uv run prek run --all-files
+#
+# Remote hooks are pinned to the commit SHA of the tag in their comment.
+default_install_hook_types: [pre-commit]
+
+repos:
+  # Secrets: gitleaks scans the staged changes with .gitleaks.toml.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # SAST: bandit with its settings in pyproject.toml.
+  - repo: https://github.com/PyCQA/bandit
+    rev: 92ae8b82fb422a639f0ed8d99e96cea769594e08 # frozen: 1.9.4
+    hooks:
+      - id: bandit
+        args: [-c, pyproject.toml]
+        exclude: ^\.semgrep/tests/
+
+  # SAST: the project's semgrep rules, and the tests that keep them honest.
+  # .semgrep/tests/ holds deliberately unsafe test cases, so it is excluded.
+  - repo: local
+    hooks:
+      - id: semgrep
+        name: semgrep (project rules)
+        language: python
+        additional_dependencies: [semgrep==1.179.0]
+        entry: semgrep scan --config .semgrep/rules --error --metrics=off --disable-version-check --quiet
+        types: [python]
+        exclude: ^\.semgrep/tests/
+        require_serial: true
+      - id: semgrep-test
+        name: semgrep --test (project rules)
+        language: python
+        additional_dependencies: [semgrep==1.179.0]
+        entry: python scripts/checks/semgrep_tests.py
+        files: ^(\.semgrep/|scripts/checks/semgrep_tests\.py$)
+        pass_filenames: false
+
+  # Dependency audit: known vulnerabilities in every package pylock.toml pins.
+  - repo: https://github.com/pypa/pip-audit
+    rev: 8894eb8cee033531a1fbd9f2fb160892531c14e3 # frozen: v2.10.1
+    hooks:
+      - id: pip-audit
+        args: [--locked, --progress-spinner, "off", "."]
+        always_run: true
+
+  # Dependency sources and licences.
+  - repo: local
+    hooks:
+      - id: lock-index
+        name: lock files name only PyPI
+        language: python
+        entry: python scripts/checks/lock_index.py
+        files: ^(uv\.lock|pylock\.toml|scripts/checks/lock_index\.py)$
+        pass_filenames: false
+      - id: licences
+        name: runtime licence allowlist (ADR-0004)
+        language: system
+        entry: uv run --locked --all-extras python scripts/checks/licences.py
+        pass_filenames: false
+        always_run: true
+
+  # Workflow security: zizmor fails on any finding above Low. With GH_TOKEN
+  # set (CI sets it) it also runs its online audits.
+  - repo: local
+    hooks:
+      - id: zizmor
+        name: zizmor (workflow security)
+        language: python
+        additional_dependencies: [zizmor==1.30.1]
+        entry: zizmor --min-severity medium .github/workflows
+        files: ^\.github/
+        pass_filenames: false
+
+  # No direct commits to main: every change arrives by pull request.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: no-commit-to-branch
+        args: [--branch, main]

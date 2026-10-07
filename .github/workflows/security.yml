@@ -1,0 +1,169 @@
+# .github/workflows/security.yml
+# The per-step security gate in CI (ROADMAP §5 "Per-step security gate"). The
+# gate-* jobs run the .pre-commit-config.yaml hooks by id, so the checks a
+# commit passes locally are the checks a pull request passes here; trufflehog,
+# zizmor and dependency review add what a local hook cannot see. Every job
+# is a required status check on main.
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  gate-secrets:
+    name: gate-secrets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      # The gitleaks hook scans staged changes. An orphan branch stages every
+      # tracked file, so the same hook scans the whole tree here.
+      - name: Stage the whole tree
+        run: git checkout --orphan gate-secrets-scan
+      - name: gitleaks
+        run: uv run --locked prek run gitleaks --all-files
+
+  gate-sast:
+    name: gate-sast
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      - name: bandit
+        run: uv run --locked prek run bandit --all-files
+      - name: semgrep
+        run: uv run --locked prek run semgrep --all-files
+      - name: semgrep --test
+        run: uv run --locked prek run semgrep-test --all-files
+
+  gate-deps:
+    name: gate-deps
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      - name: pip-audit
+        run: uv run --locked prek run pip-audit --all-files
+      - name: lock files name only PyPI
+        run: uv run --locked prek run lock-index --all-files
+
+  gate-licences:
+    name: gate-licences
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      - name: runtime licence allowlist
+        run: uv run --locked prek run licences --all-files
+
+  trufflehog:
+    name: trufflehog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # Scans the pull request's commits, or the pushed commits, for verified
+      # and unverifiable credentials.
+      - uses: trufflesecurity/trufflehog@b2b0a92070f206ab7b5a1105d82a7f2f48d92341 # v3.99.0
+        with:
+          version: 3.99.0
+          extra_args: --results=verified,unknown
+
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      # The token lets zizmor run its online audits (impostor commits,
+      # known-vulnerable actions); it fails on any finding above Low.
+      - name: zizmor
+        run: uv run --locked prek run zizmor --all-files
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  dependency-review:
+    name: dependency-review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          # ADR-0004's allowlist.
+          allow-licenses: MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, NCSA, PSF-2.0
+          # CI tools that run here but are never distributed or linked
+          # (ADR-0004 keeps development tools outside the allowlist):
+          # trufflehog's action is AGPL-3.0.
+          allow-dependencies-licenses: pkg:githubactions/trufflesecurity/trufflehog
+          comment-summary-in-pr: never

@@ -54,7 +54,12 @@ all = []
 # completes them.
 [dependency-groups]
 test = ["pytest"]
-dev = [{ include-group = "test" }]
+dev = [
+    { include-group = "test" },
+    # packaging: scripts/checks/licences.py; prek: the security gate (Step 8).
+    "packaging>=26.3",
+    "prek>=0.5.5",
+]
 docs = []
 
 [tool.uv.build-backend]
@@ -62,3 +67,12 @@ module-name = "pyeconomics"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+# The security gate runs `bandit -c pyproject.toml` (.pre-commit-config.yaml).
+# .semgrep/tests holds deliberately unsafe semgrep test cases.
+[tool.bandit]
+exclude_dirs = [".semgrep/tests", ".venv"]
+
+# pytest asserts are how tests check; everywhere else B101 still applies.
+[tool.bandit.assert_used]
+skips = ["tests/*", "*/tests/*"]
