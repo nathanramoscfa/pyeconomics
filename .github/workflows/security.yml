@@ -3,7 +3,8 @@
 # gate-* jobs run the .pre-commit-config.yaml hooks by id, so the checks a
 # commit passes locally are the checks a pull request passes here; trufflehog,
 # zizmor and dependency review add what a local hook cannot see. Every job
-# is a required status check on main.
+# is a required status check on main. --verbose prints each hook's output,
+# so the log shows what was scanned.
 name: security
 
 on:
@@ -39,7 +40,7 @@ jobs:
       - name: Stage the whole tree
         run: git checkout --orphan gate-secrets-scan
       - name: gitleaks
-        run: uv run --locked prek run gitleaks --all-files
+        run: uv run --locked prek run gitleaks --all-files --verbose
 
   gate-sast:
     name: gate-sast
@@ -58,11 +59,11 @@ jobs:
           version: "0.12.15"
           enable-cache: false
       - name: bandit
-        run: uv run --locked prek run bandit --all-files
+        run: uv run --locked prek run bandit --all-files --verbose
       - name: semgrep
-        run: uv run --locked prek run semgrep --all-files
+        run: uv run --locked prek run semgrep --all-files --verbose
       - name: semgrep --test
-        run: uv run --locked prek run semgrep-test --all-files
+        run: uv run --locked prek run semgrep-test --all-files --verbose
 
   gate-deps:
     name: gate-deps
@@ -81,9 +82,9 @@ jobs:
           version: "0.12.15"
           enable-cache: false
       - name: pip-audit
-        run: uv run --locked prek run pip-audit --all-files
+        run: uv run --locked prek run pip-audit --all-files --verbose
       - name: lock files name only PyPI
-        run: uv run --locked prek run lock-index --all-files
+        run: uv run --locked prek run lock-index --all-files --verbose
 
   gate-licences:
     name: gate-licences
@@ -102,7 +103,7 @@ jobs:
           version: "0.12.15"
           enable-cache: false
       - name: runtime licence allowlist
-        run: uv run --locked prek run licences --all-files
+        run: uv run --locked prek run licences --all-files --verbose
 
   trufflehog:
     name: trufflehog
@@ -143,7 +144,7 @@ jobs:
       # The token lets zizmor run its online audits (impostor commits,
       # known-vulnerable actions); it fails on any finding above Low.
       - name: zizmor
-        run: uv run --locked prek run zizmor --all-files
+        run: uv run --locked prek run zizmor --all-files --verbose
         env:
           GH_TOKEN: ${{ github.token }}
 
