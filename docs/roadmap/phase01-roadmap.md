@@ -3768,9 +3768,9 @@ model rated S in planning. New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 7 — Repository Reset and Package Skeleton
+## Step 7 — Repository Reset and Package Skeleton ✅
 
-**Status:** Not started
+**Status:** Complete — PR #59 (2026-10-07)
 
 > **Goal:** Replace 0.2.x on `main` with the 1.0 skeleton the accepted
 > ADRs describe. Remove the 0.2.x package, its tests (keeping
@@ -7026,7 +7026,7 @@ workflow above maps directly to the corresponding row below.
 | 4       | 0.2.6 release + advisory       | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #51 |
 | 5       | Characterize + archive 0.2.x   | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #53 |
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
-| 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Not started |
+| 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Not started |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |
