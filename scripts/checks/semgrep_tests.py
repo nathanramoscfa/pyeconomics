@@ -1,4 +1,6 @@
 # scripts/checks/semgrep_tests.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
 """Run the project semgrep rules' tests, and fail if any rule goes untested.
 
 `semgrep --test` pairs a rule file with the test file of the same stem. With
@@ -36,7 +38,7 @@ Pair = tuple[Path, Path, list[str]]  # rule file, test file, rule ids
 
 
 def annotated(text: str, kind: str, rule_id: str) -> bool:
-    """True if a test file carries a `# <kind>: ...<rule_id>...` annotation."""
+    """Return whether a test file carries a `# <kind>: ...<rule_id>...` comment."""
     pattern = rf"#\s*{kind}:\s*(?:[\w.-]+\s*,\s*)*{re.escape(rule_id)}\b"
     return re.search(pattern, text) is not None
 
@@ -52,19 +54,27 @@ def pair_rules_with_tests() -> tuple[list[Pair], list[str]]:
         ids = RULE_ID.findall(rule_file.read_text(encoding="utf-8"))
         if not ids:
             problems.append(f"{rule_file.as_posix()}: no rule id")
-        tests = sorted(t for t in TESTS.glob(f"{rule_file.stem}.*") if t.suffix != rule_file.suffix)
+        tests = sorted(
+            t for t in TESTS.glob(f"{rule_file.stem}.*") if t.suffix != rule_file.suffix
+        )
         if not tests:
-            problems.append(f"{rule_file.as_posix()}: no test file named {rule_file.stem}.*")
+            problems.append(
+                f"{rule_file.as_posix()}: no test file named {rule_file.stem}.*"
+            )
         text = "\n".join(t.read_text(encoding="utf-8") for t in tests)
-        for rule_id in ids:
-            for kind in ("ruleid", "ok"):
-                if tests and not annotated(text, kind, rule_id):
-                    problems.append(f"{rule_file.as_posix()}: no `# {kind}: {rule_id}` case")
+        problems.extend(
+            f"{rule_file.as_posix()}: no `# {kind}: {rule_id}` case"
+            for rule_id in ids
+            for kind in ("ruleid", "ok")
+            if tests and not annotated(text, kind, rule_id)
+        )
         pairs += [(rule_file, test, ids) for test in tests]
     return pairs, problems
 
 
-def run_pair(semgrep: str, rule_file: Path, test: Path, rule_ids: list[str]) -> list[str]:
+def run_pair(
+    semgrep: str, rule_file: Path, test: Path, rule_ids: list[str]
+) -> list[str]:
     """Run `semgrep --test` on one rule file and one test file."""
     command = [
         semgrep,
@@ -76,14 +86,17 @@ def run_pair(semgrep: str, rule_file: Path, test: Path, rule_ids: list[str]) -> 
         rule_file.as_posix(),
         test.as_posix(),
     ]
-    result = subprocess.run(  # nosec B603 # fixed arguments, no shell
+    # bandit B603 / ruff S603: the arguments are fixed, semgrep is resolved by
+    # shutil.which, and no shell is involved.
+    result = subprocess.run(  # nosec B603  # noqa: S603
         command, capture_output=True, text=True, check=False
     )
     label = f"{rule_file.name} on {test.name}"
     try:
         report = json.loads(result.stdout)
     except json.JSONDecodeError:
-        return [f"{label}: semgrep exited {result.returncode}: {result.stderr.strip()[-2000:]}"]
+        stderr = result.stderr.strip()[-2000:]
+        return [f"{label}: semgrep exited {result.returncode}: {stderr}"]
 
     problems = [
         f"{label}: {key.replace('_', ' ')}: {report[key]}"
@@ -101,12 +114,21 @@ def run_pair(semgrep: str, rule_file: Path, test: Path, rule_ids: list[str]) -> 
             problems.append(f"{label}: semgrep ran no test for {rule_id}")
         elif not check.get("passed"):
             for lines in check.get("matches", {}).values():
-                expected, reported = lines.get("expected_lines"), lines.get("reported_lines")
-                problems.append(f"{label}: {rule_id} expected lines {expected}, got {reported}")
-            problems += [f"{label}: {rule_id}: {error}" for error in check.get("errors", [])]
+                expected, reported = (
+                    lines.get("expected_lines"),
+                    lines.get("reported_lines"),
+                )
+                problems.append(
+                    f"{label}: {rule_id} expected lines {expected}, got {reported}"
+                )
+            problems += [
+                f"{label}: {rule_id}: {error}" for error in check.get("errors", [])
+            ]
             if not check.get("matches") and not check.get("errors"):
                 problems.append(f"{label}: {rule_id} failed")
-        elif not any(m.get("expected_lines") for m in check.get("matches", {}).values()):
+        elif not any(
+            m.get("expected_lines") for m in check.get("matches", {}).values()
+        ):
             problems.append(f"{label}: no `ruleid:` case for {rule_id} was exercised")
     if result.returncode != 0 and not problems:
         problems.append(f"{label}: semgrep exited {result.returncode}")
@@ -114,6 +136,7 @@ def run_pair(semgrep: str, rule_file: Path, test: Path, rule_ids: list[str]) -> 
 
 
 def main() -> int:
+    """Run every rule's tests; return the process exit status."""
     pairs, problems = pair_rules_with_tests()
     semgrep = shutil.which("semgrep")
     if semgrep is None:

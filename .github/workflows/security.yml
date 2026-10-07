@@ -163,8 +163,21 @@ jobs:
           fail-on-severity: high
           # ADR-0004's allowlist.
           allow-licenses: MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, NCSA, PSF-2.0
-          # CI tools that run here but are never distributed or linked
-          # (ADR-0004 keeps development tools outside the allowlist):
-          # trufflehog's action is AGPL-3.0.
-          allow-dependencies-licenses: pkg:githubactions/trufflesecurity/trufflehog
+          # Development tools, never distributed or linked (ADR-0004 keeps
+          # them outside the allowlist; the licences hook checks the real
+          # runtime closure):
+          # - trufflehog's action is AGPL-3.0;
+          # - GitHub's dependency graph files uv.lock's dependency groups
+          #   under runtime scope, so dev and test packages land here too:
+          #   hypothesis (test group) and pathspec (mypy's) are MPL-2.0.
+          # - typing-extensions is misread: its License-Expression is PSF-2.0
+          #   (allowed), but GitHub's scan of the PSF licence history reports
+          #   "Python-2.0 AND GPL-1.0-or-later AND ...". It stays exempt when
+          #   Phase 2 makes it a runtime dependency (through pydantic); the
+          #   licences hook reads its real metadata either way.
+          allow-dependencies-licenses: >-
+            pkg:githubactions/trufflesecurity/trufflehog,
+            pkg:pypi/hypothesis,
+            pkg:pypi/pathspec,
+            pkg:pypi/typing-extensions
           comment-summary-in-pr: never

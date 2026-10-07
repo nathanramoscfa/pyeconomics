@@ -4820,9 +4820,9 @@ conversation per phase-boundary hygiene.
 
 ---
 
-## Step 9 — Quality Toolchain
+## Step 9 — Quality Toolchain ✅
 
-**Status:** Not started
+**Status:** Complete — PR #63 (2026-10-07)
 
 > **Goal:** Give the skeleton the strict toolchain every later model is
 > held to. Complete the PEP 735 groups (`test`: pytest, pytest-cov,
@@ -5640,6 +5640,23 @@ per phase-boundary hygiene.
     </requirement>
 
     <requirement>
+      From Step 9: run the Step 9 hooks by id, as security.yml
+      does, so local and CI cannot drift: lint runs `uv run
+      --locked prek run <id> --all-files --verbose` for
+      check-yaml, check-toml, end-of-file-fixer,
+      trailing-whitespace, mixed-line-ending, ruff-format and
+      ruff-check; types runs the `mypy` hook; lockfile runs
+      `uv-lock` and `pylock-fresh` (scripts/checks/pylock_fresh.py,
+      the freshness diff). ruff-format also formats Python
+      blocks in Markdown. The tests job sets
+      `HYPOTHESIS_PROFILE: ci` (tests/conftest.py). pyright
+      stays out of CI (editor only): its PyPI wrapper fetches
+      Node at first run. The tests run with `uv run pytest`,
+      never `python -m pytest`, which puts the working
+      directory on sys.path.
+    </requirement>
+
+    <requirement>
       .github/workflows/release-smoke.yml, a reusable
       workflow (`workflow_call` and `workflow_dispatch`)
       with inputs `version` and `index` (pypi or testpypi):
@@ -6104,7 +6121,14 @@ S in planning. New conversation per phase-boundary hygiene.
       from ROADMAP §5 "Model quality & governance"; the
       security gate and its emergency-only bypass with a
       PR-body justification; the licence check for any new
-      dependency or data source.
+      dependency or data source; and, from Step 9, the
+      Python file header: `# <repo-relative path>`, then
+      `# Copyright <year> Nathan Ramos, CFA` and
+      `# SPDX-License-Identifier: Apache-2.0` (ruff's CPY001
+      requires the copyright line; it is not ignored), and
+      `uv run pytest`, never `python -m pytest`, which puts
+      the working directory on sys.path. AGENTS.md carries
+      the same header rule.
       CODE_OF_CONDUCT.md: the current Contributor Covenant
       with the maintainer's public address as the contact.
       SECURITY.md: supported versions (the latest 1.0
@@ -7068,7 +7092,7 @@ workflow above maps directly to the corresponding row below.
 | 6       | Architecture decision records  | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #54 |
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
-| 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |

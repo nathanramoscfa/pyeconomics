@@ -1,9 +1,12 @@
 # .pre-commit-config.yaml
-# The per-step security gate (ROADMAP §5 "Per-step security gate"), run by
-# prek before every commit: secrets, SAST with the project's semgrep rules,
-# the dependency audit and the runtime licence allowlist. It is fail-closed:
-# never commit with SKIP or --no-verify. .github/workflows/security.yml runs
-# the same hooks by id, so local and CI cannot drift.
+# Every check a commit must pass, run by prek before every commit:
+# - the quality toolchain (ROADMAP §4 1.3): file hygiene, ruff format and
+#   lint, mypy, and the lock files' freshness;
+# - the per-step security gate (ROADMAP §5 "Per-step security gate"):
+#   secrets, SAST with the project's semgrep rules, the dependency audit and
+#   the runtime licence allowlist.
+# It is fail-closed: never commit with SKIP or --no-verify. The CI workflows
+# run the same hooks by id, so local and CI cannot drift.
 #
 # Set up once per clone:   uv sync && uv run prek install
 # Run everything by hand:  uv run prek run --all-files
@@ -11,7 +14,62 @@
 # Remote hooks are pinned to the commit SHA of the tag in their comment.
 default_install_hook_types: [pre-commit]
 
+# Generated or byte-exact files no hook may rewrite:
+# - tests/fixtures/legacy and scripts/legacy: the 0.2.x characterization
+#   fixtures and their recorder (manifest.json pins their SHA-256s);
+# - planning/: roadmodel's kit, re-exported by its updater.
+exclude: ^(tests/fixtures/legacy/|scripts/legacy/|planning/)
+
 repos:
+  # File hygiene. Markdown keeps two trailing spaces as a hard line break
+  # (.editorconfig).
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Format and lint: ruff, with its settings in pyproject.toml. The rev
+  # matches the ruff version in uv.lock.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: f12be1ebaa5351c1fc76472de98db2c3446c8253 # frozen: v0.16.10
+    hooks:
+      - id: ruff-format
+      - id: ruff-check
+
+  # Types: mypy (strict, pydantic plugin) is the gate. It runs in the project
+  # environment so it sees the locked dependencies and their stubs.
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (strict)
+        language: system
+        entry: uv run --locked mypy
+        types_or: [python, pyi, toml]
+        pass_filenames: false
+
+  # Lock files: uv.lock matches pyproject.toml, and pylock.toml is a fresh
+  # export of uv.lock. --no-config keeps a user-level index out (lock_index.py).
+  - repo: local
+    hooks:
+      - id: uv-lock
+        name: uv lock --check
+        language: system
+        entry: uv lock --check --no-config
+        files: ^(pyproject\.toml|uv\.lock)$
+        pass_filenames: false
+      - id: pylock-fresh
+        name: pylock.toml is a fresh export of uv.lock
+        language: system
+        entry: uv run --locked python scripts/checks/pylock_fresh.py
+        files: ^(pyproject\.toml|uv\.lock|pylock\.toml|scripts/checks/pylock_fresh\.py)$
+        pass_filenames: false
+
   # Secrets: gitleaks scans the staged changes with .gitleaks.toml.
   - repo: https://github.com/gitleaks/gitleaks
     rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # frozen: v8.30.1

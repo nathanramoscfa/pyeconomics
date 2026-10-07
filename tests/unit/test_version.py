@@ -1,4 +1,6 @@
 # tests/unit/test_version.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
 """``pyeconomics.__version__`` comes from the installed distribution."""
 
 from importlib.metadata import version

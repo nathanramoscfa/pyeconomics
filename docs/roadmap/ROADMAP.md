@@ -518,7 +518,8 @@ An illustrative shape (the Phase 2 roadmap fixes the real API):
     evidence=Evidence.STANDARD,
 )
 def macaulay_duration(inputs: BondCashFlows) -> DurationResult:
-    ...  # pure: no I/O, no printing, no plotting
+    # pure: no I/O, no printing, no plotting
+    ...
 ```
 
 #### 2.3 Results & provenance
