@@ -1,6 +1,26 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# .gitattributes
+# Normalise every text file to LF, in the index and on checkout.
+* text=auto eol=lf
 
 # Byte-exact characterization fixtures and their recorder (manifest SHA-256s)
 tests/fixtures/legacy/** text eol=lf
 scripts/legacy/** text eol=lf
+
+# Binary files: never normalised, never diffed as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+*.gz binary
+*.tgz binary
+*.tar binary
+*.bz2 binary
+*.xz binary
+*.7z binary
+*.whl binary

@@ -1,145 +1,53 @@
-# Byte-compiled / optimized / DLL files
+# .gitignore
+
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.pyc
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-*.whl
+.eggs/
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-generate_tests.py
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# poetry
-poetry.lock
-
-# cache directory
-cache/
-
-# Development specific
-dev/
-
-# IDEs and editors
-.idea/
-*.swp
-*.swo
-*.sublime-workspace
-.vscode/
-
-# Operating system generated files
-.DS_Store
-Thumbs.db
-
-# Miscellaneous files
-*.csv
-*.json
-# Characterization fixtures (Phase 1 Step 5); Step 7 drops the blanket *.json
-!tests/fixtures/**/*.json
-secrets.py
-render_readme.py
-output.html
-
-# Virtual environments
-env/
+# uv, virtual environments and build output
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
+dist/
+build/
 
-# Other common patterns to ignore
-*.bak
-*.tmp
-*.temp
-*.old
-
-# mypy
+# Tool caches and coverage
+.ruff_cache/
 .mypy_cache/
+.pytest_cache/
+.hypothesis/
+.benchmarks/
+htmlcov/
+.coverage*
+coverage.xml
 
-# Cython debug symbols
-cython_debug/
+# Generated documentation builds
+docs/_build/
+/site/
 
-# mkdocs documentation
-/site
-
-# dotenv
+# Secrets: environment files are never committed
 .env
 .env.*
+secrets.py
+
+# Local working directories
+dev/
+cache/
+.worktrees/
 
 # roadmodel planning kit: personal posture, never commit
 planning/user-context.md
-# git worktrees (ROADMAP §5 "Worktree strategy")
-.worktrees/
+
+# Local maintainer scripts
+generate_tests.py
+render_readme.py
+output.html
+
+# Editors, notebooks and operating systems
+.idea/
+.vscode/
+*.swp
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db

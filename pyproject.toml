@@ -1,11 +1,64 @@
 # pyproject.toml
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.12.15,<0.13.0"]
+build-backend = "uv_build"
+
+[project]
+name = "pyeconomics"
+version = "1.0.0.dev1"
+description = "Open economics and finance models with typed inputs, verified outputs and reproducible results."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Nathan Ramos, CFA", email = "nathan.ramos.github@gmail.com" },
+]
+keywords = [
+    "economics",
+    "finance",
+    "monetary policy",
+    "macroeconomics",
+    "financial models",
+    "economic data",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/pyeconomics-dev/pyeconomics"
+Repository = "https://github.com/pyeconomics-dev/pyeconomics"
+Issues = "https://github.com/pyeconomics-dev/pyeconomics/issues"
+Changelog = "https://github.com/pyeconomics-dev/pyeconomics/blob/main/CHANGELOG.md"
+Roadmap = "https://github.com/pyeconomics-dev/pyeconomics/blob/main/docs/roadmap/ROADMAP.md"
+
+# ADR-0002: each extra exists from Phase 1 Step 7 as an empty list, so the
+# names are stable before their contents arrive. [app] and [bloomberg] are
+# added only when their packages exist (Phases 5 and 6).
+[project.optional-dependencies]
+server = []
+mcp = []
+ai = []
+econometrics = []
+plot = []
+all = []
+
+# PEP 735 groups: development-only, never published (ADR-0002). Step 9
+# completes them.
+[dependency-groups]
+test = ["pytest"]
+dev = [{ include-group = "test" }]
+docs = []
+
+[tool.uv.build-backend]
+module-name = "pyeconomics"
 
 [tool.pytest.ini_options]
-addopts = "-ra -q"
-testpaths = [
-    "tests",
-    "integration_tests"
-]
+testpaths = ["tests"]
