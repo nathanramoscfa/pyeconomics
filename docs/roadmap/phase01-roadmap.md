@@ -5253,9 +5253,9 @@ Thinking stays On. The backup is GPT-6 Sol on Codex under ChatGPT Pro
 
 ---
 
-## Step 10 — CI/CD and Publishing Rehearsal
+## Step 10 — CI/CD and Publishing Rehearsal ✅
 
-**Status:** Not started
+**Status:** Complete — PR #64 (2026-10-07)
 
 > **Goal:** Run every check on every pull request and prove the 1.x
 > release path end to end. Write `.github/workflows/ci.yml` — `lint`
@@ -6115,7 +6115,9 @@ S in planning. New conversation per phase-boundary hygiene.
       install`; no separate gitleaks install, because Step 8
       verified on Windows that prek builds the pinned
       gitleaks hook with its own Go toolchain on the first
-      run); DCO with `git commit -s`; Conventional
+      run); DCO with `git commit -s` (the `dco` check wants a
+      `Signed-off-by` matching each commit's author, and
+      exempts only Dependabot's own pull requests); Conventional
       Commits on PR titles; the six-stage step lifecycle and
       the Triage rule in brief; the model definition of done
       from ROADMAP §5 "Model quality & governance"; the
@@ -6652,7 +6654,9 @@ phase-boundary hygiene.
         workflow_call and workflow_dispatch.
     37. Every workflow on main has top-level
         `permissions: {}`, `persist-credentials: false` on
-        each checkout, SHA-pinned `uses:` and no
+        each checkout, SHA-pinned `uses:` (a local reusable
+        workflow, `uses: ./.github/workflows/...`, is exempt:
+        release.yml calls release-smoke.yml that way) and no
         pull_request_target.
     38. tests.yml and docs.yml are absent on main.
     39. ci.yml has pr-title and dco jobs and an aggregate
@@ -7014,7 +7018,7 @@ workflow above maps directly to the corresponding row below.
 | ---- | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
 | V7.1 | Static checks 19–25 PASS (0.2.x paths gone; `src/` package; `uv_build`, `>=3.12`, Apache-2.0; lock files; LF; ignores; licence files without ®). | `phase-verify.yml --fast`. |
 | V7.2 | `uv sync --locked`, `uv build` and `twine check --strict` pass, and a clean-venv import prints the version. | `ci.yml` package job (`--python` locally).                  |
-| V7.3 | The wheel and the sdist contain only allowlisted paths.            | `ci.yml` package job (`--python` locally).                                |
+| V7.3 | The wheel and the sdist contain only allowlisted paths.            | `ci.yml` package job, which runs `scripts/checks/dist_contents.py` (`--python` locally). |
 
 ### V8 — Per-step security gate
 
@@ -7093,7 +7097,7 @@ workflow above maps directly to the corresponding row below.
 | 7       | Reset + package skeleton       | Claude Opus 5.5   | Claude Code  | Effort High     | On       | New  | Complete — PR #59 |
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
-| 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Not started |
+| 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Complete — PR #64 |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
 | 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | V1      | Preserve + bootstrap           | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
@@ -7349,6 +7353,12 @@ forward whatever is still open here.
     during the 1.0 pre-releases;
   - every release step checking its tag against ADR-0003's milestone
     table.
+- From Step 10 (CI/CD). Patched: Step 11 (CONTRIBUTING says the `dco`
+  check exempts only Dependabot's pull requests) and Step 12 (static
+  check 37 exempts `uses: ./...` local reusable workflows; V7.3 names
+  `scripts/checks/dist_contents.py`). Owned by issue #65: Python 3.15
+  joins `ci.yml`'s matrix, with its classifier, at its final release
+  (expected 2026-10-09; ADR-0010).
 
 ---
 
