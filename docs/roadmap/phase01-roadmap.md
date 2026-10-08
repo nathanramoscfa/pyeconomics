@@ -6190,9 +6190,17 @@ S in planning. New conversation per phase-boundary hygiene.
       Sponsors and thanks.dev); funding.json at the root,
       valid against the published funding.json schema; the
       operator enrols in GitHub Sponsors and thanks.dev and
-      the agent confirms each profile URL returns 200. If
-      Sponsors approval is still pending at merge time, the
-      step is not complete until it is live.
+      the agent confirms each profile returns 200: the
+      Sponsors URL without following redirects (with no
+      listing, github.com/sponsors/<name> answers 302 to the
+      profile, so `curl -L` reports a false 200), and
+      thanks.dev through its profile API,
+      https://api.thanks.dev/v1/profile/gh/<name> (200 with
+      JSON when claimed, 500 when not), because thanks.dev
+      serves every page path as a single-page app with
+      status 403. If Sponsors approval is still pending at
+      merge time, the step is not complete until it is
+      live.
     </requirement>
 
     <requirement>
@@ -6231,8 +6239,9 @@ S in planning. New conversation per phase-boundary hygiene.
   carries its class label.
 - `AGENTS.md` states the lifecycle, the security gate, the Triage rule
   and the commit conventions, and `CLAUDE.md` imports it.
-- Gate G1: the GitHub Sponsors and thanks.dev profiles return 200, and
-  `funding.json` validates against the funding.json schema.
+- Gate G1: the GitHub Sponsors profile returns 200 without following
+  redirects, `https://api.thanks.dev/v1/profile/gh/pyeconomics-dev` returns
+  200, and `funding.json` validates against the funding.json schema.
 - **Security gate clean** (always the final criterion): every commit
   passed the prek gate and the security workflow; public files carry no
   PII beyond the maintainer's public address; SECURITY.md routes reports
@@ -6754,7 +6763,11 @@ phase-boundary hygiene.
         PyPI 0.2.6 and its attestations, TestPyPI
         1.0.0.dev1 and its attestations, the published
         advisory, Read the Docs stable and latest, the
-        Sponsors and thanks.dev URLs; RDAP for the four
+        Sponsors URL (200 without following redirects; a
+        302 means no listing) and thanks.dev's profile API
+        (https://api.thanks.dev/v1/profile/gh/<name>, 200;
+        its page URLs answer 403 to every client that is not
+        a browser); RDAP for the four
         ADR-0009 domains (V6.2 — `.io` through
         https://rdap.identitydigital.services/rdap/, since
         the IANA bootstrap that rdap.org follows has no
@@ -7069,7 +7082,7 @@ workflow above maps directly to the corresponding row below.
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
 | V11.2 | The GitHub community profile lists README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, issue templates and the PR template. | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
-| V11.4 | The GitHub Sponsors and thanks.dev profiles return 200, and `funding.json` validates. | `--live`.                                            |
+| V11.4 | The GitHub Sponsors profile returns 200 without following redirects, thanks.dev's profile API returns 200, and `funding.json` validates. | `--live`.                                            |
 
 ### V12 — CI integration + security
 
