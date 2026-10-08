@@ -5758,9 +5758,9 @@ per phase-boundary hygiene.
 
 ---
 
-## Step 11 — Governance, Community and Agent Instructions
+## Step 11 — Governance, Community and Agent Instructions ✅
 
-**Status:** Not started
+**Status:** Complete — PR #67 (2026-10-07)
 
 > **Goal:** Give the project the files, rules and funding hooks that
 > outside users, contributors and coding agents read first. Rewrite
@@ -7100,7 +7100,7 @@ workflow above maps directly to the corresponding row below.
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Complete — PR #64 |
-| 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Complete — PR #67 |
 | 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | V1      | Preserve + bootstrap           | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V2      | Legacy fix + pipeline          | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
