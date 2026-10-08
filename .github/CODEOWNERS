@@ -1,0 +1,6 @@
+# .github/CODEOWNERS
+# The maintainer owns everything. The explicit entries below keep the
+# security-relevant paths owned if the default line ever changes.
+*                @nathanramoscfa
+/.github/        @nathanramoscfa
+/docs/adr/       @nathanramoscfa

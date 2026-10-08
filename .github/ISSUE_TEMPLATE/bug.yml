@@ -1,0 +1,49 @@
+# .github/ISSUE_TEMPLATE/bug.yml
+name: Bug report
+description: Something in pyeconomics does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. For a security vulnerability, use private
+        vulnerability reporting instead (see SECURITY.md). A model that returns
+        a wrong number is a model error: say so in the summary and cite the
+        source of the correct value.
+
+        Never paste an API key, token or other secret, even a revoked one.
+  - type: input
+    id: version
+    attributes:
+      label: pyeconomics version
+      description: Output of `python -c "import pyeconomics; print(pyeconomics.__version__)"`.
+      placeholder: 1.0.0.dev1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and operating system
+      placeholder: Python 3.13.1 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: The smallest code or command that shows the problem.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or traceback
+      description: Remove any credential before pasting.
+      render: text
