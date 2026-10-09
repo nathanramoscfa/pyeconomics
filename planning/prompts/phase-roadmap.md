@@ -55,9 +55,17 @@ print one line: `Phase {{N}} roadmap settings: Model <M> · Platform
 <P> · <its dials, e.g. Effort Max · Thinking On>. This session: <your
 own model> on <this surface>.`
 
+- Name your exact model, never only its family. On Codex your
+  instructions say just "based on GPT-6", but the model picked and its
+  effort are in the session's rollout: the newest `rollout-*.jsonl` under
+  `${CODEX_HOME:-~/.codex}/sessions/` whose first line (`session_meta`)
+  has this repo as its `cwd`; its last `turn_context` line holds
+  `"model"` (e.g. `gpt-6.1-sol`) and `"effort"`. Where no source names
+  the model, print `unverified`, ask me which I picked, and go on with my
+  answer.
 - You are its Model on its Platform, or a newer version in the same
-  line (Opus 5 → Opus 5.5, Fable 5 → Fable 5.1): continue, and say so
-  on the line.
+  line (Opus 5 → Opus 5.5, Fable 5 → Fable 5.1, GPT-6 Sol → GPT-6.1
+  Sol): continue, and say so on the line.
 - You are its Backup on the backup's platform: continue — I have
   switched to it — and say so on the line.
 - Anything else — a different line, an older version, another
@@ -65,7 +73,8 @@ own model> on <this surface>.`
   then `/roadmap-phase {{N}}` again; elsewhere: the model picker and
   reasoning setting). Do not write the roadmap on a model it did not
   intend.
-- You cannot see your own reasoning dial. `/roadmap-phase` sets Claude
+- You cannot see your own reasoning dial (Codex's is the rollout's
+  `"effort"`; print it). `/roadmap-phase` sets Claude
   Code's effort to `Max` by itself, the deepest rung, so never below
   the table; pasted by hand, or on another surface, the printed line
   is my cue to set the dial before you go on.
