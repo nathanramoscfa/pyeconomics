@@ -143,6 +143,26 @@ session, that GitHub's failed-run email for this run reached the email address o
 their GitHub account. The session's own mail connector reads a different inbox, so
 the maintainer's confirmation is the evidence.
 
+## Phase 1 acceptance audit (ROADMAP §4)
+
+Each Phase 1 criterion in the project roadmap is checked against the V-checks. The
+evidence is `scripts/verify-phase01.sh --post` on 2026-10-08: 99 checks passed and
+none failed (fast 64, python 4, security 3, live 22, post 6).
+
+| ROADMAP criterion | Evidence | Result |
+| --- | --- | --- |
+| The 0.2.x patch is on PyPI without credential logging, and a published advisory names the affected and fixed versions and the key-rotation advice | Check 6; V4.1, V4.2 (clean install passes `check_credential_logging.py`), V4.3; the advisory text advises rotation | Met |
+| The archive tags and `archive/0.2-dev-wip` are on `origin` with the WIP diff intact; `dev/` sits in a private archive with a clean secret scan and an index | Checks 3–5; V5.3; Step 5's scan (PR #53) | Met |
+| Characterization fixtures for the four rules are committed | Check 14; V5.2 re-records byte-identically | Met |
+| `uv sync --locked` and the full test run pass in CI on three operating systems and every supported Python; `uv build` passes the metadata checks | V10.2 (nine green cells on `main`); V7.2, V7.3 | Met |
+| Deployed & verified: `v1.0.0.dev1` on TestPyPI with attestations installs and reports its version; 0.2.6 installs from PyPI; no PyPI API token exists | V10.3 (attestations and clean install), V4.2, V2.5 and V10.5 (no repository secret); the PyPI account has no token (Step 3 readiness §1) | Met |
+| A direct push to `main` is rejected; `git branch -r` lists only `main`, `legacy/0.2.x` and archive branches; ADRs 0001–0007, 0009 and 0010 are Accepted | V1.2 (`enforce_admins`, PR required; the push rejection itself was verified in Step 1, PR #46); check 16 (the only other branch is the head of open Dependabot PR #61); check 18 | Met |
+| Security: the gate blocks a planted credential and `pickle.loads`; the same checks are required on `main`; zizmor reports nothing above Low; CodeQL and Scorecard run on `main`; secret scanning, push protection and private reporting are on | V8.3; V8.5 and V10.4 (18 required checks, strict); V2.3 and the `zizmor` check; CodeQL and Scorecard green on `main` at `f6b07c6`; V8.4 | Met |
+
+Gate G1 funding hooks: thanks.dev and `funding.json` are live (V11.4). The GitHub
+Sponsors listing moved to ROADMAP 8.1 (issue #68), by the maintainer's amendment of
+2026-10-08.
+
 ## Pre-ship items
 
 Documented limitations:

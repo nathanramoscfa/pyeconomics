@@ -1,6 +1,6 @@
-# Phase 1 Roadmap — Reset & Foundation
+# Phase 1 Roadmap — Reset & Foundation ✅
 
-**Status:** In progress
+**Status:** Complete — 2026-10-08
 
 ## Overview
 
@@ -6264,9 +6264,9 @@ S in planning. New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 12 — QA and Verification Script
+## Step 12 — QA and Verification Script ✅
 
-**Status:** Not started
+**Status:** Complete — PR #70 (2026-10-08)
 
 > **Goal:** Package the phase's verification into
 > `scripts/verify-phase01.sh` — the first verify script, whose mode
@@ -7134,7 +7134,7 @@ workflow above maps directly to the corresponding row below.
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Complete — PR #64 |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Complete — PR #67 |
-| 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #70 |
 | V1      | Preserve + bootstrap           | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V2      | Legacy fix + pipeline          | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V3      | Readiness gate                 | CI: phase-verify.yml | --        | --              | --       | --   | --          |
