@@ -1,6 +1,6 @@
 # pyeconomics 1.0 — Rebuild as an Open Economics & Finance Model Platform
 
-> **Status:** Draft v1 — Phase 1 next
+> **Status:** Draft v1 — Phase 1 shipped 2026-10-08 (`v1.0.0.dev1` on TestPyPI); Phase 2 next
 > **Owner:** Nathan Ramos, CFA — founder and sole maintainer
 > **Audience:** The maintainer and the AI coding agents that execute phase
 > steps; public with the repository
@@ -241,9 +241,9 @@ sources with vintages and retrieval times, and a hash.
 
 ## 4. Phased Roadmap
 
-### Phase 1 — Reset & Foundation
+### Phase 1 — Reset & Foundation ✅
 
-**Status:** In progress — phase01-roadmap.md
+**Status:** Complete — 2026-10-08; PR #70; v1.0.0.dev1; phase01-roadmap.md
 
 **Goal:** Patch and preserve 0.2.x, then stand up a clean, secure,
 production-grade skeleton — packaging, toolchain, security gate, CI/CD and
@@ -412,7 +412,9 @@ needed.
   session follows: layout, registry rules, units, testing, the security
   gate and the step lifecycle.
 - Funding hooks for Gate G1: GitHub Sponsors, thanks.dev and a
-  `funding.json`. The ® after the maintainer's name goes from `LICENSE`
+  `funding.json`. (Amended 2026-10-08 by the maintainer: Phase 1 closes
+  with thanks.dev live; the GitHub Sponsors listing, blocked by a
+  wrongly linked Stripe account, moves to 8.1 under issue #68.) The ® after the maintainer's name goes from `LICENSE`
   and the git author name — CFA Institute's rules put no ® after a name.
 - Retire `docs/roadmap*.rst`, `docs/create_roadmap_files.bat` and the
   README "Roadmap" section in favour of this file; keep the Read the Docs
@@ -1477,6 +1479,12 @@ ChatGPT Pro 5x as backup.
 
 #### 8.1 Gate review & decision memo
 
+- Gate G1 carry-over (issue #68): the `pyeconomics-dev` GitHub Sponsors
+  listing goes live, and `.github/FUNDING.yml` and `funding.json` regain
+  their Sponsors entries. Do it as soon as the listing is approved; this
+  step is only the latest point. `verify-phase01.sh` then requires the
+  listing (V11.4), because FUNDING.yml names it.
+
 - A memo in `docs/decisions/` records the Gate G3 metrics against their
   thresholds, the pricing tests run, and the decision. On no-go, the phase
   executes the fallback track (§5 "Monetization strategy & validation
@@ -2397,7 +2405,7 @@ and an add-in built on PyXLL, which charges every end user $349 a year.
 
 | Gate | When                       | Question                                         | Evidence required                                                                                     | Outcome |
 |------|----------------------------|--------------------------------------------------|-------------------------------------------------------------------------------------------------------|---------|
-| G1   | Phase 1                    | Do licence and brand keep every option open?     | ADR-0004 and ADR-0009 accepted; domains registered; Sponsors, thanks.dev and `funding.json` live       | Proceed |
+| G1   | Phase 1                    | Do licence and brand keep every option open?     | ADR-0004 and ADR-0009 accepted; domains registered; thanks.dev and `funding.json` live; GitHub Sponsors deferred to 8.1 (issue #68; maintainer, 2026-10-08) | Proceed |
 | G2   | Phase 5 launch             | Can demand be measured from day one?             | Cookie-less analytics, newsletter, waitlist with tier interest, a priced "Pro" preview (fake door), API and MCP usage, downloads and stars — all recording | Instrumentation verified live |
 | G3   | After 1.0.0; window set in the Phase 5 roadmap | Will people pay, and for what? | At least 1,000 waitlist or newsletter sign-ups, or 1,000 activated users in 90 days; and at least 30 upgrade-intent clicks or pre-orders; and at least 10 interviews in which users confirm they would pay | Go: Phase 8 builds billing and the Pro tier. No-go: sponsorship, education content and consulting continue; the core is unaffected |
 | G4   | Inside Phase 8             | Is there pull beyond the Pro tier?               | At least 50 paying accounts, three consecutive months of recurring-revenue growth, and repeated requests for Excel or offline use | Excel add-in, `pyeconomics-pro`, study companion |
@@ -2492,7 +2500,7 @@ The following are deliberately deferred to a future version, or excluded:
 
 | Phase | Description                                            | Complexity | Status      |
 |-------|--------------------------------------------------------|------------|-------------|
-| 1     | Reset & Foundation                                     | Medium     | In progress |
+| 1     | Reset & Foundation                                     | Medium     | Complete    |
 | 2     | Model Engine & Core Catalog                            | High       | Not started |
 | 3     | Data Platform & Free Sources                           | High       | Not started |
 | 4     | Programmatic Surfaces: CLI, REST API, MCP & Exports    | High       | Not started |

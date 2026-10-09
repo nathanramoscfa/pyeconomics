@@ -1,0 +1,84 @@
+# .github/workflows/phase-verify.yml
+# Each phase's verification script (scripts/verify-phaseNN.sh) on every pull
+# request and push to main: the static checks (--fast) and the security gate
+# over the phase's surface (--security). Both jobs are required checks on
+# main. A later phase appends its number to the matrix; nothing else here is
+# phase-specific. --live and --post read the maintainer's authenticated
+# session and run only on the maintainer's machine, never here.
+name: phase-verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: phase-verify-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    name: phase-verify-fast (${{ matrix.phase }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Static check 16 reads the open pull requests' head branches.
+      pull-requests: read
+    strategy:
+      fail-fast: false
+      matrix:
+        phase: ["01"]
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      # Every branch and tag: the checks read the archive tags, legacy/0.2.x
+      # and the release tags.
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - name: Static checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PHASE: ${{ matrix.phase }}
+        run: timeout 300 scripts/verify-phase${PHASE}.sh --fast
+
+  security:
+    name: phase-verify-security (${{ matrix.phase }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    strategy:
+      fail-fast: false
+      matrix:
+        phase: ["01"]
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          enable-cache: false
+      # The token lets zizmor run its online audits; prek's gate then scans
+      # the whole tree.
+      - name: Security gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PHASE: ${{ matrix.phase }}
+        run: scripts/verify-phase${PHASE}.sh --security

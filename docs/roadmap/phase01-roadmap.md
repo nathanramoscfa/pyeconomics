@@ -1,6 +1,6 @@
-# Phase 1 Roadmap — Reset & Foundation
+# Phase 1 Roadmap — Reset & Foundation ✅
 
-**Status:** In progress
+**Status:** Complete — 2026-10-08
 
 ## Overview
 
@@ -6264,9 +6264,9 @@ S in planning. New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 12 — QA and Verification Script
+## Step 12 — QA and Verification Script ✅
 
-**Status:** Not started
+**Status:** Complete — PR #70 (2026-10-08)
 
 > **Goal:** Package the phase's verification into
 > `scripts/verify-phase01.sh` — the first verify script, whose mode
@@ -6695,10 +6695,11 @@ phase-boundary hygiene.
         SECURITY.md, CHANGELOG.md, CITATION.cff, NOTICE,
         AGENTS.md, CLAUDE.md, funding.json,
         .github/CODEOWNERS and .github/FUNDING.yml exist,
-        and FUNDING.yml names both `github:` and
-        `thanks_dev:` (issue #68 restores `github:`; if it
-        is still open, this check fails and Phase 1 is not
-        complete).
+        and FUNDING.yml names `thanks_dev:`. Amended
+        2026-10-08 by the maintainer: the GitHub Sponsors
+        listing (issue #68) moves to ROADMAP 8.1, so
+        `github:` is required only once FUNDING.yml names
+        it again, and then V11.4 requires its listing.
     42. The issue forms exist: bug.yml, model-request.yml
         (a required citation field),
         data-source-request.yml (a required terms-of-use URL
@@ -7030,7 +7031,7 @@ workflow above maps directly to the corresponding row below.
 | V5.1 | Static checks 14–16 PASS (fixture hashes match the manifest; recorder pinned to 0.2.6; no `dev/` path tracked; besides open-PR head branches, only `main`, `legacy/0.2.x` and `archive/` branches on `origin`). | `phase-verify.yml --fast`. |
 | V5.2 | `record_characterization.py --check` re-records byte-identically with sockets blocked. | `--post` (needs the network to build the isolated 0.2.6 environment). |
 | V5.3 | The research archive repository exists, reports `PRIVATE` and holds `INDEX.md`. | `--live`.                                                    |
-| V5.4 | None of the 25 pre-Phase-1 automated pull requests is open, and no Snyk pull request exists. | `--live` (`gh pr list`).                        |
+| V5.4 | None of the 25 pre-Phase-1 automated pull requests is open, and no Snyk pull request is open (Step 5 closed them; a closed pull request cannot be deleted). | `--live` (`gh api .../pulls?state=open`). |
 
 ### V6 — Architecture decision records
 
@@ -7099,9 +7100,9 @@ workflow above maps directly to the corresponding row below.
 | ID    | Check                                                             | Automation                                                                |
 | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
-| V11.2 | The community profile API lists README, CONTRIBUTING, CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled` is true; the issue forms parse (GraphQL `contactLinks` lists `config.yml`'s links, and `https://github.com/OWNER/REPO/community` checks Issue templates). The REST profile cannot show SECURITY or YAML issue forms. | `--live`.                |
+| V11.2 | The community profile API lists README, CONTRIBUTING, CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled` is true; the issue forms parse (GraphQL `contactLinks` lists `config.yml`'s links). The REST profile cannot show SECURITY or YAML issue forms, and `https://github.com/OWNER/REPO/community` renders only in a signed-in browser, so its Issue templates tick is a manual check (seen in Step 11). | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
-| V11.4 | The GitHub Sponsors profile returns 200 without following redirects (issue #68), thanks.dev's profile API returns 200, and `funding.json` validates and lists both channels. | `--live`.                                            |
+| V11.4 | thanks.dev's profile API returns 200; `funding.json` validates and lists every channel FUNDING.yml names; and when FUNDING.yml names `github:`, the Sponsors profile returns 200 without following redirects (issue #68, deferred to ROADMAP 8.1 by the maintainer on 2026-10-08). | `--live`. |
 
 ### V12 — CI integration + security
 
@@ -7133,7 +7134,7 @@ workflow above maps directly to the corresponding row below.
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Complete — PR #64 |
 | 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Complete — PR #67 |
-| 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #70 |
 | V1      | Preserve + bootstrap           | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V2      | Legacy fix + pipeline          | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V3      | Readiness gate                 | CI: phase-verify.yml | --        | --              | --       | --   | --          |
@@ -7399,10 +7400,12 @@ forward whatever is still open here.
   criterion (amended by the maintainer on 2026-10-08), and Step 12
   (static check 41 and V11.4 require the Sponsors listing; the `--live`
   checks verify Sponsors without following redirects and thanks.dev
-  through its API). Owned by issue #68, closed in Step 12: the
+  through its API). Owned by issue #68, moved from Step 12 to ROADMAP
+  8.1 (Gate G1 carry-over) by the maintainer on 2026-10-08: the
   `pyeconomics-dev` GitHub Sponsors listing goes live after GitHub
   Support detaches the wrongly linked Stripe account, and FUNDING.yml
-  and funding.json regain their Sponsors entries.
+  and funding.json regain their Sponsors entries. Phase 1 closed with
+  thanks.dev live.
 
 ---
 
