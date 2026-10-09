@@ -7030,7 +7030,7 @@ workflow above maps directly to the corresponding row below.
 | V5.1 | Static checks 14–16 PASS (fixture hashes match the manifest; recorder pinned to 0.2.6; no `dev/` path tracked; besides open-PR head branches, only `main`, `legacy/0.2.x` and `archive/` branches on `origin`). | `phase-verify.yml --fast`. |
 | V5.2 | `record_characterization.py --check` re-records byte-identically with sockets blocked. | `--post` (needs the network to build the isolated 0.2.6 environment). |
 | V5.3 | The research archive repository exists, reports `PRIVATE` and holds `INDEX.md`. | `--live`.                                                    |
-| V5.4 | None of the 25 pre-Phase-1 automated pull requests is open, and no Snyk pull request exists. | `--live` (`gh pr list`).                        |
+| V5.4 | None of the 25 pre-Phase-1 automated pull requests is open, and no Snyk pull request is open (Step 5 closed them; a closed pull request cannot be deleted). | `--live` (`gh api .../pulls?state=open`). |
 
 ### V6 — Architecture decision records
 
@@ -7099,7 +7099,7 @@ workflow above maps directly to the corresponding row below.
 | ID    | Check                                                             | Automation                                                                |
 | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
-| V11.2 | The community profile API lists README, CONTRIBUTING, CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled` is true; the issue forms parse (GraphQL `contactLinks` lists `config.yml`'s links, and `https://github.com/OWNER/REPO/community` checks Issue templates). The REST profile cannot show SECURITY or YAML issue forms. | `--live`.                |
+| V11.2 | The community profile API lists README, CONTRIBUTING, CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled` is true; the issue forms parse (GraphQL `contactLinks` lists `config.yml`'s links). The REST profile cannot show SECURITY or YAML issue forms, and `https://github.com/OWNER/REPO/community` renders only in a signed-in browser, so its Issue templates tick is a manual check (seen in Step 11). | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
 | V11.4 | The GitHub Sponsors profile returns 200 without following redirects (issue #68), thanks.dev's profile API returns 200, and `funding.json` validates and lists both channels. | `--live`.                                            |
 
