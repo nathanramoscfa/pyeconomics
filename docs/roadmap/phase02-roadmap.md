@@ -1424,8 +1424,11 @@ High. New conversation per phase-boundary hygiene.
       licence_exceptions.toml entry whose `licence` is
       exactly what the hook reports and whose `reason`
       names the licence file read in that version's
-      distribution (for numpy: its bundled components are
-      0BSD, MIT, Zlib and CC0-1.0, all permissive). On the
+      distribution (for numpy: its bundled sources are
+      0BSD, MIT, Zlib and CC0-1.0, and its compiled wheels,
+      like scipy's, also bundle OpenBLAS, LAPACK and the
+      GCC runtime library under its runtime-library
+      exception; disclose all of them). On the
       PR, exempt from dependency-review by purl, with a
       comment, only a package it flags whose licence the
       `licences` hook already accepts or excepts. Confirm a
@@ -2436,6 +2439,16 @@ Intelligence Extra High. New conversation per phase-boundary hygiene.
       outside a run, issues it through the warnings module
       with stacklevel pointing at the caller. Codes are
       snake_case and documented per model.
+      (From Step 1: core/warnings.py already defines
+      warn(code, message, *, stacklevel=1), which only
+      issues a ModelWarning through the warnings module,
+      and core/numerics.find_root calls it for
+      `several_roots`. Move warn() here, or have it
+      delegate here, so pyeconomics.core exports exactly
+      one warn() that records into the collector; keep its
+      stacklevel semantics and the snake_case check in
+      ModelWarning, and make find_root's warning land in
+      the collector too.)
     </requirement>
 
     <requirement>
@@ -9231,7 +9244,10 @@ forward whatever is still open here.
 - From Phase 1's Not-in-scope list: the model registry, ADR-0008 and the
   catalog (Steps 1–12); the documentation site and its preview (Step 7);
   the first PyPI upload of 1.0 and its readiness gate (Steps 13 and 14).
-- None from this phase's execution when this roadmap was written.
+- From Step 1 (2026-10-09). Patched: Step 3's `core/context.py`
+  requirement. Step 1 shipped `warn()` in `core/warnings.py`, which
+  `find_root` already calls; Step 3 makes it the one collector-aware
+  `warn()` instead of adding a second. Owned by Step 3.
 
 ---
 
