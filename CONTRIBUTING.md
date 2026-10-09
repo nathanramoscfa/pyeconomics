@@ -1,71 +1,163 @@
-## Contributing
+# Contributing to pyeconomics
 
-Contributions are welcome! If you have a model you'd like to implement or an
-improvement to an existing model, please follow these steps to contribute:
+Thank you for helping. pyeconomics 1.0 is being rebuilt phase by phase from the
+[project roadmap](docs/roadmap/ROADMAP.md); read its §4 for the phase in flight
+before proposing large changes. By taking part you agree to the
+[Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately, as
+[SECURITY.md](SECURITY.md) describes, never in a public issue.
 
-1. **Fork the Repository**:
-   - Go to the [PyEconomics repository](https://github.com/nathanramoscfa/pyeconomics)
-     on GitHub and click the "Fork" button.
+Coding agents follow [AGENTS.md](AGENTS.md), which restates these rules.
 
-2. **Clone Your Fork**:
-   - Clone your forked repository to your local machine:
-     ```sh
-     git clone https://github.com/your-username/pyeconomics.git
-     ```
+## Setup
 
-3. **Create a Feature Branch**:
-   - Navigate to the directory of your cloned repository and create a new branch
-     for your feature or bug fix:
-     ```sh
-     cd pyeconomics
-     git checkout -b feature/AmazingFeature
-     ```
+You need [uv](https://docs.astral.sh/uv/) and git. Then, once per clone:
 
-4. **Make Your Changes**:
-   - Implement your feature or fix the bug. Make sure your code follows the
-     project's coding standards and includes necessary tests.
+```sh
+git clone https://github.com/pyeconomics-dev/pyeconomics.git
+cd pyeconomics
+uv sync
+uv run prek install
+```
 
-5. **Run Tests**:
-   - Ensure that all tests pass successfully. Add new tests if applicable.
-     ```sh
-     pytest
-     ```
+`uv sync` installs the package in editable mode with the `dev` dependency
+group. `uv run prek install` installs the pre-commit hook that runs the quality
+toolchain and the security gate on every commit. There is nothing else to
+install: prek builds the pinned gitleaks hook with its own Go toolchain on its
+first run.
 
-6. **Commit Your Changes**:
-   - Commit your changes with a descriptive commit message:
-     ```sh
-     git add .
-     git commit -m "Add some AmazingFeature"
-     ```
+Run the tests with `uv run pytest`, never `python -m pytest`, which puts the
+working directory on `sys.path` and can import a stale copy of the package.
+Run every hook by hand with `uv run prek run --all-files`.
 
-7. **Push to Your Fork**:
-   - Push your changes to your forked repository:
-     ```sh
-     git push origin feature/AmazingFeature
-     ```
+## Making a change
 
-8. **Open a Pull Request**:
-   - Go to the original PyEconomics repository and open a pull request. Provide
-     a clear and descriptive title and description for your pull request,
-     detailing what changes you made and why.
+1. Open an issue first for anything larger than a small fix, using one of the
+   issue forms. A model request needs a citation; a data-source request needs
+   the source's terms-of-use URL.
+2. Branch from an up-to-date `main` with a prefix from ROADMAP §5 "Branch
+   naming convention": `feature/`, `fix/`, `hotfix/`, `chore/`, `docs/`,
+   `perf/`, `release/` or `model/`.
+3. Commit with sign-off (`git commit -s`; see below). The pre-commit hook must
+   pass.
+4. Open a pull request against `main` and fill in the template: the roadmap
+   step, summary, test plan, breaking changes, rollback plan, licence check and
+   sensitive-data checklist.
+5. Every required check must pass. Pull requests are squash-merged, so the
+   pull request title becomes the commit on `main`.
 
-### Code of Conduct
+### Commit conventions
 
-By participating in this project, you agree to abide by the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+- **Conventional Commits.** The pull request title must match
+  `<type>(<scope>)!: <description>`, where type is one of `feat`, `fix`,
+  `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` or
+  `revert`; the scope and `!` are optional. `!` (or a `BREAKING CHANGE:`
+  footer) marks a breaking change. The `pr-title` check enforces it.
+- **DCO sign-off.** Every commit carries a `Signed-off-by:` trailer certifying
+  the [Developer Certificate of Origin 1.1](https://developercertificate.org/),
+  added by `git commit -s`. The `dco` check requires the trailer's name and
+  email to match each commit's author, so set `user.name` and `user.email`
+  before committing. Only Dependabot's own pull requests are exempt. To fix a
+  branch that lacks sign-offs, run `git rebase --signoff main` and force-push
+  your branch.
+- **No CLA.** The DCO is the whole of the paperwork (ADR-0004).
 
-### Reporting Issues
+### Python file header
 
-If you encounter any issues or have questions about PyEconomics, feel free to
-open an issue on the
-[GitHub Issues](https://github.com/nathanramoscfa/pyeconomics/issues)
-page.
+Every Python file opens with three comment lines; ruff's `CPY001` requires the
+copyright line:
 
-### Suggestions and Feedback
+```python
+# src/pyeconomics/example.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
+```
 
-We welcome your feedback and suggestions! If you have any ideas to improve
-PyEconomics, please open an issue or start a discussion on the
-[GitHub Discussions](https://github.com/nathanramoscfa/pyeconomics/discussions)
-page.
+The first line is the file's repository-relative path. YAML and TOML files
+start with the same path comment; Markdown and JSON follow their own
+conventions.
 
-Thank you for your contributions!
+## The security gate
+
+The pre-commit hook is the project's per-step security gate (ROADMAP §5
+"Per-step security gate"): gitleaks for secrets, bandit and semgrep with the
+project's rules for SAST, `pip-audit` over `uv.lock` for the dependency audit,
+and the runtime licence allowlist. It is fail-closed, and CI re-runs the same
+hooks as required checks.
+
+The bypass (`SKIP=<hook>` or `git commit --no-verify`) is for genuine
+emergencies only. Every use is recorded in the pull request body's "Security
+gate bypass" field with the hook, the commit and why it could not wait. CI still
+runs every check, so a bypass never lands an issue on `main`.
+
+## Licence check for dependencies and data sources
+
+pyeconomics is Apache-2.0 from 1.0 (ADR-0004).
+
+- **A new runtime dependency**, meaning anything a user installs with the
+  package or an extra, must carry one of `MIT`, `BSD-2-Clause`,
+  `BSD-3-Clause`, `Apache-2.0`, `ISC`, `NCSA` or `PSF-2.0`. The `licences` hook
+  checks the locked runtime closure. FinancePy, rateslib, getfactormodels, the
+  DBnomics client, AGPL OpenBB extensions and MCP servers, and `full_fred` are
+  excluded by name. List each new dependency and its licence in the pull
+  request.
+- **A new data source** must have terms that allow its intended use. Record its
+  terms-of-use URL and how ROADMAP §5 "Data licensing policy" classes it
+  (hosted-safe or library-only), and carry its required notice.
+- Add or change dependencies with `uv add --no-config …` / `uv lock --no-config`
+  if your user-level uv configuration adds a private index, so no private URL
+  reaches `uv.lock`.
+
+## Model definition of done
+
+From Phase 2, a model merges only when it meets ROADMAP §5 "Model quality &
+governance", enforced by `registry.validate()` and the pull request template:
+
+| Requirement      | Rule                                                                                         |
+|------------------|----------------------------------------------------------------------------------------------|
+| Identity         | Permanent dotted id; a per-model version that bumps on any output change                     |
+| Model card       | Summary, formula, variables with units, assumptions, limitations, evidence status, curriculum mapping, references |
+| Citations        | At least one primary reference; every golden case cites its source; no copied copyrighted text — numbers and formulas only, in our own words |
+| Golden tests     | At least three cited cases including an edge case, each with a tolerance                     |
+| Property tests   | One per invariant the domain guarantees                                                      |
+| Units and bounds | Every numeric input and output                                                               |
+| Parity           | Identical canonical outputs from Python, CLI, REST API, MCP and web                          |
+| Hosted budget    | Declared compute cost class; heavy models get caps or async jobs in hosted mode              |
+| Errata           | A shipped wrong number is a High defect: fixed, regression-tested, and logged on a public errata page |
+
+A model is a pure function: it never fetches data, prints, plots or calls an
+LLM. Never copy CFA Program curriculum text, questions or worked examples; cite
+each formula's originators and take golden values from independent sources.
+Requests outside the model layer are closed by citing
+[ADR-0001](docs/adr/0001-product-boundaries.md) and ROADMAP §6.
+
+## How roadmap steps run
+
+The maintainer and coding agents implement the roadmap one step at a time, each
+in its own branch, pull request and conversation. Every step follows a
+six-stage lifecycle (ROADMAP §5 "Step lifecycle"):
+
+1. **Create the branch** named on the step's `**Branch:**` line, from an
+   up-to-date `main`, before any other work.
+2. **Work on the branch**, passing the security gate on every commit.
+3. **Open the pull request, then mark the step** `Complete — PR #n (date)` in
+   its phase roadmap, on the same branch.
+4. **Wait for green checks, then squash-merge.**
+5. **Retire the branch** locally and remotely.
+6. **Dispose of every finding, then declare completion.**
+
+**Triage rule.** A finding that is not the step is classified before it is
+acted on (ROADMAP §5 "Defect handling & triage"), and each class has one
+destination and one label:
+
+| Label          | Class                  | Destination                                                    |
+|----------------|------------------------|----------------------------------------------------------------|
+| `spec-rot`     | Spec rot               | Edit the step's task in the phase roadmap now                  |
+| `upstream-gap` | Upstream gap           | Patch the earlier step's task; add it to the carry-over list   |
+| `bug`          | Implementation bug     | Fix in-step only if it blocks the step; otherwise an issue     |
+| `model-error`  | Model error            | High: a `fix/` branch, a golden test and an errata entry       |
+| `architecture` | Architectural question | An issue for a future phase                                    |
+| `process`      | Process improvement    | Written where the next session reads it; a check if it is a rule |
+| `security`     | Security finding       | Jumps the queue by severity (SECURITY.md)                      |
+
+A pull request contains its step plus blocking fixes only, and lists the issues
+it opened.

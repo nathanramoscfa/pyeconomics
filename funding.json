@@ -1,0 +1,50 @@
+{
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Nathan Ramos, CFA",
+    "email": "nathan.ramos.github@gmail.com",
+    "description": "Founder and sole maintainer of pyeconomics, an open platform of economics and finance models.",
+    "webpageUrl": {
+      "url": "https://github.com/pyeconomics-dev"
+    }
+  },
+  "projects": [
+    {
+      "guid": "pyeconomics",
+      "name": "pyeconomics",
+      "description": "An open platform of economics and finance models: a registry of tested, cited models served identically to Python, a command line, a REST API, an MCP server and a web app, with a provenance manifest on every result. The library, CLI, local app and MCP server stay free and open source.",
+      "webpageUrl": {
+        "url": "https://github.com/pyeconomics-dev/pyeconomics"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/pyeconomics-dev/pyeconomics"
+      },
+      "licenses": ["spdx:Apache-2.0"],
+      "tags": ["finance", "data-science", "scientific-computing", "analytics", "education", "api"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "thanks-dev",
+        "type": "payment-provider",
+        "address": "https://thanks.dev/u/gh/pyeconomics-dev",
+        "description": "thanks.dev, which funds the dependencies of its donors' projects."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "maintenance",
+        "status": "active",
+        "name": "Maintenance",
+        "description": "Any amount, one-time or recurring, toward maintaining pyeconomics and verifying its models.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": ["thanks-dev"]
+      }
+    ]
+  }
+}

@@ -5758,9 +5758,9 @@ per phase-boundary hygiene.
 
 ---
 
-## Step 11 — Governance, Community and Agent Instructions
+## Step 11 — Governance, Community and Agent Instructions ✅
 
-**Status:** Not started
+**Status:** Complete — PR #67 (2026-10-07)
 
 > **Goal:** Give the project the files, rules and funding hooks that
 > outside users, contributors and coding agents read first. Rewrite
@@ -6190,9 +6190,26 @@ S in planning. New conversation per phase-boundary hygiene.
       Sponsors and thanks.dev); funding.json at the root,
       valid against the published funding.json schema; the
       operator enrols in GitHub Sponsors and thanks.dev and
-      the agent confirms each profile URL returns 200. If
-      Sponsors approval is still pending at merge time, the
-      step is not complete until it is live.
+      the agent confirms each profile returns 200: the
+      Sponsors URL without following redirects (with no
+      listing, github.com/sponsors/<name> answers 302 to the
+      profile, so `curl -L` reports a false 200), and
+      thanks.dev through its profile API,
+      https://api.thanks.dev/v1/profile/gh/<name> (200 with
+      JSON when claimed, 500 when not), because thanks.dev
+      serves every page path as a single-page app with
+      status 403. If Sponsors approval is still pending at
+      merge time, the step is not complete until it is
+      live.
+      Amended 2026-10-08 by the maintainer: Sponsors
+      onboarding stalled on a GitHub Support ticket (a
+      Stripe account linked to the wrong legal entity), so
+      Step 11 merges with thanks.dev live and the Sponsors
+      listing tracked in issue #68. Until the listing is
+      live, FUNDING.yml and funding.json name thanks.dev
+      only; #68 restores the Sponsors entries, and Step 12's
+      V11.4 must see the listing live before Phase 1 is
+      complete.
     </requirement>
 
     <requirement>
@@ -6231,8 +6248,11 @@ S in planning. New conversation per phase-boundary hygiene.
   carries its class label.
 - `AGENTS.md` states the lifecycle, the security gate, the Triage rule
   and the commit conventions, and `CLAUDE.md` imports it.
-- Gate G1: the GitHub Sponsors and thanks.dev profiles return 200, and
-  `funding.json` validates against the funding.json schema.
+- Gate G1: `https://api.thanks.dev/v1/profile/gh/pyeconomics-dev` returns
+  200, `funding.json` validates against the funding.json schema, and the
+  GitHub Sponsors listing is tracked in issue #68 (amended by the maintainer
+  on 2026-10-08; Step 12's V11.4 requires it live, returning 200 without
+  following redirects, before Phase 1 is complete).
 - **Security gate clean** (always the final criterion): every commit
   passed the prek gate and the security workflow; public files carry no
   PII beyond the maintainer's public address; SECURITY.md routes reports
@@ -6670,7 +6690,11 @@ phase-boundary hygiene.
     41. README.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md,
         SECURITY.md, CHANGELOG.md, CITATION.cff, NOTICE,
         AGENTS.md, CLAUDE.md, funding.json,
-        .github/CODEOWNERS and .github/FUNDING.yml exist.
+        .github/CODEOWNERS and .github/FUNDING.yml exist,
+        and FUNDING.yml names both `github:` and
+        `thanks_dev:` (issue #68 restores `github:`; if it
+        is still open, this check fails and Phase 1 is not
+        complete).
     42. The issue forms exist: bug.yml, model-request.yml
         (a required citation field),
         data-source-request.yml (a required terms-of-use URL
@@ -6754,7 +6778,11 @@ phase-boundary hygiene.
         PyPI 0.2.6 and its attestations, TestPyPI
         1.0.0.dev1 and its attestations, the published
         advisory, Read the Docs stable and latest, the
-        Sponsors and thanks.dev URLs; RDAP for the four
+        Sponsors URL (200 without following redirects; a
+        302 means no listing) and thanks.dev's profile API
+        (https://api.thanks.dev/v1/profile/gh/<name>, 200;
+        its page URLs answer 403 to every client that is not
+        a browser); RDAP for the four
         ADR-0009 domains (V6.2 — `.io` through
         https://rdap.identitydigital.services/rdap/, since
         the IANA bootstrap that rdap.org follows has no
@@ -7069,7 +7097,7 @@ workflow above maps directly to the corresponding row below.
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
 | V11.2 | The GitHub community profile lists README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, issue templates and the PR template. | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
-| V11.4 | The GitHub Sponsors and thanks.dev profiles return 200, and `funding.json` validates. | `--live`.                                            |
+| V11.4 | The GitHub Sponsors profile returns 200 without following redirects (issue #68), thanks.dev's profile API returns 200, and `funding.json` validates and lists both channels. | `--live`.                                            |
 
 ### V12 — CI integration + security
 
@@ -7100,7 +7128,7 @@ workflow above maps directly to the corresponding row below.
 | 8       | Per-step security gate         | Claude Opus 5.5   | Claude Code  | Effort XHigh    | On       | New  | Complete — PR #60 |
 | 9       | Quality toolchain              | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Complete — PR #63 |
 | 10      | CI/CD + publishing rehearsal   | Claude Sonnet 5.5 | Claude Code  | Effort High     | On       | New  | Complete — PR #64 |
-| 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Not started |
+| 11      | Governance + agent instructions | Claude Opus 5.5  | Claude Code  | Effort Medium   | On       | New  | Complete — PR #67 |
 | 12      | QA + verify-phase01.sh         | Claude Opus 5.5   | Claude Code  | Effort Medium   | On       | New  | Not started |
 | V1      | Preserve + bootstrap           | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
 | V2      | Legacy fix + pipeline          | CI: phase-verify.yml; live | --  | --              | --       | --   | --          |
@@ -7363,6 +7391,14 @@ forward whatever is still open here.
   Owned by issue #65: Python 3.15
   joins `ci.yml`'s matrix, with its classifier, at its final release
   (expected 2026-10-09; ADR-0010).
+- From Step 11 (governance). Patched: Step 11's funding requirement and
+  criterion (amended by the maintainer on 2026-10-08), and Step 12
+  (static check 41 and V11.4 require the Sponsors listing; the `--live`
+  checks verify Sponsors without following redirects and thanks.dev
+  through its API). Owned by issue #68, closed in Step 12: the
+  `pyeconomics-dev` GitHub Sponsors listing goes live after GitHub
+  Support detaches the wrongly linked Stripe account, and FUNDING.yml
+  and funding.json regain their Sponsors entries.
 
 ---
 

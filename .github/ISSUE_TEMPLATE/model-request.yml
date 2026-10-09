@@ -1,0 +1,51 @@
+# .github/ISSUE_TEMPLATE/model-request.yml
+name: Model request
+description: Propose a model, formula or method for the catalog.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        pyeconomics is a model layer: a registry of tested, cited models, each a
+        pure function. Before proposing, check the product boundaries in
+        [ADR-0001](https://github.com/pyeconomics-dev/pyeconomics/blob/main/docs/adr/0001-product-boundaries.md)
+        and [ROADMAP §6 Out of Scope](https://github.com/pyeconomics-dev/pyeconomics/blob/main/docs/roadmap/ROADMAP.md#6-out-of-scope):
+        trading and backtesting systems, personalised advice, exam-prep
+        question banks and copied curriculum material are out of scope.
+  - type: input
+    id: name
+    attributes:
+      label: Model name
+      placeholder: Macaulay duration
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What it computes, and who would use it
+      description: Inputs, outputs and units, in your own words.
+    validations:
+      required: true
+  - type: textarea
+    id: citation
+    attributes:
+      label: Primary reference
+      description: >-
+        At least one primary source for the model (author, year, title, and
+        a DOI or URL). Describe it in your own words: never paste curriculum
+        text, questions or worked examples.
+      placeholder: Macaulay, F. R. (1938). Some Theoretical Problems Suggested by the Movements of Interest Rates ... NBER.
+    validations:
+      required: true
+  - type: textarea
+    id: golden
+    attributes:
+      label: Published values to test against
+      description: Independent, cited worked values the model must reproduce, if you know any.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - label: I have read ADR-0001 and ROADMAP §6, and this request is inside the model layer.
+          required: true

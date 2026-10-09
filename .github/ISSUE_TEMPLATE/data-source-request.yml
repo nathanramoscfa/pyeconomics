@@ -1,0 +1,50 @@
+# .github/ISSUE_TEMPLATE/data-source-request.yml
+name: Data-source request
+description: Propose a data provider or dataset.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A source's terms decide where its data may flow: some sources can be
+        served by the hosted site, others only on a user's own machine (ROADMAP
+        §5 "Data licensing policy"). A request without the terms of use cannot
+        be assessed.
+  - type: input
+    id: name
+    attributes:
+      label: Source name
+      placeholder: Bureau of Labor Statistics Public Data API
+    validations:
+      required: true
+  - type: input
+    id: terms
+    attributes:
+      label: Terms-of-use URL
+      description: The page with the source's terms of use or licence.
+      placeholder: https://www.bls.gov/developers/termsOfService.htm
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data and models it would serve
+      description: The series or datasets, and which models would use them.
+    validations:
+      required: true
+  - type: dropdown
+    id: access
+    attributes:
+      label: Access
+      options:
+        - Free, no key
+        - Free, with an API key
+        - Paid or subscription
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notice
+    attributes:
+      label: Required attribution or notice
+      description: Any notice the terms require wherever the data appears, if you know it.
