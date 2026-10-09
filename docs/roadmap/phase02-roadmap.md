@@ -1584,7 +1584,7 @@ High. New conversation per phase-boundary hygiene.
 
 ## Step 2 — Dates, Day Counts and Calendars
 
-**Status:** Not started
+**Status:** Complete ? PR #73 (2026-10-09)
 
 > **Goal:** Build the date layer ADR-0008 decided: `core/dates.py` (month
 > arithmetic and the end-of-month rule), `core/daycount.py` (`DayCount` with
@@ -1608,11 +1608,14 @@ High. New conversation per phase-boundary hygiene.
 
 | Setting      | Value                                         |
 | ------------ | --------------------------------------------- |
-| Model        | GPT-6 Sol                                     |
+| Model        | GPT-6.1 Sol                                   |
 | Backup       | Claude Opus 5.5 — Claude Code · Effort Medium |
 | Platform     | Codex                                         |
 | Intelligence | Medium                                        |
 | Conversation | **New**                                       |
+
+> Settings updated 2026-10-09: was GPT-6 Sol ? Intelligence Medium.
+> GPT-6.1 Sol supersedes it in the same model line; this session ran at Medium.
 
 **Model rationale:** Coding is PRIMARY — six day-count conventions,
 schedule generation and business-day adjustment — and knowledge SECONDARY,
@@ -1954,7 +1957,11 @@ conversation per phase-boundary hygiene.
       is_business_day and add_business_days. A calendar
       `holidays` does not provide (SIFMA's US bond-market
       calendar is one) is not invented; it waits for a
-      later step with a source. `uv add --no-config
+      later step with a source. Reject dates outside a provider's
+      declared start_year/end_year with InputError instead of
+      accepting its silently empty holiday set (holidays 0.106
+      ends in 2100; TARGET begins in 1999). weekends_only
+      supports the full ADR date range. `uv add --no-config
       holidays` with a floor no higher than the release
       this step tests, then lock and export.
     </requirement>
@@ -8921,7 +8928,7 @@ workflow above maps directly to the corresponding row below.
 | Step    | Scope                            | Model             | Platform     | Reasoning dial      | Thinking | Conv | Status      |
 | ------- | -------------------------------- | ----------------- | ------------ | ------------------- | -------- | ---- | ----------- |
 | 1       | ADR-0008 + core conventions      | Claude Opus 5.5   | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #71 |
-| 2       | Dates, day counts, calendars     | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
+| 2       | Dates, day counts, calendars     | GPT-6.1 Sol       | Codex        | Intelligence Medium | --       | New  | Complete ? PR #73 |
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Not started |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |

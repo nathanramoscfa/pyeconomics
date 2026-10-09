@@ -14,7 +14,8 @@ Pyodide (the ``pyodide`` job; ADR-0002, ADR-0008 decision 14). It:
 3. converts a monthly rate to its effective annual rate and compares it with
    the closed form;
 4. checks the default rate tolerance accepts a rounding error and refuses a
-   real difference.
+   real difference;
+5. checks ACT/360 and an observed federal holiday adjustment.
 
 It prints one line per check and exits 0 when every check passes, 1 when one
 fails and 2 when it refuses to run. Phase 2 Step 4 extends it to run one
@@ -25,6 +26,7 @@ model per domain. Usage, from outside the checkout:
 
 from __future__ import annotations
 
+import datetime as dt
 import platform
 import sys
 from importlib import metadata
@@ -86,10 +88,29 @@ def check_tolerance(package: ModuleType) -> str:
     return "the rate tolerance accepts 1e-14 and refuses 1bp"
 
 
+def check_dates(package: ModuleType) -> str:
+    """Exercise the installed day counter and holidays-backed adjustment."""
+    core = package.core
+    fraction = core.year_fraction(
+        dt.date(2024, 1, 1), dt.date(2024, 7, 1), core.DayCount.ACT_360
+    )
+    if fraction != 182 / 360:
+        msg = "ACT/360 did not count the leap-year half as 182 days"
+        raise AssertionError(msg)
+    payment = core.adjust(
+        dt.date(2026, 7, 3), "us_federal", core.BusinessDayConvention.FOLLOWING
+    )
+    if payment != dt.date(2026, 7, 6):
+        msg = "the observed federal holiday did not adjust to July 6"
+        raise AssertionError(msg)
+    return "ACT/360 and holidays-backed federal adjustment agree"
+
+
 CHECKS: tuple[tuple[str, Callable[[ModuleType], str]], ...] = (
     ("version", check_version),
     ("compounding", check_compounding),
     ("tolerance", check_tolerance),
+    ("dates", check_dates),
 )
 
 

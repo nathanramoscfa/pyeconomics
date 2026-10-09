@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """The conventions every pyeconomics model encodes (ADR-0008).
 
-This package holds the date-free numerical conventions: unit kinds and their
+This package holds numerical conventions and the date layer: unit kinds and their
 default bounds (:mod:`~pyeconomics.core.units`), percent and basis-point
 conversion (:mod:`~pyeconomics.core.rates`), compounding
 (:mod:`~pyeconomics.core.compounding`), tolerances
@@ -21,6 +21,14 @@ Examples
 
 """
 
+from pyeconomics.core.calendars import (
+    CALENDAR_IDS,
+    BusinessDayConvention,
+    CalendarId,
+    add_business_days,
+    adjust,
+    is_business_day,
+)
 from pyeconomics.core.compounding import (
     Compounding,
     Frequency,
@@ -30,6 +38,14 @@ from pyeconomics.core.compounding import (
     effective_annual_rate,
     implied_rate,
 )
+from pyeconomics.core.dates import (
+    actual_days,
+    add_months,
+    add_years,
+    is_end_of_month,
+    validate_date,
+)
+from pyeconomics.core.daycount import DayCount, year_fraction
 from pyeconomics.core.errors import (
     ConvergenceError,
     DomainError,
@@ -65,6 +81,7 @@ from pyeconomics.core.rates import (
     format_percent,
     percent_to_decimal,
 )
+from pyeconomics.core.schedule import Schedule, generate
 from pyeconomics.core.tolerance import (
     DEFAULT_TOLERANCES,
     EXACT,
@@ -107,6 +124,7 @@ from pyeconomics.core.warnings import (
 __all__ = [
     "BASIS_POINTS_PER_UNIT",
     "BIT_GENERATOR",
+    "CALENDAR_IDS",
     "DEFAULT_BOUNDS",
     "DEFAULT_DATE_BOUNDS",
     "DEFAULT_ROOT_POLICY",
@@ -120,12 +138,15 @@ __all__ = [
     "SEED_MIN",
     "UNIT_SCHEMA_KEY",
     "Bounds",
+    "BusinessDayConvention",
+    "CalendarId",
     "Compounding",
     "ConvergenceError",
     "Correlation",
     "Count",
     "DateBounds",
     "DateValue",
+    "DayCount",
     "Days",
     "DomainError",
     "Frequency",
@@ -147,12 +168,18 @@ __all__ = [
     "Return",
     "RootPolicy",
     "RootResult",
+    "Schedule",
     "Tolerance",
     "Unit",
     "UnitKind",
     "Volatility",
     "Years",
     "accumulation_factor",
+    "actual_days",
+    "add_business_days",
+    "add_months",
+    "add_years",
+    "adjust",
     "basis_points_to_decimal",
     "bracket_roots",
     "convert_rate",
@@ -166,9 +193,14 @@ __all__ = [
     "find_root",
     "format_basis_points",
     "format_percent",
+    "generate",
     "generator",
     "implied_rate",
+    "is_business_day",
+    "is_end_of_month",
     "percent_to_decimal",
     "provenance",
+    "validate_date",
     "warn",
+    "year_fraction",
 ]

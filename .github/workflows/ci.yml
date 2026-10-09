@@ -249,7 +249,10 @@ jobs:
           pyodide xbuildenv install "$PYODIDE_VERSION"
           test "$(pyodide xbuildenv version)" = "$PYODIDE_VERSION"
           pyodide venv --no-periodic-update "$RUNNER_TEMP/pyodide-venv"
-      # Only Pyodide's package index: pydantic-core also publishes Emscripten
+      # holidays is pure Python and absent from Pyodide's index. Install ONLY
+      # its locked wheel from PyPI without dependencies, then resolve the
+      # compiled baseline and python-dateutil exclusively in Pyodide's index.
+      # pydantic-core also publishes Emscripten
       # wheels on PyPI, which would hide a floor above the version Pyodide
       # bundles.
       - name: Install the wheel with Pyodide's NumPy, SciPy, pandas and pydantic
@@ -257,6 +260,9 @@ jobs:
         run: |
           set -euo pipefail
           index="$PYODIDE_XBUILDENV_PATH/$PYODIDE_VERSION/xbuildenv/pyodide-root/package_index"
+          holidays_version=$(uv run --no-project python -c 'import pathlib, tomllib; print(next(p["version"] for p in tomllib.loads(pathlib.Path("uv.lock").read_text())["package"] if p["name"] == "holidays"))')
+          "$RUNNER_TEMP/pyodide-venv/bin/pip" install --index-url https://pypi.org/simple \
+            --only-binary=:all: --no-deps "holidays==$holidays_version"
           "$RUNNER_TEMP/pyodide-venv/bin/pip" install --index-url "file://$index" dist/*.whl
       - name: Run the smoke script in Pyodide
         shell: bash
