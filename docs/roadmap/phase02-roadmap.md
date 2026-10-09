@@ -1954,7 +1954,11 @@ conversation per phase-boundary hygiene.
       is_business_day and add_business_days. A calendar
       `holidays` does not provide (SIFMA's US bond-market
       calendar is one) is not invented; it waits for a
-      later step with a source. `uv add --no-config
+      later step with a source. Reject dates outside a provider's
+      declared start_year/end_year with InputError instead of
+      accepting its silently empty holiday set (holidays 0.106
+      ends in 2100; TARGET begins in 1999). weekends_only
+      supports the full ADR date range. `uv add --no-config
       holidays` with a floor no higher than the release
       this step tests, then lock and export.
     </requirement>

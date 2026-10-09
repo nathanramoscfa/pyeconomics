@@ -15,6 +15,12 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
 
 ### Added
 
+- Date arithmetic with end-of-month rules, six day-count conventions including
+  irregular ICMA coupon periods, backward coupon schedules with short or long
+  front stubs, and five holiday calendars with business-day adjustments.
+- `holidays>=0.106` as an audited runtime dependency; QuantLib as a test-only
+  oracle for day counts, schedules and calendars. The installed-wheel and
+  Pyodide smoke checks exercise the date layer.
 - Governance and community files: README with status banner and notices,
   CONTRIBUTING, Contributor Covenant 3.0 Code of Conduct, SECURITY policy,
   CITATION.cff, CODEOWNERS, issue forms, defect-class labels, `AGENTS.md` and
