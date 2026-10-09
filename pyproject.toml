@@ -30,7 +30,12 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.4",
+    "pandas>=3.0",
+    "pydantic>=2.12",
+    "scipy>=1.18",
+]
 
 [project.urls]
 Homepage = "https://github.com/pyeconomics-dev/pyeconomics"
@@ -66,9 +71,6 @@ dev = [
     # packaging: scripts/checks/licences.py imports it (Step 8).
     "packaging>=26.3",
     "prek>=0.5.5",
-    # pydantic: only for mypy's pydantic.mypy plugin until Phase 2 makes it a
-    # runtime dependency.
-    "pydantic>=2.13.5",
     "pyright>=1.1.414",
     "ruff>=0.16.10",
     "ty>=0.0.85",

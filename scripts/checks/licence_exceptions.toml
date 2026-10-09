@@ -15,3 +15,27 @@
 # package = "example-package"
 # licence = "BSD License"
 # reason = "Classifier only; LICENSE in the 1.2.3 sdist is BSD-3-Clause (checked by <name>, <date>)."
+
+# Phase 2 Step 1: the runtime baseline (ADR-0008 decision 14). Each licence
+# file below was read in the installed wheel's dist-info on 2026-10-09, and
+# the maintainer approved every entry in that step's pull request.
+
+[[exception]]
+package = "numpy"
+licence = "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+reason = "SPDX expression, all permissive. numpy 2.5.3 dist-info/licenses/: LICENSE.txt is BSD-3-Clause; bundled sources are pythoncapi-compat (0BSD), libdivide (Zlib), splitmix64 and highway's random-inl.h (CC0-1.0), and pcg64, sfc64 and dragon4 (MIT). The win_amd64 wheel's LICENSE.txt (like the other compiled wheels) also lists OpenBLAS (BSD-3-Clause), LAPACK (BSD-3-Clause-Open-MPI) and the GCC runtime library (GPL-3.0-or-later WITH GCC-exception-3.1, whose exception lets non-GPL programs use it). Checked by Claude Opus 5.5, 2026-10-09."
+
+[[exception]]
+package = "scipy"
+licence = "BSD License"
+reason = "Ambiguous classifier only. scipy 1.18.1 dist-info/LICENSE.txt (win_amd64 wheel) is BSD-3-Clause (SciPy Developers) and lists the same OpenBLAS (BSD-3-Clause), LAPACK (BSD-3-Clause-Open-MPI) and GCC runtime (GPL-3.0-or-later WITH GCC-exception-3.1) bundle as numpy; the vendored sources' licences in the wheel are Qhull (scipy/spatial/qhull_src/COPYING_QHULL.txt, permissive) and BSD-3-Clause (duccfft, DOP, uarray). Checked by Claude Opus 5.5, 2026-10-09."
+
+[[exception]]
+package = "pandas"
+licence = "BSD License"
+reason = "Ambiguous classifier only. pandas 3.0.6 dist-info/LICENSE is the BSD 3-Clause License (AQR Capital Management, Lambda Foundry, PyData Development Team and contributors). Checked by Claude Opus 5.5, 2026-10-09."
+
+[[exception]]
+package = "python-dateutil"
+licence = "Apache Software License AND BSD License"
+reason = "Ambiguous classifiers for a dual licence. python-dateutil 2.9.0.post0 dist-info/LICENSE: Apache-2.0 for contributions after 2017-12-01 and relicensed code, BSD-3-Clause for the rest; both are on the allowlist. pandas requires it. Checked by Claude Opus 5.5, 2026-10-09."
