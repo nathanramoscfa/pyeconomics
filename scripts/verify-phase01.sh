@@ -603,7 +603,12 @@ c43() {
   return 0
 }
 c44() {
-  grep -qE '^version:\s*"?1\.0\.0\.dev1"?\s*$' CITATION.cff || fail "version is not 1.0.0.dev1"
+  # Phase 2 moved the version (post-merge addendum): CITATION.cff follows
+  # pyproject.toml at every commit instead of naming 1.0.0.dev1.
+  local cff project
+  cff=$(sed -nE 's/^version:\s*"?([^" ]+)"?\s*$/\1/p' CITATION.cff | head -n 1)
+  project=$("$PY" -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+  [ -n "$cff" ] && [ "$cff" = "$project" ] || fail "CITATION.cff says ${cff:-no version}, pyproject.toml $project"
   grep -qE '^license:\s*"?Apache-2\.0"?\s*$' CITATION.cff || fail "license is not Apache-2.0"
 }
 c45() {
@@ -681,7 +686,7 @@ run_static() {
   check 41 "Community and agent files; FUNDING.yml names thanks_dev:" c41
   check 42 "Issue forms: required citation, required terms URL, blank issues off" c42
   check 43 "README: CFA notice verbatim, 0.2.x pointer, disambiguation, no wishlist" c43
-  check 44 "CITATION.cff: 1.0.0.dev1, Apache-2.0" c44
+  check 44 "CITATION.cff: version equals pyproject.toml's, Apache-2.0" c44
   check 45 "AGENTS.md lifecycle, gate, Triage rule; CLAUDE.md imports it" c45
   check 46 "scripts/verify-phase01.sh is 100755 in the index" c46
   check 47 "docs/phase01-qa-findings.md exists" c47
@@ -722,7 +727,9 @@ v7_2() {
   uv venv --no-config -q "$TMP/clean" || return 1
   local py expected found
   py=$(venv_python "$TMP/clean")
-  uv pip install --no-config --no-index --python "$py" "$TMP"/dist/*.whl || return 1
+  # The wheel has runtime dependencies since Phase 2 (post-merge addendum),
+  # so they come from PyPI; --no-config keeps a user-level index out.
+  uv pip install --no-config --python "$py" "$TMP"/dist/*.whl || return 1
   expected=$(uv version --short)
   found=$(cd "$TMP" && "$py" -c 'import pyeconomics; print(pyeconomics.__version__)')
   echo "installed $found; pyproject.toml says $expected"
