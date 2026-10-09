@@ -3,9 +3,10 @@
 # lint, types and lockfile jobs run the .pre-commit-config.yaml hooks by id,
 # as security.yml does, so the checks a commit passes locally are the checks a
 # pull request passes here. `test` is the one aggregate status check that
-# branch protection requires for the whole matrix; ty is informational until
-# it reaches 1.0 and is never required. pyright is editor-only: its PyPI
-# wrapper fetches Node at first run.
+# branch protection requires for the whole matrix and for `pyodide`, which
+# runs scripts/smoke.py against the wheel in Pyodide; ty is informational
+# until it reaches 1.0 and is never required. pyright is editor-only: its
+# PyPI wrapper fetches Node at first run.
 name: ci
 
 on:
@@ -179,6 +180,93 @@ jobs:
           found=$("$RUNNER_TEMP/clean/bin/python" -c 'import pyeconomics; print(pyeconomics.__version__)')
           echo "installed ${found}, pyproject.toml says ${expected}"
           test "$found" = "$expected"
+      # scripts/smoke.py exercises the installed wheel's core and refuses to
+      # run against a checkout, so it runs from a copy outside it.
+      - name: Run the smoke script against the installed wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/smoke"
+          cp scripts/smoke.py "$RUNNER_TEMP/smoke/"
+          cd "$RUNNER_TEMP/smoke"
+          "$RUNNER_TEMP/clean/bin/python" smoke.py
+
+  pyodide:
+    name: pyodide
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      # ADR-0002 and ADR-0008 decision 14: the wheel installs and runs in the
+      # current Pyodide with Pyodide's own builds of its dependencies. Every
+      # tool is pinned exactly, and pyodide-build does not verify the
+      # cross-build environment's checksum, so this job does.
+      PYODIDE_VERSION: "314.0.7"
+      XBUILDENV_SHA256: "682bc46d63b860cbc17af17531718dd741d0b9e68de598874280f06706f7d58d"
+      PYODIDE_CLI: "pyodide-cli==0.5.0"
+      PYODIDE_BUILD: "pyodide-build==0.39.1"
+      # The tools' own dependencies resolve as PyPI stood on this date.
+      TOOLS_EXCLUDE_NEWER: "2026-10-09T00:00:00Z"
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Pyodide 314.0.7 runs Python 3.14, and pyodide-build needs the same
+      # minor version on the host.
+      - name: Set up uv and Python 3.14
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          python-version: "3.14"
+          enable-cache: true
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.21.0"
+      - name: Build the wheel
+        run: uv build --wheel --out-dir dist
+      - name: Install the Pyodide cross-build environment and a Pyodide venv
+        shell: bash
+        run: |
+          set -euo pipefail
+          pyodide() {
+            uvx --python 3.14 --exclude-newer "$TOOLS_EXCLUDE_NEWER" \
+              --from "$PYODIDE_CLI" --with "$PYODIDE_BUILD" pyodide "$@"
+          }
+          export PYODIDE_XBUILDENV_PATH="$RUNNER_TEMP/pyodide-xbuildenv"
+          echo "PYODIDE_XBUILDENV_PATH=$PYODIDE_XBUILDENV_PATH" >> "$GITHUB_ENV"
+          archive="$RUNNER_TEMP/xbuildenv.tar.gz"
+          curl -fsSL -o "$archive" \
+            "https://github.com/pyodide/pyodide/releases/download/${PYODIDE_VERSION}/xbuildenv-${PYODIDE_VERSION}.tar.gz"
+          echo "${XBUILDENV_SHA256}  ${archive}" | sha256sum -c -
+          mkdir -p "$PYODIDE_XBUILDENV_PATH/$PYODIDE_VERSION"
+          tar -xzf "$archive" -C "$PYODIDE_XBUILDENV_PATH/$PYODIDE_VERSION"
+          pyodide xbuildenv install "$PYODIDE_VERSION"
+          test "$(pyodide xbuildenv version)" = "$PYODIDE_VERSION"
+          pyodide venv --no-periodic-update "$RUNNER_TEMP/pyodide-venv"
+      # Only Pyodide's package index: pydantic-core also publishes Emscripten
+      # wheels on PyPI, which would hide a floor above the version Pyodide
+      # bundles.
+      - name: Install the wheel with Pyodide's NumPy, SciPy, pandas and pydantic
+        shell: bash
+        run: |
+          set -euo pipefail
+          index="$PYODIDE_XBUILDENV_PATH/$PYODIDE_VERSION/xbuildenv/pyodide-root/package_index"
+          "$RUNNER_TEMP/pyodide-venv/bin/pip" install --index-url "file://$index" dist/*.whl
+      - name: Run the smoke script in Pyodide
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/pyodide-smoke"
+          cp scripts/smoke.py "$RUNNER_TEMP/pyodide-smoke/"
+          cd "$RUNNER_TEMP/pyodide-smoke"
+          "$RUNNER_TEMP/pyodide-venv/bin/python" -c 'import numpy, pandas, pydantic, scipy; print("numpy", numpy.__version__, "scipy", scipy.__version__, "pandas", pandas.__version__, "pydantic", pydantic.VERSION)'
+          "$RUNNER_TEMP/pyodide-venv/bin/python" smoke.py
 
   lockfile:
     name: lockfile
@@ -276,10 +364,11 @@ jobs:
   test:
     name: test
     # The single status check that branch protection requires for the whole
-    # matrix. ty is deliberately absent. A job skipped by design (pr-title and
-    # dco on a push) passes; a failed or cancelled one does not.
+    # matrix and the Pyodide smoke test. ty is deliberately absent. A job
+    # skipped by design (pr-title and dco on a push) passes; a failed or
+    # cancelled one does not.
     if: always()
-    needs: [lint, types, tests, package, lockfile, pr-title, dco]
+    needs: [lint, types, tests, package, pyodide, lockfile, pr-title, dco]
     runs-on: ubuntu-latest
     permissions: {}
     steps:

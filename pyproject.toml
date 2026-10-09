@@ -122,8 +122,10 @@ convention = "numpy"
 # pytest checks with assert, test names document themselves, and expected
 # values are literals.
 "tests/**" = ["S101", "D", "PLR2004"]
-# The checks are CLIs: printing their report to stdout/stderr is their output.
+# The checks and the smoke test are CLIs: printing their report to
+# stdout/stderr is their output.
 "scripts/checks/*.py" = ["T201"]
+"scripts/smoke.py" = ["T201"]
 # ADR-0008 names these modules; they are only ever imported as
 # pyeconomics.core.random and pyeconomics.core.warnings, never top-level.
 "src/pyeconomics/core/random.py" = ["A005"]
