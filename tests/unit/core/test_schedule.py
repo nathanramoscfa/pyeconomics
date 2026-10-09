@@ -146,7 +146,7 @@ def test_adjustment_preserves_accruals() -> None:
         end_of_month,
     )
     assert [day.isoformat() for day in adjusted.payment_dates] == [
-        day.ISO() for day in list(oracle)[1:]
+        oracle[i].ISO() for i in range(1, len(oracle))
     ]
     for left, right in pairwise(adjusted.accrual_dates):
         assert add_months(left, 3, end_of_month=True) == right
@@ -179,9 +179,9 @@ def test_bad_options_and_too_many_dates() -> None:
     with pytest.raises(InputError, match="MAX_ARRAY_LENGTH"):
         generate(first, last, Frequency.DAILY, end_of_month=False)
     with pytest.raises(InputError, match="Frequency"):
-        generate(first, last, "monthly", end_of_month=False)  # type: ignore[arg-type]
+        generate(first, last, "monthly", end_of_month=False)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type] - deliberate invalid input
     with pytest.raises(InputError, match="stub"):
-        generate(first, last, Frequency.ANNUAL, stub="short_back", end_of_month=False)  # type: ignore[arg-type]
+        generate(first, last, Frequency.ANNUAL, stub="short_back", end_of_month=False)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type] - deliberate invalid input
     result = generate(first, last, Frequency.ANNUAL, end_of_month=True)
     assert result.accrual_dates[0] == first
     assert result.accrual_dates[-1] == last

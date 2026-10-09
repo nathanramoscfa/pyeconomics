@@ -284,7 +284,7 @@ def test_icma_requires_consistent_references_even_for_equal_dates() -> None:
             frequency=Frequency.MONTHLY,
         )
     with pytest.raises(InputError, match="DayCount"):
-        year_fraction(first, last, "act_360")  # type: ignore[arg-type]
+        year_fraction(first, last, "act_360")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type] - deliberate invalid input
 
 
 @pytest.mark.parametrize(

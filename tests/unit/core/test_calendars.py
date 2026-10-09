@@ -124,11 +124,11 @@ def test_december_observance_from_next_year() -> None:
 def test_invalid_arguments() -> None:
     day = dt.date(2024, 1, 1)
     with pytest.raises(InputError, match="unknown calendar"):
-        is_business_day(day, "sifma")  # type: ignore[arg-type]
+        is_business_day(day, "sifma")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type] - deliberate invalid input
     with pytest.raises(InputError, match="explicit calendar"):
         adjust(day, convention=BusinessDayConvention.FOLLOWING)
     with pytest.raises(InputError, match="BusinessDayConvention"):
-        adjust(day, "target2", "following")  # type: ignore[arg-type]
+        adjust(day, "target2", "following")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type] - deliberate invalid input
     assert adjust(day) == day
 
 
