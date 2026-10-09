@@ -6201,6 +6201,15 @@ S in planning. New conversation per phase-boundary hygiene.
       status 403. If Sponsors approval is still pending at
       merge time, the step is not complete until it is
       live.
+      Amended 2026-10-08 by the maintainer: Sponsors
+      onboarding stalled on a GitHub Support ticket (a
+      Stripe account linked to the wrong legal entity), so
+      Step 11 merges with thanks.dev live and the Sponsors
+      listing tracked in issue #68. Until the listing is
+      live, FUNDING.yml and funding.json name thanks.dev
+      only; #68 restores the Sponsors entries, and Step 12's
+      V11.4 must see the listing live before Phase 1 is
+      complete.
     </requirement>
 
     <requirement>
@@ -6239,9 +6248,11 @@ S in planning. New conversation per phase-boundary hygiene.
   carries its class label.
 - `AGENTS.md` states the lifecycle, the security gate, the Triage rule
   and the commit conventions, and `CLAUDE.md` imports it.
-- Gate G1: the GitHub Sponsors profile returns 200 without following
-  redirects, `https://api.thanks.dev/v1/profile/gh/pyeconomics-dev` returns
-  200, and `funding.json` validates against the funding.json schema.
+- Gate G1: `https://api.thanks.dev/v1/profile/gh/pyeconomics-dev` returns
+  200, `funding.json` validates against the funding.json schema, and the
+  GitHub Sponsors listing is tracked in issue #68 (amended by the maintainer
+  on 2026-10-08; Step 12's V11.4 requires it live, returning 200 without
+  following redirects, before Phase 1 is complete).
 - **Security gate clean** (always the final criterion): every commit
   passed the prek gate and the security workflow; public files carry no
   PII beyond the maintainer's public address; SECURITY.md routes reports
@@ -6679,7 +6690,11 @@ phase-boundary hygiene.
     41. README.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md,
         SECURITY.md, CHANGELOG.md, CITATION.cff, NOTICE,
         AGENTS.md, CLAUDE.md, funding.json,
-        .github/CODEOWNERS and .github/FUNDING.yml exist.
+        .github/CODEOWNERS and .github/FUNDING.yml exist,
+        and FUNDING.yml names both `github:` and
+        `thanks_dev:` (issue #68 restores `github:`; if it
+        is still open, this check fails and Phase 1 is not
+        complete).
     42. The issue forms exist: bug.yml, model-request.yml
         (a required citation field),
         data-source-request.yml (a required terms-of-use URL
@@ -7082,7 +7097,7 @@ workflow above maps directly to the corresponding row below.
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
 | V11.2 | The GitHub community profile lists README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, issue templates and the PR template. | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
-| V11.4 | The GitHub Sponsors profile returns 200 without following redirects, thanks.dev's profile API returns 200, and `funding.json` validates. | `--live`.                                            |
+| V11.4 | The GitHub Sponsors profile returns 200 without following redirects (issue #68), thanks.dev's profile API returns 200, and `funding.json` validates and lists both channels. | `--live`.                                            |
 
 ### V12 — CI integration + security
 
@@ -7376,6 +7391,14 @@ forward whatever is still open here.
   Owned by issue #65: Python 3.15
   joins `ci.yml`'s matrix, with its classifier, at its final release
   (expected 2026-10-09; ADR-0010).
+- From Step 11 (governance). Patched: Step 11's funding requirement and
+  criterion (amended by the maintainer on 2026-10-08), and Step 12
+  (static check 41 and V11.4 require the Sponsors listing; the `--live`
+  checks verify Sponsors without following redirects and thanks.dev
+  through its API). Owned by issue #68, closed in Step 12: the
+  `pyeconomics-dev` GitHub Sponsors listing goes live after GitHub
+  Support detaches the wrongly linked Stripe account, and FUNDING.yml
+  and funding.json regain their Sponsors entries.
 
 ---
 
