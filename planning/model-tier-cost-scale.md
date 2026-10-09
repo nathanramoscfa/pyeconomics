@@ -85,8 +85,10 @@ table and surface material cost / availability / capability constraints.
 | Gemini 3 Flash             | $0.50 | –           | $0.05      | $3.00  | Low    | Hidden by default |
 | Gemini 3 Pro               | $2.00 | –           | $0.20      | $12.00 | Medium | Hidden by default |
 | Gemini 3 Pro Image Preview | $2.00 | –           | $0.20      | $12.00 | Medium | Hidden by default; Native image generation model optimized for speed, flexibility, and contextual understanding; Text input and output priced the same as Gemini 3 Pro; Image output: $120/1M tokens (~$0.134 per 1K/2K image, ~$0.24 per 4K image); Preview models may change before becoming stable and have more restrictive rate limits |
+| Gemini 3.1 Flash-Lite      | $0.25 | –           | –          | $1.50  | Low    | Provider-direct Google API per-token pricing (not via the Cursor pool) |
 | Gemini 3.1 Pro             | $2.00 | –           | $0.20      | $12.00 | Medium | -                 |
 | Gemini 3.5 Flash           | $1.50 | –           | $0.15      | $9.00  | Low    | Hidden by default |
+| Gemini 3.5 Flash-Lite      | $0.30 | –           | –          | $2.50  | Low    | Provider-direct Google API per-token pricing (not via the Cursor pool) |
 | Gemini 3.6 Flash           | $1.50 | –           | $0.15      | $7.50  | Low    | Hidden by default |
 | Gemini 3.7 Flash           | $0.75 | –           | $0.075     | $3.50  | Low    | Hidden by default |
 | Gemini 3.8 Flash           | $0.75 | –           | $0.075     | $3.50  | Low    | -                 |
@@ -263,6 +265,8 @@ appear here.
 | gemini-3.6-flash | $7.50   | Low          | Low          | ✓      |
 | gemini-3.7-flash | $3.50   | Low          | Low          | ✓      |
 | gemini-3.8-flash | $3.50   | Low          | Low          | ✓      |
+| gemini-3.5-flash-lite | $2.50 | Low        | Low          | ✓      |
+| gemini-3.1-flash-lite | $1.50 | Low        | Low          | ✓      |
 | mistral-medium-3.5 | $7.50 | Low          | Low          | ✓      |
 | grok-4.5         | $6.00   | Low          | Low          | ✓      |
 | grok-4.6         | $6.00   | Low          | Low          | ✓      |
@@ -312,6 +316,8 @@ recommendable engines.
 
 | Model id           | Output | Tier | Change                                                                                                                     |
 | ------------------ | ------ | ---- | -------------------------------------------------------------------------------------------------------------------------- |
+| Gemini 3.5 Flash-Lite | $2.50 | Low | New 2026-10-07 via the provider-discovery lane. Google's own Gemini API pricing page now prices gemini-3.5-flash-lite at $0.30/$2.50 (previously listed there without a price), and it is not on Cursor's pricing page. Provider-direct (Federation rule: prices owned by the Google provider snapshot). The selector pass adds it to `<model-options>` in the Low bucket |
+| Gemini 3.1 Flash-Lite | $1.50 | Low | New 2026-10-07 via the provider-discovery lane. Google's own Gemini API pricing page now prices gemini-3.1-flash-lite at $0.25/$1.50 (previously listed there without a price), and it is not on Cursor's pricing page. Provider-direct (Federation rule: prices owned by the Google provider snapshot). The selector pass adds it to `<model-options>` in the Low bucket |
 | GPT-6.1 Sol        | $10.00 | Medium | New 2026-10-01 via the provider-discovery lane. OpenAI's own pricing page lists gpt-6.1-sol at $2/$10, and it is not on Cursor's pricing page. Provider-direct (Federation rule: prices owned by `catalog-openai.json`). The selector pass adds it to `<model-options>` in the Medium bucket |
 | Claude Sonnet 5.5  | $10.00 | Medium | New 2026-09-29 on Cursor's pricing page — Anthropic's Sonnet 5 successor at the same $2/$10 rates (US-only endpoints 10% higher at $2.20/$11); visible by default. Selector pass adds it to `<model-options>`; Anthropic is provider-direct, so `catalog-anthropic.json` must carry it for the G4 gate |
 | Claude Sonnet 5    | $10.00 | Medium | Notes refreshed 2026-09-29 — Cursor flipped Sonnet 5 to "Hidden by default" after the Sonnet 5.5 launch (pricing unchanged) |
@@ -433,7 +439,5 @@ model per line, in exactly this form:
 - xai/grok-4.20-0309-reasoning — dated (0309) snapshot of the Grok 4.20 generation; the catalog carries grok-4.3 / grok-4.6 / grok-4.7 as the Grok line (declined 2026-09-25)
 - xai/grok-4.20-multi-agent-0309 — dated (0309) multi-agent variant of the Grok 4.20 generation; not a fixed single-engine model the catalog tracks (declined 2026-09-25)
 - xai/grok-build-0.1 — build-agent preview removed from the catalog on 2026-07-15 when Cursor delisted it; retired (declined 2026-09-25)
-- google/Gemini 3.1 Flash-Lite — no price on the provider page; re-checked each run (declined 2026-10-01)
-- google/Gemini 3.1 Flash-Lite Image — no price on the provider page; re-checked each run (declined 2026-10-01)
-- google/Gemini 3.5 Flash-Lite — no price on the provider page; re-checked each run (declined 2026-10-01)
-- google/Gemini Robotics Er 2 — no price on the provider page; re-checked each run (declined 2026-10-01)
+- google/Gemini 3.1 Flash-Lite Image — an image, audio, video, embedding, robotics or computer-use model; the catalog rates general text models (declined 2026-10-07)
+- google/Gemini Robotics Er 2 — an image, audio, video, embedding, robotics or computer-use model; the catalog rates general text models (declined 2026-10-07)
