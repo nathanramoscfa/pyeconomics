@@ -982,13 +982,13 @@
       <model id="claude-opus-5" name="Opus 5"
              input-price-per-1m="$5.00" output-price-per-1m="$25.00"
              jurisdiction="us"
-             tier-coding="A" tier-planning="A" tier-agentic="S"
+             tier-coding="S" tier-planning="A" tier-agentic="S"
              tier-multimodal="A" tier-long-context="A" tier-knowledge="A"
              tier-speed="D"
              headline-benchmarks="AA Intelligence Index 50.8 (max); HLE 54.9% (max); Terminal-Bench 2.1 89.1 (max); τ²-bench banking pass_1 42.1%"
              pricing-notes="Hidden by default; Requires Max Mode on legacy request-based plans; Fast mode (`claude-opus-5-fast`) requires Max Mode on legacy request-based plans; Up to 1M tokens with extended context at the same per-token rates (no long-context surcharge)"
              prose-generated="best-for"
-             best-for="Frontier-class agentic work, plus strong coding, planning, multimodal input, long context and knowledge, at a very high price. Its AA Intelligence Index of 50.8 ranks 6th of 56 measured models. Weakest at speed (D). Superseded by Opus 5.5." superseded-by="claude-opus-5-5" superseded-on="2026-09-24"/>
+             best-for="Frontier-class coding and agentic work, plus strong planning, multimodal input, long context and knowledge, at a very high price. Its AA Intelligence Index of 50.8 ranks 6th of 56 measured models. Weakest at speed (D). Superseded by Opus 5.5." superseded-by="claude-opus-5-5" superseded-on="2026-09-24"/>
       <model id="claude-fable-5" name="Fable 5"
              input-price-per-1m="$10.00" output-price-per-1m="$50.00"
              jurisdiction="us"
@@ -1541,10 +1541,10 @@
              tier-coding="A" tier-planning="A" tier-agentic="A"
              tier-multimodal="B" tier-long-context="A" tier-knowledge="A"
              tier-speed="B"
-             headline-benchmarks="AA Intelligence Index 44.3 (high); HLE 42.9% (high); Terminal-Bench 2.1 88.4 (high); τ²-bench banking pass_1 50.7%"
+             headline-benchmarks="AA Intelligence Index 44.2 (xhigh); HLE 44.1%; SciCode 53.0; Terminal-Bench 4.0 17.2; AA-LCR 0.810; Terminal-Bench 2.1 88.4 (high); τ²-bench banking pass_1 43.3%"
              pricing-notes="Jointly trained by Cursor and SpaceXAI"
-             prose-generated="best-for"
-             best-for="Strong coding, planning, agentic work, long context and knowledge at a low price. Its AA Intelligence Index of 44.3 ranks 13th of 56 measured models. Superseded by Grok 4.7." superseded-by="grok-4.7" superseded-on="2026-09-24"/>
+             prose-generated="best-for headline-benchmarks"
+             best-for="Strong coding, planning, agentic work, long context and knowledge at a low price. Its AA Intelligence Index of 44.2 ranks 13th of 56 measured models. Superseded by Grok 4.7." superseded-by="grok-4.7" superseded-on="2026-09-24"/>
     </tier>
   </model-options>
 
@@ -1870,7 +1870,7 @@
         context (opus-4.7 1M, opus-4.8 1M, claude-opus-5 1M, claude-opus-5-5 1M, gemini-3.1-pro 1M, gemini-3.5-flash-lite 1M) over forcing
         a smaller-context model into Max Mode truncation.
       - For PRIMARY = `coding` at S-tier requirement, the candidate set is
-        muse-spark-1.3, glm-5.3, claude-sonnet-5-5, gpt-6-sol, claude-opus-5-5, claude-fable-5, claude-fable-5.1, gpt-6-astra; cost tie-breaker favors
+        muse-spark-1.3, glm-5.3, claude-sonnet-5-5, gpt-6-sol, claude-opus-5-5, claude-opus-5, claude-fable-5, claude-fable-5.1, gpt-6-astra; cost tie-breaker favors
         muse-spark-1.3 when the ratings are equivalent for the prompt.
       - Default to composer-2.5 for routine multi-file implementation when a
         coding-A rating suffices; escalate only on a concrete capability
