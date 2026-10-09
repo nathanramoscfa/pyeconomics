@@ -70,9 +70,13 @@ dev = [
     "mypy>=2.4.0",
     # packaging: scripts/checks/licences.py imports it (Step 8).
     "packaging>=26.3",
+    # pandas-stubs, scipy-stubs: mypy strict types pandas and SciPy, which ship
+    # no py.typed (Phase 2 Step 1).
+    "pandas-stubs>=3.0.5.260914",
     "prek>=0.5.5",
     "pyright>=1.1.414",
     "ruff>=0.16.10",
+    "scipy-stubs>=1.18.1.1",
     "ty>=0.0.85",
 ]
 docs = []
@@ -115,10 +119,15 @@ ignore = [
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-# pytest checks with assert, and test names document themselves.
-"tests/**" = ["S101", "D"]
+# pytest checks with assert, test names document themselves, and expected
+# values are literals.
+"tests/**" = ["S101", "D", "PLR2004"]
 # The checks are CLIs: printing their report to stdout/stderr is their output.
 "scripts/checks/*.py" = ["T201"]
+# ADR-0008 names these modules; they are only ever imported as
+# pyeconomics.core.random and pyeconomics.core.warnings, never top-level.
+"src/pyeconomics/core/random.py" = ["A005"]
+"src/pyeconomics/core/warnings.py" = ["A005"]
 
 # The formatter runs at its defaults.
 [tool.ruff.format]

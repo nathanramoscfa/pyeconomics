@@ -499,6 +499,20 @@ wheels = [
 ]
 
 [[packages]]
+name = "numpy-typing-compat"
+version = "20260602.2.5"
+index = "https://pypi.org/simple"
+sdist = { url = "https://files.pythonhosted.org/packages/08/db/5cd1d99caea4bf39fd477686ded4b9b70dff3c7673b5d84ef2d96a4f5aab/numpy_typing_compat-20260602.2.5.tar.gz", upload-time = 2026-06-02T15:52:39Z, size = 4593, hashes = { sha256 = "1885a678e9a24564839ed5d1711c0031735fb7de7f0b5ed88d550e5d45a8d4f9" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/b1/a4/9376b38b7387a0296b1f626b966e5503578625c9673777db1b45bf70acb0/numpy_typing_compat-20260602.2.5-py3-none-any.whl", upload-time = 2026-06-02T15:52:34Z, size = 5881, hashes = { sha256 = "21ba7757c8924d359a9ed3ab2163c282a70983ae64498fdba6d1892a6641c8b1" } }]
+
+[[packages]]
+name = "optype"
+version = "0.19.0"
+index = "https://pypi.org/simple"
+sdist = { url = "https://files.pythonhosted.org/packages/51/cc/ab0d908a4fd70493628cde3ce0f809c2b0d69b645af52202da4f1b0aeea3/optype-0.19.0.tar.gz", upload-time = 2026-10-02T23:14:27Z, size = 116633, hashes = { sha256 = "50ce4c0ca419026eeae4130dc90c6a0b9a0b54ffe1d940fc26e8d0058903de4c" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/a9/2c/8de9d2c9a328419b28feb53081460d901e950b8b676914959a6e1beecc83/optype-0.19.0-py3-none-any.whl", upload-time = 2026-10-02T23:14:25Z, size = 141516, hashes = { sha256 = "31bff7d2e51e88916a11affed80dbe306ca9e74c76b93b143f1355bb127a7a8c" } }]
+
+[[packages]]
 name = "packaging"
 version = "26.3"
 index = "https://pypi.org/simple"
@@ -561,6 +575,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/73/3d/1b142bd0d0f1326a5d98c91c955b923cd1e06b5eecb428cd9d8817fa01c0/pandas-3.0.6-cp315-cp315t-win_amd64.whl", upload-time = 2026-09-17T23:23:12Z, size = 10161518, hashes = { sha256 = "83e91d15738d7783c050197cef2f2cf82fc6353dae9865aa87ed1fa16aa4d55a" } },
     { url = "https://files.pythonhosted.org/packages/0b/a3/6419c14da2adc1f09a6a183b8f91d7494d325b287f4ca984ac04f663638a/pandas-3.0.6-cp315-cp315t-win_arm64.whl", upload-time = 2026-09-17T23:23:15Z, size = 9364529, hashes = { sha256 = "963ca21199097a84c7827c4678b04e30833084fbf8ef44fde3fa7180a29f8fa0" } },
 ]
+
+[[packages]]
+name = "pandas-stubs"
+version = "3.0.5.260914"
+index = "https://pypi.org/simple"
+sdist = { url = "https://files.pythonhosted.org/packages/c1/93/8948ae6c1e1e3d6833596fd266f7be2d27c1451b8be094975ad42c5e842e/pandas_stubs-3.0.5.260914.tar.gz", upload-time = 2026-09-14T16:42:35Z, size = 117622, hashes = { sha256 = "3f6fc1f147f68fd89c007105e7c94a948acb4ecd7eb20dc1c02e153c4ed5c250" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/9a/cb/5ad79e02a556cc23fed5816de0109fa8af660c66cfa5f4af74c3e8d4cd26/pandas_stubs-3.0.5.260914-py3-none-any.whl", upload-time = 2026-09-14T16:42:33Z, size = 177344, hashes = { sha256 = "39a1300c5c5c55fdf609e3476805decce5d5015539a4dcb683449f8feaeee2fb" } }]
 
 [[packages]]
 name = "pathspec"
@@ -855,6 +876,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5c/a2/5b7d5270621ab7cfa3f7766067bf95dc360b5efb6394694e8143b4156e2b/scipy-1.18.1-cp315-cp315t-win_amd64.whl", upload-time = 2026-08-21T23:28:40Z, size = 37408295, hashes = { sha256 = "5632e3ae3d09197c446310cd5187de63e28448ce22f0f67b2b93d97503c0c230" } },
     { url = "https://files.pythonhosted.org/packages/63/ad/741c19fcb66755ff953daf9243af8480e4bf3d7fbe57583c178c7d2b6b51/scipy-1.18.1-cp315-cp315t-win_arm64.whl", upload-time = 2026-08-21T23:28:45Z, size = 25319710, hashes = { sha256 = "eda632a7981f69730d6281f451db9c1c370993a2c0d7ddb43e2a809a2862b83a" } },
 ]
+
+[[packages]]
+name = "scipy-stubs"
+version = "1.18.1.1"
+index = "https://pypi.org/simple"
+sdist = { url = "https://files.pythonhosted.org/packages/dc/76/13f1b922b32ec866389b6f359cf6c29bdb74726df130f0a23a95c72486c1/scipy_stubs-1.18.1.1.tar.gz", upload-time = 2026-09-20T22:37:38Z, size = 460131, hashes = { sha256 = "87995ba945f04a3c3fb9cdb5c06d093cf3637ca1271ae6799eb8030b63fb2263" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/27/53/9b6dff8225ef3dbc203b1c2329d9efb2b66dfd51d5c2bf048c0676f47731/scipy_stubs-1.18.1.1-py3-none-any.whl", upload-time = 2026-09-20T22:37:37Z, size = 665244, hashes = { sha256 = "1a48be1702cad1ae9aa850c62ed157c988d990305880511d0e38994d502664f4" } }]
 
 [[packages]]
 name = "six"
