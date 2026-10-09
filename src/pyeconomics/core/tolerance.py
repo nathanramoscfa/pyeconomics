@@ -117,7 +117,7 @@ DEFAULT_TOLERANCES: Final[Mapping[UnitKind, Tolerance]] = MappingProxyType(
         UnitKind.MONEY: _LEVEL,
         UnitKind.YEARS: _LEVEL,
         UnitKind.INDEX_LEVEL: _LEVEL,
-        UnitKind.PERIODS: EXACT,
+        UnitKind.PERIODS: _LEVEL,
         UnitKind.COUNT: EXACT,
         UnitKind.DAYS: EXACT,
         UnitKind.DATE: EXACT,

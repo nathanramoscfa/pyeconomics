@@ -355,7 +355,15 @@ c18() {
     grep -qE "^\| \[$n\]\($(basename "$f")\) \|.*\| Accepted \| $date \|" docs/adr/README.md \
       || fail "index row for $n is not Accepted with $date"
   done
-  grep -qE '^\| 0008 \|.*Reserved' docs/adr/README.md || fail "0008 not reserved in the index"
+  # ADR-0008: reserved in Phase 1, accepted by Phase 2 Step 1 (post-merge
+  # addendum in the phase roadmap). Either state passes; a half-done one fails.
+  grep -qE '^\| 0008 \|.*Reserved' docs/adr/README.md && return 0
+  f=$(compgen -G "docs/adr/0008-*.md" | head -n 1)
+  [ -n "$f" ] || fail "0008 is neither reserved nor written"
+  grep -qE '^- Status: Accepted\s*$' "$f" || fail "$f is not Accepted"
+  date=$(sed -nE 's/^- Date: ([0-9-]+).*/\1/p' "$f" | head -n 1)
+  grep -qE "^\| \[0008\]\($(basename "$f")\) \|.*\| Accepted \| $date \|" docs/adr/README.md \
+    || fail "index row for 0008 is neither reserved nor Accepted with $date"
 }
 
 # Step 7 — reset and skeleton
@@ -647,7 +655,7 @@ run_static() {
   check 15 "Recorder's PEP 723 block pins pyeconomics==0.2.6" c15
   check 16 "No dev/ tracked; origin has only main, legacy, archive/ and open-PR heads" c16
   check 17 "docs/adr: README, template and nine ADRs" c17
-  check 18 "Nine ADRs Accepted and indexed with dates; 0008 reserved" c18
+  check 18 "Nine ADRs Accepted and indexed with dates; 0008 reserved or Accepted" c18
   check 19 "No 0.2.x path tracked on main" c19
   check 20 "src/pyeconomics reads importlib.metadata; py.typed" c20
   check 21 "pyproject: uv_build, >=3.12, Apache-2.0, groups; no 'cfa' names" c21

@@ -86,14 +86,14 @@ def test_decimal_kinds_default_to_1e_12_absolute(kind: UnitKind) -> None:
     assert default_tolerance(kind) == Tolerance(abs_tol=1e-12, rel_tol=1e-9)
 
 
-@pytest.mark.parametrize("kind", [UnitKind.MONEY, UnitKind.YEARS, UnitKind.INDEX_LEVEL])
+@pytest.mark.parametrize(
+    "kind", [UnitKind.MONEY, UnitKind.YEARS, UnitKind.INDEX_LEVEL, UnitKind.PERIODS]
+)
 def test_level_kinds_default_to_1e_9_absolute(kind: UnitKind) -> None:
     assert default_tolerance(kind) == Tolerance(abs_tol=1e-9, rel_tol=1e-9)
 
 
-@pytest.mark.parametrize(
-    "kind", [UnitKind.PERIODS, UnitKind.COUNT, UnitKind.DAYS, UnitKind.DATE]
-)
+@pytest.mark.parametrize("kind", [UnitKind.COUNT, UnitKind.DAYS, UnitKind.DATE])
 def test_whole_and_date_kinds_default_to_exact(kind: UnitKind) -> None:
     assert default_tolerance(kind) is EXACT
 
