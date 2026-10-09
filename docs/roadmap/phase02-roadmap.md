@@ -1,6 +1,6 @@
 # Phase 2 Roadmap — Model Engine & Core Catalog
 
-**Status:** Not started
+**Status:** In progress
 
 ## Overview
 
@@ -898,9 +898,9 @@ does not arise in this phase.
 
 ---
 
-## Step 1 — ADR-0008 Numerical Conventions and Core Types
+## Step 1 — ADR-0008 Numerical Conventions and Core Types ✅
 
-**Status:** Not started
+**Status:** Complete — PR #71 (2026-10-09)
 
 > **Goal:** Fix the numerical conventions every later layer encodes, and lay
 > the runtime foundation beneath them. Land this roadmap and the refreshed
@@ -8920,7 +8920,7 @@ workflow above maps directly to the corresponding row below.
 
 | Step    | Scope                            | Model             | Platform     | Reasoning dial      | Thinking | Conv | Status      |
 | ------- | -------------------------------- | ----------------- | ------------ | ------------------- | -------- | ---- | ----------- |
-| 1       | ADR-0008 + core conventions      | Claude Opus 5.5   | Claude Code  | Effort XHigh        | On       | New  | Not started |
+| 1       | ADR-0008 + core conventions      | Claude Opus 5.5   | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #71 |
 | 2       | Dates, day counts, calendars     | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Not started |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
