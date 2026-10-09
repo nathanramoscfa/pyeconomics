@@ -6238,9 +6238,13 @@ S in planning. New conversation per phase-boundary hygiene.
 - The README carries the CFA notice verbatim, the 0.2.x pointer with the
   advisory link, the disambiguation note and "As is; not investment
   advice", and no 2024 wishlist section.
-- `gh api repos/OWNER/REPO/community/profile` reports README, CONTRIBUTING,
-  CODE_OF_CONDUCT, SECURITY, issue templates and the PR template as
-  present.
+- The repository's community standards are complete: `gh api
+  repos/OWNER/REPO/community/profile` reports README, CONTRIBUTING,
+  CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled`
+  is true; and the public page `https://github.com/OWNER/REPO/community`
+  checks Security policy and Issue templates. (The REST profile has no
+  security-policy field, and reports `issue_template` as null for YAML
+  issue forms, a known GitHub API gap.)
 - `uvx cffconvert --validate` passes; `CITATION.cff` names `1.0.0.dev1`,
   `Apache-2.0` and the author without ®; `gh api user --jq .name` prints
   "Nathan Ramos, CFA".
@@ -7095,7 +7099,7 @@ workflow above maps directly to the corresponding row below.
 | ID    | Check                                                             | Automation                                                                |
 | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | V11.1 | Static checks 41–45 PASS (community and agent files, issue forms, README notices, CITATION, AGENTS/CLAUDE). | `phase-verify.yml --fast`.                     |
-| V11.2 | The GitHub community profile lists README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, issue templates and the PR template. | `--live`.                |
+| V11.2 | The community profile API lists README, CONTRIBUTING, CODE_OF_CONDUCT and the PR template; GraphQL `isSecurityPolicyEnabled` is true; the issue forms parse (GraphQL `contactLinks` lists `config.yml`'s links, and `https://github.com/OWNER/REPO/community` checks Issue templates). The REST profile cannot show SECURITY or YAML issue forms. | `--live`.                |
 | V11.3 | The seven defect-class labels exist.                              | `--live` (`gh label list`).                                               |
 | V11.4 | The GitHub Sponsors profile returns 200 without following redirects (issue #68), thanks.dev's profile API returns 200, and `funding.json` validates and lists both channels. | `--live`.                                            |
 
