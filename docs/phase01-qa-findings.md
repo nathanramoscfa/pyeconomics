@@ -112,7 +112,7 @@ phase that owns the item. Nothing here is left without one.
 
 | Finding | Class | Destination | Guard |
 | --- | --- | --- | --- |
-| A wrongly linked Stripe account blocks the `pyeconomics-dev` GitHub Sponsors listing | process | Issue #68, owned by Step 12; it gates Phase 1's close | Static check 41; V11.4 |
+| A wrongly linked Stripe account blocks the `pyeconomics-dev` GitHub Sponsors listing | process | Issue #68. On 2026-10-08 the maintainer moved it from Step 12 to ROADMAP 8.1 as a Gate G1 carry-over, so Phase 1 closes with thanks.dev live | V11.4 requires the listing once FUNDING.yml names `github:`, and funding.json must match FUNDING.yml |
 | Checking the funding profiles needs Sponsors without following redirects, and thanks.dev's API (its pages answer 403) | spec-rot | Roadmap edited in PR #67 | V11.4 |
 | The community-profile API shows neither the security policy nor YAML issue forms | spec-rot | Roadmap edited in PR #69 | V11.2 (GraphQL) |
 | The repository's About description was stale | bug | Fixed outside the diff (PR #69) | none (one-off) |
@@ -138,7 +138,10 @@ published.
 
 Synthetic alarm run: https://github.com/pyeconomics-dev/pyeconomics/actions/runs/37866605106
 
-NOTIFICATION_PENDING
+Notification received: the maintainer confirmed on 2026-10-08, in the Step 12
+session, that GitHub's failed-run email for this run reached the email address on
+their GitHub account. The session's own mail connector reads a different inbox, so
+the maintainer's confirmation is the evidence.
 
 ## Pre-ship items
 
@@ -160,6 +163,9 @@ Downstream follow-ups, each with its owner:
 - Issue #62: Scorecard dispositions (`security`). The Code-Review and
   Branch-Protection items wait on the maintainer; the badge belongs to Phase 5
   (5.7).
+- Issue #68: the GitHub Sponsors listing and its funding-file entries (`process`).
+  ROADMAP 8.1 owns it as a Gate G1 carry-over, by the maintainer's amendment of
+  2026-10-08. Do it as soon as GitHub Support detaches the Stripe account.
 - Issue #65: Python 3.15 in CI and the classifiers at its final release
   (`process`; ADR-0010).
 - Pull request #61: Dependabot's `uv_build` bump predates `ci.yml`. It follows

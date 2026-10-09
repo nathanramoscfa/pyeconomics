@@ -564,8 +564,9 @@ c41() {
     .github/FUNDING.yml; do
     [ -f "$p" ] || fail "$p missing"
   done
+  # github: returns with the Sponsors listing (issue #68, ROADMAP 8.1);
+  # V11.4 then requires the listing to be live.
   grep -qE '^thanks_dev:' .github/FUNDING.yml || fail "FUNDING.yml lacks thanks_dev:"
-  grep -qE '^github:' .github/FUNDING.yml || fail "FUNDING.yml lacks github: (issue #68)"
 }
 c42() {
   local d=.github/ISSUE_TEMPLATE
@@ -669,7 +670,7 @@ run_static() {
   check 38 "tests.yml and docs.yml absent on main" c38
   check 39 "ci.yml: pr-title, dco and aggregate test jobs" c39
   check 40 "Tag v1.0.0.dev1 on main" c40
-  check 41 "Community and agent files; FUNDING.yml github: and thanks_dev:" c41
+  check 41 "Community and agent files; FUNDING.yml names thanks_dev:" c41
   check 42 "Issue forms: required citation, required terms URL, blank issues off" c42
   check 43 "README: CFA notice verbatim, 0.2.x pointer, disambiguation, no wishlist" c43
   check 44 "CITATION.cff: 1.0.0.dev1, Apache-2.0" c44
@@ -950,12 +951,23 @@ v11_3() {
   done
 }
 v11_4() {
-  [ "$(http_code https://github.com/sponsors/pyeconomics-dev)" = 200 ] || fail "no Sponsors listing (302 means none; issue #68)"
+  if grep -qE '^github:' .github/FUNDING.yml; then
+    [ "$(http_code https://github.com/sponsors/pyeconomics-dev)" = 200 ] || fail "no Sponsors listing (302 means none; issue #68)"
+  fi
   [ "$(http_code https://api.thanks.dev/v1/profile/gh/pyeconomics-dev)" = 200 ] || fail "thanks.dev profile"
   curl -s --max-time 30 https://fundingjson.org/schema/v1.1.0.json -o "$TMP/funding.schema.json" || fail "schema download"
   uvx --from check-jsonschema check-jsonschema --schemafile "$TMP/funding.schema.json" funding.json || fail "funding.json invalid"
-  "$PY" -c 'import json, sys; c = [x["address"] for x in json.load(open("funding.json"))["funding"]["channels"]]; sys.exit(not (any("github.com/sponsors/" in a for a in c) and any("thanks.dev" in a for a in c)))' \
-    || fail "funding.json does not list both channels"
+  # funding.json lists exactly the channels FUNDING.yml names.
+  "$PY" - << 'EOF' || fail "funding.json and FUNDING.yml name different channels"
+import json, re, sys
+
+yml = open(".github/FUNDING.yml", encoding="utf-8").read()
+named = {k for k, pat in (("github", r"^github:"), ("thanks", r"^thanks_dev:")) if re.search(pat, yml, re.M)}
+addresses = [c["address"] for c in json.load(open("funding.json", encoding="utf-8"))["funding"]["channels"]]
+listed = {"github" for a in addresses if "github.com/sponsors/" in a} | {"thanks" for a in addresses if "thanks.dev" in a}
+print("FUNDING.yml", sorted(named), "funding.json", sorted(listed))
+sys.exit(named != listed)
+EOF
 }
 
 run_live() {
@@ -986,7 +998,7 @@ run_live() {
   vcheck V10.5 "SHA pinning required; token read-only; no repository secret" v10_5
   vcheck V11.2 "Community profile; security policy; issue-form contact links" v11_2
   vcheck V11.3 "The seven defect-class labels exist" v11_3
-  vcheck V11.4 "Sponsors 200 (no redirects); thanks.dev API 200; funding.json valid with both" v11_4
+  vcheck V11.4 "thanks.dev API 200; funding.json valid, matching FUNDING.yml; Sponsors 200 when named" v11_4
 }
 
 # --------------------------------------------------------------------------
