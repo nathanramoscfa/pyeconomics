@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -18,6 +19,9 @@ from pyeconomics.core import (
     bracket_roots,
     find_root,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def test_a_known_root() -> None:
@@ -133,19 +137,21 @@ def test_bad_brackets_and_limits_are_refused(
 
 
 @pytest.mark.parametrize(
-    ("changes", "message"),
+    ("make", "message"),
     [
-        ({"xtol": 0.0}, "xtol"),
-        ({"rtol": 1e-17}, "rtol"),
-        ({"maxiter": 0}, "maxiter"),
-        ({"expansion_factor": 1.0}, "expansion_factor"),
-        ({"max_expansions": -1}, "max_expansions"),
-        ({"scan_points": 1}, "scan_points"),
+        (lambda: RootPolicy(xtol=0.0), "xtol"),
+        (lambda: RootPolicy(rtol=1e-17), "rtol"),
+        (lambda: RootPolicy(maxiter=0), "maxiter"),
+        (lambda: RootPolicy(expansion_factor=1.0), "expansion_factor"),
+        (lambda: RootPolicy(max_expansions=-1), "max_expansions"),
+        (lambda: RootPolicy(scan_points=1), "scan_points"),
     ],
 )
-def test_policy_limits_are_checked(changes: dict[str, float], message: str) -> None:
+def test_policy_limits_are_checked(
+    make: Callable[[], RootPolicy], message: str
+) -> None:
     with pytest.raises(ValueError, match=message):
-        RootPolicy(**changes)  # type: ignore[arg-type]
+        make()
 
 
 def test_the_default_policy_is_scipys() -> None:

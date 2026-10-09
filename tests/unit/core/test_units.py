@@ -138,13 +138,13 @@ def test_valid_values_pass() -> None:
 @pytest.mark.parametrize("bad", [math.nan, math.inf, -math.inf])
 def test_float_markers_reject_nan_and_infinity(name: str, bad: float) -> None:
     with pytest.raises(ValidationError, match=r"finite_number|finite number"):
-        AllUnits(**{**VALID, name: bad})
+        AllUnits.model_validate({**VALID, name: bad})
 
 
 @pytest.mark.parametrize("name", ["days", "count"])
 def test_whole_number_markers_reject_fractions(name: str) -> None:
     with pytest.raises(ValidationError):
-        AllUnits(**{**VALID, name: 2.5})
+        AllUnits.model_validate({**VALID, name: 2.5})
 
 
 def test_every_numeric_kind_has_default_bounds() -> None:

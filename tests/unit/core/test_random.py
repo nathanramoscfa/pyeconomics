@@ -55,7 +55,7 @@ def test_seed_bounds_are_canonical_json_safe() -> None:
     assert DEFAULT_SEED == 0
     generator(SEED_MIN)
     generator(SEED_MAX)
-    generator(np.int64(42))  # type: ignore[arg-type] # numpy integers are accepted
+    generator(np.int64(42))  # numpy integers are accepted
 
 
 @pytest.mark.parametrize("seed", [-1, SEED_MAX + 1, 2**64])

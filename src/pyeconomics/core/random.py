@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import operator
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, SupportsIndex
 
 import numpy as np
 
@@ -54,7 +54,7 @@ DEFAULT_SEED: Final = 0
 BIT_GENERATOR: Final = "PCG64"
 
 
-def _seed(seed: int) -> int:
+def _seed(seed: SupportsIndex) -> int:
     if isinstance(seed, bool):
         msg = "the seed must be an integer, not a bool"
         raise InputError(msg)
@@ -69,13 +69,14 @@ def _seed(seed: int) -> int:
     return value
 
 
-def generator(seed: int) -> np.random.Generator:
+def generator(seed: SupportsIndex) -> np.random.Generator:
     """Return a new random generator seeded with ``seed``.
 
     Parameters
     ----------
     seed
-        An integer from :data:`SEED_MIN` to :data:`SEED_MAX`.
+        An integer from :data:`SEED_MIN` to :data:`SEED_MAX`: a Python
+        ``int`` or a NumPy integer, never a ``bool``.
 
     Returns
     -------
@@ -101,7 +102,7 @@ class RandomProvenance:
     numpy_version: str
 
 
-def provenance(seed: int) -> RandomProvenance:
+def provenance(seed: SupportsIndex) -> RandomProvenance:
     """Return the provenance of draws made with ``seed``.
 
     Examples
