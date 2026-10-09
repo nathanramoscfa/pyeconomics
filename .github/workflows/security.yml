@@ -175,9 +175,15 @@ jobs:
           #   "Python-2.0 AND GPL-1.0-or-later AND ...". It stays exempt when
           #   Phase 2 makes it a runtime dependency (through pydantic); the
           #   licences hook reads its real metadata either way.
+          # - numpy is a runtime dependency (ADR-0008 decision 14). Its SPDX
+          #   expression adds 0BSD, Zlib and CC0-1.0 for bundled sources, all
+          #   permissive; the licences hook allows it only through the
+          #   reviewed entry in scripts/checks/licence_exceptions.toml, which
+          #   the maintainer approved in Phase 2 Step 1.
           allow-dependencies-licenses: >-
             pkg:githubactions/trufflesecurity/trufflehog,
             pkg:pypi/hypothesis,
+            pkg:pypi/numpy,
             pkg:pypi/pathspec,
             pkg:pypi/typing-extensions
           comment-summary-in-pr: never

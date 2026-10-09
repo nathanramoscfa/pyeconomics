@@ -18,13 +18,14 @@ and from the §5 section it implements.
 | [0005](0005-data-licence-model.md) | Data-licence model | Accepted | 2026-10-05 |
 | [0006](0006-web-stack-and-hosting.md) | Web stack and hosting | Accepted | 2026-10-05 |
 | [0007](0007-documentation-tooling.md) | Documentation tooling | Accepted | 2026-10-05 |
-| 0008 | Numerical conventions | Reserved for Phase 2 | — |
+| [0008](0008-numerical-conventions.md) | Numerical conventions | Accepted | 2026-10-09 |
 | [0009](0009-name-domains-and-trademark.md) | Name, domains and trademark | Accepted | 2026-10-05 |
 | [0010](0010-python-support-policy.md) | Python support policy | Accepted | 2026-10-05 |
 
-ADR-0008 is reserved for the numerical conventions (decimal rates, units,
-compounding and day-count enums, tolerances, seeds) that Phase 2 writes when
-it first needs them (ROADMAP §4 2.1).
+ADR-0008, the numerical conventions (decimal rates, units, bounds,
+compounding and day counts, tolerances, seeds, canonical JSON numbers and the
+error taxonomy), was reserved in Phase 1 and written in Phase 2 Step 1, when
+the model engine first needed it (ROADMAP §4 2.1).
 
 ## Lifecycle
 

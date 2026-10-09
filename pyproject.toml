@@ -5,7 +5,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pyeconomics"
-version = "1.0.0.dev1"
+version = "1.0.0a1.dev1"
 description = "Open economics and finance models with typed inputs, verified outputs and reproducible results."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -30,7 +30,12 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.4",
+    "pandas>=3.0",
+    "pydantic>=2.12",
+    "scipy>=1.18",
+]
 
 [project.urls]
 Homepage = "https://github.com/pyeconomics-dev/pyeconomics"
@@ -65,12 +70,13 @@ dev = [
     "mypy>=2.4.0",
     # packaging: scripts/checks/licences.py imports it (Step 8).
     "packaging>=26.3",
+    # pandas-stubs, scipy-stubs: mypy strict types pandas and SciPy, which ship
+    # no py.typed (Phase 2 Step 1).
+    "pandas-stubs>=3.0.5.260914",
     "prek>=0.5.5",
-    # pydantic: only for mypy's pydantic.mypy plugin until Phase 2 makes it a
-    # runtime dependency.
-    "pydantic>=2.13.5",
     "pyright>=1.1.414",
     "ruff>=0.16.10",
+    "scipy-stubs>=1.18.1.1",
     "ty>=0.0.85",
 ]
 docs = []
@@ -113,10 +119,17 @@ ignore = [
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-# pytest checks with assert, and test names document themselves.
-"tests/**" = ["S101", "D"]
-# The checks are CLIs: printing their report to stdout/stderr is their output.
+# pytest checks with assert, test names document themselves, and expected
+# values are literals.
+"tests/**" = ["S101", "D", "PLR2004"]
+# The checks and the smoke test are CLIs: printing their report to
+# stdout/stderr is their output.
 "scripts/checks/*.py" = ["T201"]
+"scripts/smoke.py" = ["T201"]
+# ADR-0008 names these modules; they are only ever imported as
+# pyeconomics.core.random and pyeconomics.core.warnings, never top-level.
+"src/pyeconomics/core/random.py" = ["A005"]
+"src/pyeconomics/core/warnings.py" = ["A005"]
 
 # The formatter runs at its defaults.
 [tool.ruff.format]

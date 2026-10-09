@@ -20,6 +20,29 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
   CITATION.cff, CODEOWNERS, issue forms, defect-class labels, `AGENTS.md` and
   `CLAUDE.md` for coding agents, and funding hooks (`.github/FUNDING.yml`,
   `funding.json`).
+- ADR-0008, numerical conventions: decimal rates, the unit vocabulary and
+  default bounds, compounding, day counts and calendars, tolerances, seeded
+  randomness, arrays and tabular data, pandas 3 semantics, non-finite and
+  undefined results, root finding, canonical JSON numbers, the error and
+  warning taxonomy, and the runtime floors.
+- `pyeconomics.core`, the date-free conventions: unit kinds with `Annotated`
+  markers (`Rate`, `Money`, `Years` and the rest) that export `x-unit` and
+  reject NaN and infinity; percent and basis-point converters and
+  formatting; `Frequency`, `Compounding` and rate and discount-factor
+  conversions; `Tolerance`; seeded `PCG64` generators; a bracketed Brent
+  root finder; and the exceptions (`PyeconomicsError` and its subclasses)
+  and warnings (`ModelWarning`, `PyeconomicsDeprecationWarning`, a
+  `FutureWarning`).
+- Runtime dependencies: pydantic 2.12, NumPy 2.4, SciPy 1.18 and pandas 3.0
+  or later (floors Pyodide 314.0.7 can satisfy), with reviewed licence
+  exceptions for numpy, scipy, pandas and python-dateutil.
+- `scripts/smoke.py` and a `pyodide` CI job that installs the wheel in
+  Pyodide 314.0.7 and runs it, beside the clean-venv run in the package job.
+
+### Changed
+
+- The version on `main` is `1.0.0a1.dev1`, the milestone it builds towards
+  (Phase 2's version rule); `CITATION.cff` names the same version.
 
 ## [1.0.0.dev1] - 2026-10-07
 

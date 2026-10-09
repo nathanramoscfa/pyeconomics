@@ -355,7 +355,15 @@ c18() {
     grep -qE "^\| \[$n\]\($(basename "$f")\) \|.*\| Accepted \| $date \|" docs/adr/README.md \
       || fail "index row for $n is not Accepted with $date"
   done
-  grep -qE '^\| 0008 \|.*Reserved' docs/adr/README.md || fail "0008 not reserved in the index"
+  # ADR-0008: reserved in Phase 1, accepted by Phase 2 Step 1 (post-merge
+  # addendum in the phase roadmap). Either state passes; a half-done one fails.
+  grep -qE '^\| 0008 \|.*Reserved' docs/adr/README.md && return 0
+  f=$(compgen -G "docs/adr/0008-*.md" | head -n 1)
+  [ -n "$f" ] || fail "0008 is neither reserved nor written"
+  grep -qE '^- Status: Accepted\s*$' "$f" || fail "$f is not Accepted"
+  date=$(sed -nE 's/^- Date: ([0-9-]+).*/\1/p' "$f" | head -n 1)
+  grep -qE "^\| \[0008\]\($(basename "$f")\) \|.*\| Accepted \| $date \|" docs/adr/README.md \
+    || fail "index row for 0008 is neither reserved nor Accepted with $date"
 }
 
 # Step 7 — reset and skeleton
@@ -595,7 +603,12 @@ c43() {
   return 0
 }
 c44() {
-  grep -qE '^version:\s*"?1\.0\.0\.dev1"?\s*$' CITATION.cff || fail "version is not 1.0.0.dev1"
+  # Phase 2 moved the version (post-merge addendum): CITATION.cff follows
+  # pyproject.toml at every commit instead of naming 1.0.0.dev1.
+  local cff project
+  cff=$(sed -nE 's/^version:\s*"?([^" ]+)"?\s*$/\1/p' CITATION.cff | head -n 1)
+  project=$("$PY" -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+  [ -n "$cff" ] && [ "$cff" = "$project" ] || fail "CITATION.cff says ${cff:-no version}, pyproject.toml $project"
   grep -qE '^license:\s*"?Apache-2\.0"?\s*$' CITATION.cff || fail "license is not Apache-2.0"
 }
 c45() {
@@ -647,7 +660,7 @@ run_static() {
   check 15 "Recorder's PEP 723 block pins pyeconomics==0.2.6" c15
   check 16 "No dev/ tracked; origin has only main, legacy, archive/ and open-PR heads" c16
   check 17 "docs/adr: README, template and nine ADRs" c17
-  check 18 "Nine ADRs Accepted and indexed with dates; 0008 reserved" c18
+  check 18 "Nine ADRs Accepted and indexed with dates; 0008 reserved or Accepted" c18
   check 19 "No 0.2.x path tracked on main" c19
   check 20 "src/pyeconomics reads importlib.metadata; py.typed" c20
   check 21 "pyproject: uv_build, >=3.12, Apache-2.0, groups; no 'cfa' names" c21
@@ -673,7 +686,7 @@ run_static() {
   check 41 "Community and agent files; FUNDING.yml names thanks_dev:" c41
   check 42 "Issue forms: required citation, required terms URL, blank issues off" c42
   check 43 "README: CFA notice verbatim, 0.2.x pointer, disambiguation, no wishlist" c43
-  check 44 "CITATION.cff: 1.0.0.dev1, Apache-2.0" c44
+  check 44 "CITATION.cff: version equals pyproject.toml's, Apache-2.0" c44
   check 45 "AGENTS.md lifecycle, gate, Triage rule; CLAUDE.md imports it" c45
   check 46 "scripts/verify-phase01.sh is 100755 in the index" c46
   check 47 "docs/phase01-qa-findings.md exists" c47
@@ -714,7 +727,9 @@ v7_2() {
   uv venv --no-config -q "$TMP/clean" || return 1
   local py expected found
   py=$(venv_python "$TMP/clean")
-  uv pip install --no-config --no-index --python "$py" "$TMP"/dist/*.whl || return 1
+  # The wheel has runtime dependencies since Phase 2 (post-merge addendum),
+  # so they come from PyPI; --no-config keeps a user-level index out.
+  uv pip install --no-config --python "$py" "$TMP"/dist/*.whl || return 1
   expected=$(uv version --short)
   found=$(cd "$TMP" && "$py" -c 'import pyeconomics; print(pyeconomics.__version__)')
   echo "installed $found; pyproject.toml says $expected"

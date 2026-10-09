@@ -7422,3 +7422,23 @@ three-OS CI matrix, a Trusted Publishing pipeline rehearsed to TestPyPI,
 nine accepted ADRs, one agent rulebook, and `verify-phase01.sh` as the
 template for `verify-phase02.sh`, while Phase 3 inherits the 0.2.x
 characterization fixtures._
+
+## Post-merge addendum (2026-10-09) — Phase 2 changes to verify-phase01.sh
+
+Phase 2's Cross-phase verification rule: a Phase 2 pull request that
+legitimately invalidates one of this phase's checks narrows the check to the
+invariant it protected, never deletes it, and adds one line here.
+
+- Static check 18 (Phase 2 Step 1): accepts ADR-0008's index row as either
+  reserved or Accepted with its file's date, because Phase 2 accepted
+  ADR-0008. It still requires the nine Phase 1 ADRs Accepted.
+- Static check 44 (Phase 2 Step 1): `CITATION.cff`'s version equals
+  `pyproject.toml`'s, and its licence is Apache-2.0, because the version
+  moved to `1.0.0a1.dev1` and moves again at each release.
+- V7.2 (`--python`, Phase 2 Step 1): the clean venv installs the wheel with
+  its runtime dependencies from PyPI (`--no-config`, no `--no-index`),
+  because the wheel now requires pydantic, NumPy, SciPy and pandas.
+- Not a script check, recorded for the same reason: Step 8's
+  `tests/checks/test_licences.py` pinned an empty
+  `licence_exceptions.toml`; it now pins the four exceptions the maintainer
+  reviewed in Phase 2 Step 1 (numpy, scipy, pandas, python-dateutil).

@@ -8,6 +8,7 @@ from __future__ import annotations
 import importlib.util
 import re
 import sys
+import tomllib
 from email.message import Message
 from importlib import metadata
 from pathlib import Path
@@ -285,6 +286,23 @@ def test_exceptions_file_validation(tmp_path: Path) -> None:
     ]
 
 
-def test_the_shipped_exceptions_file_is_empty() -> None:
+# The reviewed exceptions the maintainer approved (Phase 2 Step 1's pull
+# request). The file started empty (ADR-0004); a new entry needs a new review,
+# and this set changes with it.
+REVIEWED_EXCEPTIONS = {"numpy", "pandas", "python-dateutil", "scipy"}
+
+
+def test_the_shipped_exceptions_are_the_reviewed_ones() -> None:
     exceptions, problems = licences.load_exceptions(licences.EXCEPTIONS_FILE)
-    assert (exceptions, problems) == ({}, [])
+    assert problems == []
+    assert set(exceptions) == REVIEWED_EXCEPTIONS
+    lock = tomllib.loads((licences.ROOT / "uv.lock").read_text(encoding="utf-8"))
+    runtime = {
+        name
+        for name, _ in licences.runtime_closure(
+            lock, licences.project_name(licences.ROOT), follow_markers=False
+        )
+    }
+    assert set(exceptions) <= runtime
+    for entry in exceptions.values():
+        assert "Checked by" in entry["reason"]
