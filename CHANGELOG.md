@@ -65,6 +65,46 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
 - Purity guards for `src/pyeconomics/models/`: the `model-purity` semgrep rule
   (no I/O, clock, environment, network, print, logging or global randomness)
   and an import allowlist test.
+- Results: `pyeconomics.run(model_id, inputs=None, /, **fields)` and
+  `pyeconomics.run_batch(model_id, rows)` return an immutable `Result` (or
+  `BatchResult`) holding the inputs, the outputs, the warnings the model
+  recorded and a manifest. A batch takes a pandas or Polars DataFrame, an
+  Arrow PyCapsule stream or an iterable of mappings, at most 100,000 rows.
+  `Result` converts to a dict, canonical JSON, pandas, Polars, Arrow and
+  Parquet; Polars and pyarrow stay optional and are named in the error when
+  missing. A table has `inputs.<field>`, `outputs.<field>` and `result_sha256`
+  columns, and a single result's Arrow and Parquet output carries its manifest
+  in the schema metadata (`pyeconomics.manifest`).
+- The manifest: schema version, model id and version, the versions of
+  pyeconomics, NumPy, SciPy, pandas and pydantic, the seed and bit generator
+  of a stochastic model, an empty `data_sources` list for Phase 3, and the
+  SHA-256 of the canonical JSON of the inputs and of the result body. It holds
+  no clock time, host, user, path or environment value, so two runs of the same
+  inputs give the same bytes.
+- `pyeconomics.core.canonical_json`: RFC 8785 canonical JSON, implemented with
+  the standard library and checked against the RFC's number samples, its
+  key-sorting example and the `rfc8785` package.
+- `pyeconomics.core.input_schema` and `output_schema`: JSON Schema 2020-12 for
+  every model, with a stable `urn:pyeconomics:model:<id>:<version>:input|output`
+  `$id`, `x-unit` on every numeric field, bounds, descriptions, examples, and a
+  `oneOf` with a `discriminator` mapping for families of calculations.
+- `pyeconomics.registry.describe(id)`: one JSON-ready description of a model
+  (specification, both schemas, the card's Markdown) for Phase 4's registry
+  export.
+- Model cards (`ModelCard`, `Result.card()`): title, formula, variables tables,
+  assumptions, limitations, evidence status, a worked example, references, a
+  curriculum-mapping placeholder, the changelog and a notice, rendered as MyST
+  Markdown.
+- `Result.plot()` builds Plotly figures from a model's chart specifications.
+  Plotly is the new `plot` extra (also in `all`) and is imported on demand;
+  without it the error names `pyeconomics[plot]`.
+- `scripts/smoke.py` validates the registry and runs one model per registered
+  domain twice, requiring identical results (`--all`, `--min-domains N`,
+  `--extras`); `release-smoke.yml` runs it, from the release's own tag and
+  outside the checkout, with `--min-domains 11`.
+- Test-only dependencies: `rfc8785` and `jsonschema` (oracle and validator),
+  `plotly`, and `polars` and `pyarrow` (so the conversions are tested against
+  the real libraries).
 
 ### Changed
 

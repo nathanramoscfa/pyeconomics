@@ -53,18 +53,27 @@ server = []
 mcp = []
 ai = []
 econometrics = []
-plot = []
-all = []
+plot = [
+    "plotly>=7.1.0",
+]
+all = [
+    "plotly>=7.1.0",
+]
 
 # PEP 735 groups: development-only, never published (ADR-0002).
 [dependency-groups]
 test = [
     "hypothesis>=6.168.5",
+    "jsonschema>=4.26.0",
+    "plotly>=7.1.0",
+    "polars>=2.0.0",
+    "pyarrow>=26.0.0",
     "pytest>=9.1.1",
     "pytest-benchmark>=5.3.0",
     "pytest-cov>=7.1.0",
     "pytest-socket>=0.8.1",
     "quantlib>=1.43",
+    "rfc8785>=0.1.4",
     "syrupy>=6.1.1",
 ]
 dev = [
@@ -151,6 +160,12 @@ enable_error_code = [
 ]
 files = ["src", "tests"]
 exclude = ['^\.semgrep/tests/', '^tests/fixtures/']
+
+# plotly (the plot extra) and jsonschema (the schema tests' validator) ship no
+# type information; only their own modules are left unchecked.
+[[tool.mypy.overrides]]
+module = ["plotly.*", "jsonschema.*"]
+ignore_missing_imports = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

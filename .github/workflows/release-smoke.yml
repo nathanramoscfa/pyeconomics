@@ -4,8 +4,13 @@
 # checkout, it installs pyeconomics==<version> from the index the release went
 # to, with no dependencies, then installs its dependencies from PyPI only, and
 # asserts that the installed package reports the version that was released.
+# It then runs scripts/smoke.py, taken from the repository at the release's
+# tag, against the installed release from outside the checkout: the registry
+# validates, and one model per domain runs twice with identical results
+# (--min-domains 11 fails a release that registers fewer domains).
 # release.yml calls it after each publish; run it by hand to re-check a past
-# release.
+# release. A release from before the model smoke (1.0.0.dev1) predates the
+# script's options and cannot be re-checked this way.
 name: release-smoke
 
 on:
@@ -47,6 +52,16 @@ jobs:
         uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
         with:
           egress-policy: audit
+
+      # Only scripts/ at the tag: the smoke script that shipped with the
+      # release, never a source tree to import. No credential is kept.
+      - name: Check out the release's scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/v${{ inputs.version }}
+          path: release-source
+          sparse-checkout: scripts
+          persist-credentials: false
 
       - name: Set up Python 3.12
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -106,3 +121,12 @@ jobs:
           print(f"released {expected}; metadata {metadata}; module {pyeconomics.__version__}")
           sys.exit(not (metadata == pyeconomics.__version__ == expected))
           EOF
+
+      # From outside the checkout, with the interpreter that has the release
+      # installed; the script refuses to run against a source tree.
+      - name: Run the model smoke test against the installed release
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/smoke/bin/python" \
+            "$GITHUB_WORKSPACE/release-source/scripts/smoke.py" --min-domains 11

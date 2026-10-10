@@ -1,0 +1,105 @@
+# src/pyeconomics/core/plotting.py
+# Copyright 2026 Nathan Ramos, CFA
+# SPDX-License-Identifier: Apache-2.0
+"""Plotly figures from a result and its model's chart specifications.
+
+Plotly belongs to the ``plot`` extra and is imported only when a figure is
+asked for. A figure's JSON renders unchanged in notebooks, the docs, the web app
+(Plotly.js) and MCP Apps (ROADMAP section 4 2.3). The charts come from the
+model's :class:`~pyeconomics.core.spec.ChartSpec` list, so a model draws
+nothing itself.
+
+Examples
+--------
+>>> from pyeconomics.core.plotting import PLOTLY_EXTRA
+>>> PLOTLY_EXTRA
+'plot'
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Final
+
+from pyeconomics.core._optional import import_optional
+from pyeconomics.core.spec import ChartKind
+
+if TYPE_CHECKING:
+    from pyeconomics.core.results import Result
+    from pyeconomics.core.spec import ChartSpec
+
+__all__ = ["PLOTLY_EXTRA", "figure"]
+
+#: The extra that installs Plotly.
+PLOTLY_EXTRA: Final = "plot"
+
+
+def _calculation(result: Result[Any, Any]) -> str | None:
+    value = getattr(result.inputs, "calculation", None)
+    return value if isinstance(value, str) else None
+
+
+def _applicable(result: Result[Any, Any]) -> list[ChartSpec]:
+    calculation = _calculation(result)
+    return [
+        chart
+        for chart in result.model.spec.charts
+        if chart.calculation is None or chart.calculation == calculation
+    ]
+
+
+def _pick(result: Result[Any, Any], chart_id: str | None) -> ChartSpec:
+    charts = _applicable(result)
+    if chart_id is not None:
+        for chart in charts:
+            if chart.id == chart_id:
+                return chart
+        known = ", ".join(chart.id for chart in charts) or "none"
+        msg = (
+            f"model {result.model_id!r} has no chart {chart_id!r}; its charts: {known}"
+        )
+        raise ValueError(msg)
+    if not charts:
+        msg = f"model {result.model_id!r} declares no chart for this result"
+        raise ValueError(msg)
+    if len(charts) > 1:
+        known = ", ".join(chart.id for chart in charts)
+        msg = f"model {result.model_id!r} has several charts; name one of: {known}"
+        raise ValueError(msg)
+    return charts[0]
+
+
+def figure(result: Result[Any, Any], chart_id: str | None = None) -> Any:  # noqa: ANN401 - a Plotly figure
+    """Build the Plotly figure of one chart of a result.
+
+    Parameters
+    ----------
+    result
+        The result to draw.
+    chart_id
+        The chart's id; optional when exactly one chart applies.
+
+    Raises
+    ------
+    MissingOptionalDependencyError
+        If Plotly is not installed; the message names ``pyeconomics[plot]``.
+    ValueError
+        If no chart, or more than one, applies and none was named.
+    """
+    graph_objects = import_optional("plotly.graph_objects", extra=PLOTLY_EXTRA)
+    spec = _pick(result, chart_id)
+    outputs = result.outputs.model_dump(mode="python")
+    x = list(outputs[spec.x])
+    fig = graph_objects.Figure()
+    for name in spec.y:
+        values = list(outputs[name])
+        if spec.kind is ChartKind.BAR:
+            fig.add_trace(graph_objects.Bar(x=x, y=values, name=name))
+        else:
+            mode = "lines" if spec.kind is ChartKind.LINE else "markers"
+            fig.add_trace(graph_objects.Scatter(x=x, y=values, mode=mode, name=name))
+    fig.update_layout(
+        title={"text": spec.title},
+        xaxis={"title": {"text": spec.x_label or spec.x}},
+        yaxis={"title": {"text": spec.y_label or ", ".join(spec.y)}},
+    )
+    return fig
