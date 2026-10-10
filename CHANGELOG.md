@@ -44,11 +44,38 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
   exceptions for numpy, scipy, pandas and python-dateutil.
 - `scripts/smoke.py` and a `pyodide` CI job that installs the wheel in
   Pyodide 314.0.7 and runs it, beside the clean-venv run in the package job.
+- The model specification: `ModelSpec` with `Reference`, `Evidence`,
+  `CostClass`, `Invariant`, `Example`, `ChartSpec`, `ChangelogEntry` and
+  `Alias`; the `@model` decorator; and `Model` objects that validate their
+  inputs, run a pure `compute` and validate their outputs. `ModelInputs` and
+  `ModelOutputs` are frozen, closed to unknown fields and reject NaN and
+  infinity. Array fields (`RateArray`, `MoneyArray`, `DateArray` and the rest)
+  accept lists, tuples, NumPy arrays, pandas and Polars columns and Arrow
+  streams. A family of formulas is a discriminated union on `calculation`.
+- `pyeconomics.registry` with `ids`, `get`, `models`, `domains`, `resolve` and
+  `validate`. Models register through the `pyeconomics.models` entry-point
+  group; discovery is lazy, ordered, and fails closed on a duplicate id or
+  alias, a malformed entry point or a module that fails to import. An alias
+  resolves to its canonical model and warns with
+  `PyeconomicsDeprecationWarning`. `validate()` rejects an incomplete
+  specification with one line per problem, each naming the model and the rule,
+  and checks the released-id ledger (ADR-0003).
+- `pyeconomics.core.collect_warnings`, which the runner installs so `warn()`
+  records into the result; outside a run `warn()` still issues the warning.
+- Purity guards for `src/pyeconomics/models/`: the `model-purity` semgrep rule
+  (no I/O, clock, environment, network, print, logging or global randomness)
+  and an import allowlist test.
 
 ### Changed
 
 - The version on `main` is `1.0.0a1.dev1`, the milestone it builds towards
   (Phase 2's version rule); `CITATION.cff` names the same version.
+- `import pyeconomics` exposes `pyeconomics.registry`, so it now imports
+  `pyeconomics.core` (pydantic, NumPy, SciPy and pandas). It still discovers no
+  model.
+- `pyeconomics.core.warn` moved to `pyeconomics.core.context`; the import from
+  `pyeconomics.core` is unchanged. `ModelNotFoundError` lists close matches, and
+  `RegistryError` carries its `problems`.
 
 ## [1.0.0.dev1] - 2026-10-07
 

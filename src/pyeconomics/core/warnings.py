@@ -6,8 +6,8 @@
 - :class:`PyeconomicsWarning` is the base class, a ``UserWarning``.
 - :class:`ModelWarning` reports a non-fatal condition in a computation (an
   output left undefined, several roots found) with a stable, machine-readable
-  ``code``. Models issue it through :func:`warn`, and the runner records it in
-  the result.
+  ``code``. Models issue it through :func:`~pyeconomics.core.context.warn`,
+  and the runner records it in the result.
 - :class:`PyeconomicsDeprecationWarning` announces a removal. It is a
   ``FutureWarning``, so Python shows it by default, and its message names the
   replacement and the release that removes the old name (ADR-0003). Issue it
@@ -35,7 +35,6 @@ __all__ = [
     "PyeconomicsDeprecationWarning",
     "PyeconomicsWarning",
     "deprecated",
-    "warn",
 ]
 
 _CODE = re.compile(r"[a-z][a-z0-9_]*")
@@ -103,23 +102,6 @@ class PyeconomicsDeprecationWarning(PyeconomicsWarning, FutureWarning):
         self.name = name
         self.replacement = replacement
         self.removed_in = removed_in
-
-
-def warn(code: str, message: str, *, stacklevel: int = 1) -> None:
-    """Issue a :class:`ModelWarning` from inside a computation.
-
-    Parameters
-    ----------
-    code
-        The warning's snake_case code.
-    message
-        What happened, for people.
-    stacklevel
-        Which frame the warning points at, counted from the code that calls
-        :func:`warn`: 1, the default, is that line; 2 is its caller.
-
-    """
-    warnings.warn(ModelWarning(code, message), stacklevel=stacklevel + 1)
 
 
 def deprecated(

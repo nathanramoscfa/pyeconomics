@@ -31,6 +31,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from pydantic import ValidationError
     from pydantic_core import ErrorDetails
 
@@ -120,16 +122,42 @@ class ModelNotFoundError(PyeconomicsError, LookupError):
     'fixed_income.no_such_model'
     >>> str(error)
     "no model is registered with id 'fixed_income.no_such_model'"
+    >>> print(ModelNotFoundError("fixed_income.bond", close_matches=("fixed_income.bonds",)))
+    no model is registered with id 'fixed_income.bond'; did you mean 'fixed_income.bonds'?
 
-    """
+    """  # noqa: E501 - doctest output lines cannot wrap
 
-    def __init__(self, model_id: str) -> None:
-        super().__init__(f"no model is registered with id {model_id!r}")
+    def __init__(self, model_id: str, *, close_matches: Sequence[str] = ()) -> None:
+        message = f"no model is registered with id {model_id!r}"
+        if close_matches:
+            message += "; did you mean " + " or ".join(map(repr, close_matches)) + "?"
+        super().__init__(message)
         self.model_id = model_id
+        self.close_matches = tuple(close_matches)
 
 
 class RegistryError(PyeconomicsError):
-    """The model registry is inconsistent: a duplicate or reused id, say."""
+    """The model registry is inconsistent: a duplicate or reused id, say.
+
+    Parameters
+    ----------
+    message
+        What is wrong, naming the model or distribution and the rule.
+    problems
+        One line per problem when the error reports several, as
+        ``registry.validate()`` does; each names the model and the rule.
+
+    Examples
+    --------
+    >>> error = RegistryError("1 problem", problems=("a.b: [bindings] must be empty",))
+    >>> error.problems
+    ('a.b: [bindings] must be empty',)
+
+    """
+
+    def __init__(self, message: str, *, problems: Sequence[str] = ()) -> None:
+        super().__init__(message)
+        self.problems = tuple(problems)
 
 
 class MissingOptionalDependencyError(PyeconomicsError, ImportError):
