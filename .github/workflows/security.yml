@@ -184,12 +184,24 @@ jobs:
           #   docs-group dependencies only. The licences hook confirms both
           #   are outside the runtime/all-extras closure; pip-audit audits
           #   them through pylock.toml's --all-groups export.
+          # - Other docs-only packages flagged by dependency-review:
+          #   astroid (LGPL-2.1-or-later, AutoAPI's static parser), cffi
+          #   (MIT-0), parso (MIT AND Python-2.0), roman-numerals
+          #   (BSD-3-Clause AND 0BSD AND CC0-1.0), and sphinx
+          #   (BSD-2-Clause-Views AND BSD-3-Clause AND BSD-2-Clause).
+          #   The licences hook excludes all five from the runtime closure;
+          #   the all-groups audit still covers their locked versions.
           allow-dependencies-licenses: >-
             pkg:githubactions/trufflesecurity/trufflehog,
+            pkg:pypi/astroid,
             pkg:pypi/certifi,
+            pkg:pypi/cffi,
             pkg:pypi/docutils,
             pkg:pypi/hypothesis,
             pkg:pypi/numpy,
+            pkg:pypi/parso,
             pkg:pypi/pathspec,
+            pkg:pypi/roman-numerals,
+            pkg:pypi/sphinx,
             pkg:pypi/typing-extensions
           comment-summary-in-pr: never
