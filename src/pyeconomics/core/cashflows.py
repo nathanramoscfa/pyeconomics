@@ -289,8 +289,8 @@ def present_value(
 
     Examples
     --------
-    >>> round(present_value(0.1, [-100.0, 110.0]), 12)
-    0.0
+    >>> abs(present_value(0.1, [-100.0, 110.0])) < 1e-12
+    True
     >>> present_value(0.0, [1.0, 2.0, 3.0])
     6.0
 
