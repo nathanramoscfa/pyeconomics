@@ -30,14 +30,22 @@ from _loader import (
     parse_golden,
     run_case,
 )
+from pydantic import Field
 
-from pyeconomics.core import Registry, run_model
+from pyeconomics.core import (
+    Model,
+    ModelInputs,
+    ModelOutputs,
+    ModelSpec,
+    Ratio,
+    Registry,
+    run_model,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from pathlib import Path
 
-    from pyeconomics.core import Model
     from pyeconomics.core.results import Result
 
 ZERO = "fixed_income.toy_zero_coupon"
@@ -726,3 +734,63 @@ def test_the_readmes_example_follows_its_own_rules(tmp_path: Path) -> None:
     assert file_problems(golden, None) == []
     assert {s.kind for s in golden.sources} == {"official", "textbook", "identity"}
     assert any(case.edge for case in golden.cases)
+
+
+# --- a nested output --------------------------------------------------------------
+
+
+class Pair(ModelOutputs):
+    low: Ratio = Field(ge=0, le=100, description="Low")
+    high: Ratio = Field(ge=0, le=100, description="High")
+
+
+class PairInputs(ModelInputs):
+    x: Ratio = Field(ge=0, le=50, description="A number")
+
+
+class NestedOutputs(ModelOutputs):
+    pair: Pair = Field(description="A nested output")
+
+
+def nested_compute(inputs: PairInputs) -> NestedOutputs:
+    return NestedOutputs(pair=Pair(low=inputs.x, high=2 * inputs.x))
+
+
+NESTED = Model(
+    ModelSpec(
+        id="foundations.nested",
+        version=1,
+        title="Nested",
+        summary="A nested output.",
+        inputs=PairInputs,
+        outputs=NestedOutputs,
+    ),
+    nested_compute,
+)
+
+
+def nested_case(tmp_path: Path, expected: str) -> Case:
+    body = f"""[[cases]]
+id = "c"
+source = "identity"
+edge = true
+inputs = {{ x = 10 }}
+expected = {{ pair = {expected} }}
+"""
+    text = file_text(
+        [body],
+        sources=IDENTITY,
+        model="foundations.nested",
+        top='min_cases_reason = "One case suffices for this toy."',
+    )
+    path = "foundations/nested.toml"
+    assert problems_of(tmp_path, text, NESTED, path) == []
+    return load_golden(tmp_path / path).cases[0]
+
+
+def test_a_nested_output_compares_field_by_field(tmp_path: Path) -> None:
+    assert run_case(NESTED, nested_case(tmp_path, "{ low = 10.0, high = 20.0 }")) == []
+    wrong = nested_case(tmp_path, "{ low = 10.0, high = 21.0 }")
+    assert len(run_case(NESTED, wrong)) == 1
+    missing = nested_case(tmp_path, "{ low = 10.0 }")
+    assert len(run_case(NESTED, missing)) == 1

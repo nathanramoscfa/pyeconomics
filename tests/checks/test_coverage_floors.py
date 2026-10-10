@@ -64,7 +64,7 @@ def run(
 
 
 def test_the_floors_are_95_on_core_and_90_on_models() -> None:
-    assert {name: floor for name, _, floor in floors.FLOORS} == {
+    assert {name: floor for name, _, floor, _ in floors.FLOORS} == {
         "core": 95.0,
         "models": 90.0,
     }
@@ -168,12 +168,19 @@ def test_models_with_only_a_docstring_module_passes_with_a_note(
     assert "models: no measured statements (1 file(s)); skipped" in out
 
 
-def test_core_with_no_files_also_passes_with_a_note(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+@pytest.mark.parametrize(
+    "files",
+    [{}, {"src/pyeconomics/core/x.py": entry(0, 0, 0, 0)}, {MODELS: entry(10, 10)}],
+    ids=["empty-report", "no-statements", "paths-point-elsewhere"],
+)
+def test_core_with_nothing_measured_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], files: dict[str, Any]
 ) -> None:
-    code, out, _ = run(tmp_path, {"files": {}}, capsys)
-    assert code == 0
+    code, out, err = run(tmp_path, {"files": files}, capsys)
+    assert code == 1
     assert "core: no measured statements" in out
+    assert "core has no measured statements" in err
+    assert "source_pkgs" in err
 
 
 # --- paths --------------------------------------------------------------------

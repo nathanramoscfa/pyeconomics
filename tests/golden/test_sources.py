@@ -56,6 +56,13 @@ REJECTED = [
     "https://cfainstitute.org/en/membership",
     "https://rpc.cfainstitute.org/policy-and-research/x",
     "See www.cfainstitute.org/en/research/foundation for the table",
+    "Level II, Reading 23: Yield-Based Bond Duration Measures",
+    "Reading 23, Level II",
+    "CFA Institute\nLevel II Reading 23",
+    "Level 3 Reading 7",
+    "CFAI Level II Reading 23",
+    "Study Session 7, Example 4",
+    "https://cfainstitute.org./programs/cfa",
 ]
 
 

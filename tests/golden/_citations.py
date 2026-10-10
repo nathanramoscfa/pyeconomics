@@ -56,12 +56,14 @@ _PATTERNS: Final = (
     ),
     (re.compile(r"\bq-?bank\b", re.IGNORECASE), "a question bank"),
     (re.compile(r"\bSchweser\b", re.IGNORECASE), "curriculum-derived study notes"),
+    (re.compile(r"(?-i:\bCFAI\b)"), "a CFAI curriculum reference"),
+    (re.compile(r"\bstudy\s+session\b", re.IGNORECASE), "a study session"),
     (
         re.compile(
-            r"(?-i:\bCFA\b).*\b(?:Level\s+(?:I{1,3}|[123])|Reading\s+\d+)\b",
-            re.IGNORECASE,
+            r"(?=.*\bLevel\s+(?:I{1,3}|[123])\b)(?=.*\bReading\s+\d+)",
+            re.IGNORECASE | re.DOTALL,
         ),
-        "a CFA Program level or reading",
+        "a curriculum level and reading",
     ),
 )
 
@@ -69,7 +71,7 @@ _PATTERNS: Final = (
 def _link_problem(link: str) -> str | None:
     """Reject a link into cfainstitute.org that is not the journal's."""
     parts = urlsplit(link if "://" in link else f"https://{link}")
-    host = (parts.hostname or "").lower()
+    host = (parts.hostname or "").lower().rstrip(".")
     if (host == _CFA_HOST or host.endswith(f".{_CFA_HOST}")) and (
         _JOURNAL_PATH not in parts.path.lower()
     ):

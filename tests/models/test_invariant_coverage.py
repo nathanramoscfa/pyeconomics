@@ -18,9 +18,10 @@ fails to import. It fails when:
 - a marker names a model or an invariant that does not exist;
 - the marked test is not a hypothesis property test (no ``@given``);
 - a marker is not on a test function, or its arguments are not string literals;
-- an ``oracle`` test can skip: it carries ``skip``, ``skipif`` or ``xfail``, or its
-  module calls ``pytest.importorskip``. A missing oracle library must be an import
-  error that fails the suite, never a silent skip.
+- a marked test is never collected (its function or its file is not named
+  ``test*``), or can skip: it carries ``skip``, ``skipif`` or ``xfail``, or its
+  module calls ``pytest.importorskip``. An invariant that is not checked, or an
+  oracle library that is missing, must fail the suite, never skip silently.
 """
 
 from __future__ import annotations
@@ -57,6 +58,7 @@ class Marker:
     where: str
     property_test: bool
     can_skip: bool
+    collected: bool
 
 
 def _name(node: ast.expr) -> str | None:
@@ -99,6 +101,8 @@ def _scan_file(path: Path, where: str) -> tuple[list[Marker], list[str]]:
         names = [_name(d) for d in node.decorator_list]
         property_test = "given" in names
         can_skip = skips_on_import or any(n in _SKIPS for n in names)
+        # pytest collects test_*.py files and test* functions, and nothing else.
+        collected = path.name.startswith("test_") and node.name.startswith("test")
         for decorator in node.decorator_list:
             kind = _marker_kind(decorator) if isinstance(decorator, ast.Call) else None
             if kind is None or not isinstance(decorator, ast.Call):
@@ -123,6 +127,7 @@ def _scan_file(path: Path, where: str) -> tuple[list[Marker], list[str]]:
                     where=at,
                     property_test=property_test,
                     can_skip=can_skip,
+                    collected=collected,
                 )
             )
     problems += [
@@ -164,12 +169,19 @@ def problems_with(
                 f"{marker.where}: the {marker.kind} marker names unknown model "
                 f"{marker.model_id!r}"
             )
+        elif not marker.collected:
+            problems.append(
+                f"{marker.where}: the {marker.kind} test is never collected by "
+                "pytest; its function and its file must be named test*"
+            )
+        elif marker.can_skip:
+            problems.append(
+                f"{marker.where}: a {marker.kind} test must never skip; remove the "
+                "skip, skipif, xfail or importorskip so the check always runs and "
+                "a missing library fails the suite"
+            )
         elif marker.kind == "oracle":
-            if marker.can_skip:
-                problems.append(
-                    f"{marker.where}: an oracle test must never skip; remove the "
-                    "skip mark or importorskip so a missing library fails the suite"
-                )
+            continue
         elif marker.invariant_id not in {i.id for i in model.spec.invariants}:
             problems.append(
                 f"{marker.where}: {marker.model_id!r} declares no invariant "
@@ -404,3 +416,49 @@ def test_fixture_and_cache_directories_are_not_scanned(tmp_path: Path) -> None:
 
 def test_an_empty_tree_and_an_empty_registry_agree(tmp_path: Path) -> None:
     assert run(tmp_path, {}, Registry.from_models()) == []
+
+
+@pytest.mark.parametrize(
+    "skip",
+    [
+        "@pytest.mark.skip",
+        '@pytest.mark.skipif(True, reason="x")',
+        "@pytest.mark.xfail",
+    ],
+)
+def test_an_invariant_test_that_can_skip_fails(tmp_path: Path, skip: str) -> None:
+    text = COVERED.replace("@given", f"{skip}\n@given")
+    found = run(tmp_path, {"test_a.py": text})
+    assert any("invariant test must never skip" in f for f in found)
+    assert any("has no @pytest.mark.invariant" in f for f in found)
+
+
+def test_an_invariant_test_in_a_module_that_uses_importorskip_fails(
+    tmp_path: Path,
+) -> None:
+    text = COVERED + '\nlibrary = pytest.importorskip("numpy")\n'
+    found = run(tmp_path, {"test_a.py": text})
+    assert any("invariant test must never skip" in f for f in found)
+
+
+@pytest.mark.parametrize(
+    ("name", "text"),
+    [
+        ("helpers.py", COVERED),
+        ("test_a.py", COVERED.replace("def test_price_falls", "def check_price_falls")),
+        ("conftest.py", COVERED),
+    ],
+    ids=["file-not-collected", "function-not-collected", "conftest"],
+)
+def test_a_marked_function_pytest_never_collects_does_not_count(
+    tmp_path: Path, name: str, text: str
+) -> None:
+    found = run(tmp_path, {name: text})
+    assert any("never collected by pytest" in f for f in found)
+    assert any("has no @pytest.mark.invariant" in f for f in found)
+
+
+def test_an_oracle_test_pytest_never_collects_fails(tmp_path: Path) -> None:
+    text = ORACLE.replace("def test_against_quantlib", "def against_quantlib")
+    found = run(tmp_path, {"test_o.py": text, "test_a.py": COVERED})
+    assert any("oracle test is never collected" in f for f in found)

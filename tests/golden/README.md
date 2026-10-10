@@ -117,7 +117,7 @@ expected = { price = 100.0 }
 | `edge`          | yes                     | `true` for an edge case (below).                                          |
 | `inputs`        | yes                     | An inline table, passed to `pyeconomics.run`. A model with several calculations needs `calculation`. |
 | `expected`      | one of these two        | Output field → value. A list for an array output, a TOML date for a date. |
-| `expected_none` | one of these two        | Output fields that must be `None` (undefined, with a warning).            |
+| `expected_none` | one of these two        | Output fields that must be `None` (undefined). The contract suite checks that a run says why with a warning. |
 | `tolerance`     | no                      | Output field → `{ abs = ..., rel = ... }`.                                |
 | `note`          | no                      | Context for a reviewer.                                                   |
 

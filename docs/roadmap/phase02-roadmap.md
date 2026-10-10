@@ -4020,6 +4020,25 @@ hygiene.
       use).
     - scripts/new_model.py scaffolds a model, its golden
       file and its property tests.
+    - Harness facts from Step 5: tests/golden/_loader.py
+      holds the rules and tests/contract.py the contract.
+      A golden file's `min_cases_reason` also waives its
+      edge-case requirement; a per-field `tolerance`
+      replaces the unit default, and an omitted `abs` or
+      `rel` is zero. The contract suite draws inputs from
+      tests/strategies.py field by field, so a model with a
+      rule between fields (a strike below a spot) adds a
+      strategy to `strategies.OVERRIDES`; it lets
+      DomainError and ConvergenceError through only for a
+      model whose `limitations` are not empty, and its
+      fuzz fails when valid inputs push an output past its
+      own bound (the toy growth, time-value and zero-coupon
+      models do, so size each output bound to the input
+      bounds). Test file basenames stay unique across
+      tests/ (mypy). An id `domain.family.name` uses the
+      file stem `family_name`. The scaffold creates a new
+      domain's `__init__.py` and prints the entry-point
+      line; it never edits pyproject.toml.
 
     Files to read (every file before drafting):
     - This roadmap's Overview: the model contract, the

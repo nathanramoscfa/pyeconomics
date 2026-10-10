@@ -198,6 +198,18 @@ def test_an_error_the_limitations_do_not_document_fails(mode: str) -> None:
         contract.check_run(undocumented, {"x": 0.5, "mode": mode})
 
 
+def test_a_model_that_raises_for_every_input_fails() -> None:
+    from pyeconomics.core import DomainError  # noqa: PLC0415 - beside its use
+
+    def never_answers(_inputs: Any) -> Any:  # noqa: ANN401 - a toy compute
+        msg = "no answer"
+        raise DomainError(msg)
+
+    model = rebuilt(tm.zero_coupon, never_answers)
+    with pytest.raises(AssertionError, match="no output was checked"):
+        contract.check_model(model, max_examples=FEW)
+
+
 def test_an_error_without_a_message_fails() -> None:
     from pyeconomics.core import DomainError  # noqa: PLC0415 - beside its use
 

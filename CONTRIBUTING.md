@@ -160,9 +160,10 @@ until you complete it, and says what to register by hand. Then:
 - **The contract suite** (`tests/models/test_contract.py`) generates valid inputs
   from each model's fields (`tests/strategies.py`) and checks that outputs stay
   within their bounds and are finite or `None` with a warning, that nothing but
-  `DomainError` and `ConvergenceError` escapes (and only for a model whose
-  limitations say when), that two runs give the same canonical JSON, and that the
-  result survives a round trip. A model with a rule between fields (a strike
+  `DomainError` and `ConvergenceError` escapes (for a model that lists
+  limitations, which the reviewer reads for the condition, and never for every
+  input), that two runs give the same canonical JSON, and that the result
+  survives a round trip. A model with a rule between fields (a strike
   below a spot) adds a strategy to `strategies.OVERRIDES`.
 - **The coverage floors.** CI's tests job runs
   `scripts/checks/coverage_floors.py`: 95% branch coverage on `src/pyeconomics/core/`

@@ -251,6 +251,23 @@ def test_an_invalid_id_is_rejected_before_anything_is_written(
 
 
 @pytest.mark.parametrize("model_id", ["nowhere.thing", "cfa.thing", "Equity.thing"])
+def test_the_domain_must_be_one_of_the_fifteen_domains(
+    tmp_path: Path, model_id: str
+) -> None:
+    with pytest.raises(nm.ScaffoldError):
+        nm.plan(model_id, tmp_path)
+
+
+@pytest.mark.parametrize(
+    "model_id", ["equity.cfa_beta", "equity.beta_cfa", "risk.cfa.x"]
+)
+def test_an_id_may_not_contain_cfa(tmp_path: Path, model_id: str) -> None:
+    with pytest.raises(nm.ScaffoldError, match="contains 'cfa'"):
+        nm.plan(model_id, tmp_path)
+    assert files_under(tmp_path) == []
+
+
+@pytest.mark.parametrize("model_id", ["nowhere.thing", "Equity.thing"])
 def test_the_domain_must_be_one_of_the_fifteen(tmp_path: Path, model_id: str) -> None:
     with pytest.raises(nm.ScaffoldError):
         nm.plan(model_id, tmp_path)

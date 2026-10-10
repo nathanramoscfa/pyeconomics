@@ -13,7 +13,7 @@ completed:
 - ``src/pyeconomics/models/<domain>/<name>.py``: a specification that fails
   ``registry.validate()`` (no formula, assumptions, limitations or references);
 - ``tests/golden/<domain>/<name>.toml``: a golden file the harness rejects (one
-  placeholder case, no source, no edge case);
+  placeholder source and case, no edge case);
 - ``tests/models/<domain>/test_<name>.py``: a property test marked for the
   skeleton's one invariant, which fails until it asserts something.
 
@@ -22,9 +22,10 @@ file name. For a domain with no package yet it also creates the package's
 ``__init__.py`` and prints the entry-point line to add to ``pyproject.toml``;
 otherwise it prints the two lines to add to the domain's ``__init__.py``.
 
-The id is validated first (ADR-0003's shape, one of the fifteen domains, a name
-that is a Python identifier). The script writes only below ``src/`` and
-``tests/``, refuses to overwrite any file and creates nothing if one exists.
+The id is validated first (ADR-0003's shape, no "cfa" per ADR-0009, one of the
+fifteen domains, a name that is a Python identifier). The script writes only
+below ``src/`` and ``tests/``, refuses to overwrite any file and creates nothing
+if one exists.
 """
 
 from __future__ import annotations
@@ -193,6 +194,9 @@ def parse_id(model_id: str) -> tuple[str, str]:
             f"{model_id!r} is not <domain>.<name> in snake_case "
             "(optionally <domain>.<family>.<name>)"
         )
+        raise ScaffoldError(msg)
+    if "cfa" in model_id.lower():
+        msg = f"{model_id!r} contains 'cfa', which no id may (ADR-0009)"
         raise ScaffoldError(msg)
     domain, _, rest = model_id.partition(".")
     if domain not in DOMAINS:

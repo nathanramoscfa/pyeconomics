@@ -11,8 +11,10 @@ For inputs the model accepts (``strategies.inputs``), a run must:
 - return only finite numbers, or ``None`` for an output that is undefined, with
   a warning that says why (ADR-0008 decision 10);
 - raise nothing but :class:`~pyeconomics.core.DomainError` and
-  :class:`~pyeconomics.core.ConvergenceError`, and only when the model lists
-  its limitations, which is where it documents when valid inputs have no answer;
+  :class:`~pyeconomics.core.ConvergenceError`, and only for a model that lists
+  limitations (where it documents when valid inputs have no answer; a reviewer
+  reads that they do), and not for every input: some generated input must
+  return a result;
 - give the same canonical JSON on a second run of the same inputs;
 - round-trip: the canonical JSON parses and canonicalizes to the same bytes, and
   running the parsed inputs again gives the same result.
@@ -88,8 +90,14 @@ def _check_documented(model: Model[Any, Any], error: Exception) -> None:
     assert str(error).strip(), f"{model.id}: {kind} has no message"
 
 
-def check_run(model: Model[Any, Any], raw: Mapping[str, object]) -> None:
+def check_run(model: Model[Any, Any], raw: Mapping[str, object]) -> bool:
     """Run ``model`` on ``raw`` and hold the run to the contract.
+
+    Returns
+    -------
+    bool
+        ``True`` if the run returned a result, ``False`` if it raised a
+        documented error.
 
     Raises
     ------
@@ -107,7 +115,7 @@ def check_run(model: Model[Any, Any], raw: Mapping[str, object]) -> None:
         try:
             run_model(model, raw)
         except type(error):
-            return
+            return False
         msg = f"{model.id}: raised {type(error).__name__} once and not on a rerun"
         raise AssertionError(msg) from error
     except Exception as error:
@@ -128,6 +136,7 @@ def check_run(model: Model[Any, Any], raw: Mapping[str, object]) -> None:
     assert rerun.to_json() == text, (
         f"{model.id}: running the parsed inputs of a result does not reproduce it"
     )
+    return True
 
 
 def check_model(model: Model[Any, Any], *, max_examples: int | None = None) -> None:
@@ -143,9 +152,18 @@ def check_model(model: Model[Any, Any], *, max_examples: int | None = None) -> N
     cost = model.spec.cost
     count = max_examples or (EXAMPLES[cost] if cost else _FALLBACK_EXAMPLES)
 
+    returned: list[bool] = []
+
     @settings(max_examples=count, deadline=None)
     @given(inputs(model))
     def fuzz(raw: Mapping[str, object]) -> None:
-        check_run(model, raw)
+        returned.append(check_run(model, raw))
 
     fuzz()
+    # A model that raises for every input would pass each clause above without
+    # any output ever being checked.
+    assert any(returned), (
+        f"{model.id}: all {len(returned)} generated inputs raised a documented "
+        "error, so no output was checked; DomainError is for inputs with no "
+        "defined result, not for every input"
+    )

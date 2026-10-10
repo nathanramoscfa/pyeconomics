@@ -671,15 +671,25 @@ def _agrees(actual: object, expected: object, tolerance: Tolerance) -> bool:
                 _agrees(a, e, tolerance) for a, e in zip(actual, expected, strict=True)
             )
         )
+    if isinstance(expected, dict):
+        return (
+            isinstance(actual, dict)
+            and set(actual) == set(expected)
+            and all(_agrees(actual[k], v, tolerance) for k, v in expected.items())
+        )
+    return _scalars_agree(actual, expected, tolerance)
+
+
+def _scalars_agree(actual: object, expected: object, tolerance: Tolerance) -> bool:
+    """Compare two leaves: numbers within tolerance, everything else exactly."""
     if isinstance(expected, bool) or isinstance(actual, bool):
         return actual is expected
-    if isinstance(expected, str) or isinstance(actual, str):
+    exact = (str, dt.date)
+    if isinstance(expected, exact) or isinstance(actual, exact):
         return bool(actual == expected)
-    if isinstance(expected, dt.date) or isinstance(actual, dt.date):
-        return bool(actual == expected)
-    if not (_is_number(actual) and _is_number(expected)):
-        return False
-    return tolerance.isclose(float(actual), float(expected))
+    if _is_number(actual) and _is_number(expected):
+        return tolerance.isclose(float(actual), float(expected))
+    return False
 
 
 def _run_directly(
