@@ -3480,6 +3480,22 @@ hygiene.
       describe() exist; the contract tests in
       tests/registry/ and the schema tests iterate over the
       registry, which still holds no catalog model.
+    - What Step 4 built for this step to use: run(model_id,
+      ...) looks the model up in the installed registry, so
+      the harness's own tests, which use toy models, call
+      pyeconomics.core.run_model(model, inputs) (and
+      run_model_batch) instead; both return a Result with
+      .inputs, .outputs (validated models), .warnings
+      (code, message), .manifest and .to_dict()/.to_json().
+      Warnings land in the Result, never in Python's
+      warnings machinery. Canonical JSON writes a
+      whole-number double such as 5.78e16 without an
+      exponent, so json.loads returns an exact int: compare
+      with float(loaded), and canonicalize parsed data again
+      only through json.loads(text, parse_int=float).
+      tests/results/ shows the pattern (schemas, round
+      trips, conversions over the registry plus
+      tests/registry/toy_results_models.py).
     - ModelSpec declares invariants (snake_case ids with a
       statement), examples, references and a cost class;
       ADR-0008 decision 6 fixes the tolerance semantics and
