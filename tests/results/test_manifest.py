@@ -155,7 +155,7 @@ def test_a_hand_built_manifest_freezes_what_it_is_given() -> None:
         model_version=1,
         package_version="1",
         dependencies={"scipy": "1", "numpy": "2"},
-        data_sources=[],  # type: ignore[arg-type]
+        data_sources=[],  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
         inputs_sha256="0" * 64,
         result_sha256="1" * 64,
     )

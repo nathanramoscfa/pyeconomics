@@ -115,7 +115,7 @@ class Result[I: ModelInputs, O: ModelOutputs]:
             model=model,
         )
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the result as JSON-ready values (dates are ISO 8601 strings)."""
         return {
             "model_id": self.model_id,

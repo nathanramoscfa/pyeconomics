@@ -25,8 +25,8 @@ Examples
 from __future__ import annotations
 
 import itertools
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Final
+from collections.abc import Iterable, Mapping
+from typing import TYPE_CHECKING, Any, Final, cast
 
 import pandas as pd
 
@@ -36,7 +36,7 @@ from pyeconomics.core.errors import InputError
 from pyeconomics.core.results import BatchResult, Result, ResultWarning
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterator, Sized
 
     from pyeconomics.core.model import Model
 
@@ -128,27 +128,27 @@ def _refuse() -> InputError:
 def _rows(rows: object) -> list[object]:
     """Read at most :data:`MAX_BATCH_ROWS` rows from a table or an iterable."""
     source: Iterable[object]
+    iter_rows = getattr(rows, "iter_rows", None)  # a Polars DataFrame
     if isinstance(rows, pd.DataFrame):
         if len(rows) > MAX_BATCH_ROWS:
             raise _refuse()
         source = rows.to_dict("records")
-    elif hasattr(rows, "iter_rows"):  # a Polars DataFrame, without importing Polars
-        if len(rows) > MAX_BATCH_ROWS:  # type: ignore[arg-type] # Polars has __len__
+    elif callable(iter_rows):
+        if len(cast("Sized", rows)) > MAX_BATCH_ROWS:
             raise _refuse()
-        source = rows.iter_rows(named=True)
+        source = cast("Iterable[object]", iter_rows(named=True))
     elif hasattr(rows, "__arrow_c_stream__"):
         source = _arrow_rows(rows)
     elif isinstance(rows, Mapping):
         msg = "run_batch takes a table or an iterable of mappings, not one mapping"
         raise InputError(msg)
+    elif isinstance(rows, Iterable):
+        source = rows
     else:
-        source = rows  # type: ignore[assignment] # a non-iterable is reported below
-    try:
-        taken = list(itertools.islice(source, MAX_BATCH_ROWS + 1))
-    except TypeError as error:
         kind = type(rows).__name__
         msg = f"run_batch needs a table or an iterable of mappings, not {kind}"
-        raise InputError(msg) from error
+        raise InputError(msg)
+    taken = list(itertools.islice(source, MAX_BATCH_ROWS + 1))
     if len(taken) > MAX_BATCH_ROWS:
         raise _refuse()
     return taken

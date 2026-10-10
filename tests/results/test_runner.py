@@ -171,7 +171,7 @@ def test_a_null_output_and_its_warning() -> None:
     result = pyeconomics.run("foundations.toy_dated", start="2026-01-31", days=0)
     assert result.outputs.per_day is None
     assert [w.code for w in result.warnings] == ["zero_days"]
-    assert result.to_dict()["outputs"]["per_day"] is None  # type: ignore[index]
+    assert result.to_dict()["outputs"]["per_day"] is None
     assert b'"per_day":null' in result.to_json().encode()
 
 
@@ -179,20 +179,20 @@ def test_dates_are_iso_strings_in_json_and_dates_in_the_result() -> None:
     result = pyeconomics.run("foundations.toy_dated", start="2026-01-31", days=30)
     assert str(result.outputs.end) == "2026-03-02"
     outputs = result.to_dict()["outputs"]
-    assert outputs["end"] == "2026-03-02"  # type: ignore[index]
-    assert outputs["dates"] == ["2026-01-31", "2026-03-02"]  # type: ignore[index]
+    assert outputs["end"] == "2026-03-02"
+    assert outputs["dates"] == ["2026-01-31", "2026-03-02"]
 
 
 def test_a_result_is_immutable() -> None:
     result = pyeconomics.run(ZERO_ID, **ZERO)
     with pytest.raises(dataclasses.FrozenInstanceError):
-        result.outputs = result.inputs  # type: ignore[misc]
+        result.outputs = result.inputs  # type: ignore[misc]  # ty: ignore[invalid-assignment]
     with pytest.raises(dataclasses.FrozenInstanceError):
-        result.manifest.seed = 3  # type: ignore[misc]
+        result.manifest.seed = 3  # type: ignore[misc]  # ty: ignore[invalid-assignment]
     with pytest.raises((TypeError, ValueError)):
         result.outputs.price = 0.0
     with pytest.raises(TypeError):
-        result.manifest.dependencies["numpy"] = "0"  # type: ignore[index]
+        result.manifest.dependencies["numpy"] = "0"  # type: ignore[index]  # ty: ignore[invalid-assignment]
     assert isinstance(result.warnings, tuple)
     assert isinstance(result.manifest.data_sources, tuple)
 

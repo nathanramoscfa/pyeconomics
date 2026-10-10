@@ -184,6 +184,8 @@ venv = ".venv"
 # ty runs as a non-blocking check until it reaches 1.0 (Step 10's CI).
 [tool.ty.environment]
 python-version = "3.12"
+# tests/registry holds the toy models the result and smoke tests import too.
+extra-paths = ["tests/registry"]
 
 [tool.ty.src]
 include = ["src", "tests"]

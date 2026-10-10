@@ -107,14 +107,15 @@ def _float(value: float) -> str:
     if value == 0:
         return "0"  # also -0.0
     sign = "-" if value < 0 else ""
-    _, decimal_digits, exponent = Decimal(repr(abs(value))).as_tuple()
+    _, decimal_digits, raw_exponent = Decimal(repr(abs(value))).as_tuple()
+    exponent = int(raw_exponent)  # a finite Decimal's exponent is an int
     digits = list(decimal_digits)
     while digits[-1] == 0:
         digits.pop()
-        exponent += 1  # type: ignore[operator] # a finite Decimal's exponent is an int
+        exponent += 1
     text = "".join(map(str, digits))
     count = len(text)
-    point = count + int(exponent)  # value = 0.<digits> x 10**point
+    point = count + exponent  # value = 0.<digits> x 10**point
     if count <= point <= _DIGITS_BEFORE_EXPONENT:
         body = text + "0" * (point - count)
     elif 0 < point <= _DIGITS_BEFORE_EXPONENT:

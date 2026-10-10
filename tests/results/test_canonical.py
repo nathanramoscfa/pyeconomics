@@ -193,7 +193,10 @@ def test_the_hash_is_the_sha256_of_the_canonical_bytes() -> None:
 # --- property tests ------------------------------------------------------------
 
 finite_floats = st.floats(allow_nan=False, allow_infinity=False)
-exact_integers = st.integers(-MAX_EXACT_INTEGER, MAX_EXACT_INTEGER)
+# The rfc8785 package stops at I-JSON's safe integers, 2**53 - 1; ADR-0008 and
+# canonical_json also take 2**53 itself, which a double holds exactly (that edge
+# has its own test above).
+exact_integers = st.integers(1 - MAX_EXACT_INTEGER, MAX_EXACT_INTEGER - 1)
 text = st.text()  # hypothesis draws no lone surrogates by default
 json_values = st.recursive(
     st.none() | st.booleans() | exact_integers | finite_floats | text,
