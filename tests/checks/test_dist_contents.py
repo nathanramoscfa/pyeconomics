@@ -24,6 +24,7 @@ PYPROJECT = f'[project]\nname = "pyeconomics"\nversion = "{VERSION}"\n'
 INFO = f"pyeconomics-{VERSION}.dist-info"
 ROOT = f"pyeconomics-{VERSION}"
 METADATA = f"Metadata-Version: 2.4\nName: pyeconomics\nVersion: {VERSION}\n"
+ENTRY_POINTS = "[pyeconomics.models]\nfoundations = pyeconomics.models.foundations\n"
 
 WHEEL_FILES = {
     "pyeconomics/__init__.py": "",
@@ -31,6 +32,7 @@ WHEEL_FILES = {
     f"{INFO}/METADATA": METADATA,
     f"{INFO}/WHEEL": "Wheel-Version: 1.0\n",
     f"{INFO}/RECORD": "",
+    f"{INFO}/entry_points.txt": ENTRY_POINTS,
     f"{INFO}/licenses/LICENSE": "",
     f"{INFO}/licenses/NOTICE": "",
 }
@@ -120,6 +122,25 @@ def test_wheel_without_py_typed_fails(
     wheel = {k: v for k, v in WHEEL_FILES.items() if k != "pyeconomics/py.typed"}
     assert run(build(tmp_path, wheel=wheel)) == 1
     assert "pyeconomics/py.typed is missing" in capsys.readouterr().err
+
+
+def test_wheel_without_entry_points_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Model discovery reads entry_points.txt: without it the wheel has no models.
+    wheel = {k: v for k, v in WHEEL_FILES.items() if not k.endswith("entry_points.txt")}
+    assert run(build(tmp_path, wheel=wheel)) == 1
+    assert f"{INFO}/entry_points.txt is missing" in capsys.readouterr().err
+
+
+def test_wheel_with_other_dist_info_files_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # Admitting entry_points.txt admits nothing else in the dist-info.
+    for name in ("entry_points.json", "top_level.txt", "direct_url.json"):
+        root = build(tmp_path / name, wheel={**WHEEL_FILES, f"{INFO}/{name}": ""})
+        assert run(root) == 1
+        assert f"{INFO}/{name} is not allowlisted" in capsys.readouterr().err
 
 
 def test_wheel_version_mismatch_fails(

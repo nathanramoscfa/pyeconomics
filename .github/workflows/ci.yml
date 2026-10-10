@@ -187,7 +187,9 @@ jobs:
           echo "installed ${found}, pyproject.toml says ${expected}"
           test "$found" = "$expected"
       # scripts/smoke.py exercises the installed wheel's core and refuses to
-      # run against a checkout, so it runs from a copy outside it.
+      # run against a checkout, so it runs from a copy outside it. It runs
+      # every model's examples, and --min-domains 1 fails a wheel whose
+      # entry_points.txt registers no model.
       - name: Run the smoke script against the installed wheel
         shell: bash
         run: |
@@ -195,7 +197,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/smoke"
           cp scripts/smoke.py "$RUNNER_TEMP/smoke/"
           cd "$RUNNER_TEMP/smoke"
-          "$RUNNER_TEMP/clean/bin/python" smoke.py
+          "$RUNNER_TEMP/clean/bin/python" smoke.py --all --min-domains 1
 
   pyodide:
     name: pyodide
@@ -278,7 +280,7 @@ jobs:
           cp scripts/smoke.py "$RUNNER_TEMP/pyodide-smoke/"
           cd "$RUNNER_TEMP/pyodide-smoke"
           "$RUNNER_TEMP/pyodide-venv/bin/python" -c 'import numpy, pandas, pydantic, scipy; print("numpy", numpy.__version__, "scipy", scipy.__version__, "pandas", pandas.__version__, "pydantic", pydantic.VERSION)'
-          "$RUNNER_TEMP/pyodide-venv/bin/python" smoke.py
+          "$RUNNER_TEMP/pyodide-venv/bin/python" smoke.py --min-domains 1
 
   lockfile:
     name: lockfile

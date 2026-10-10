@@ -3,13 +3,16 @@
 # SPDX-License-Identifier: Apache-2.0
 """The conventions every pyeconomics model encodes (ADR-0008).
 
-This package holds numerical conventions and the date layer: unit kinds and their
+This package holds numerical conventions, the date layer and the shared
+numerics models build on: unit kinds and their
 default bounds (:mod:`~pyeconomics.core.units`), percent and basis-point
 conversion (:mod:`~pyeconomics.core.rates`), compounding
 (:mod:`~pyeconomics.core.compounding`), tolerances
 (:mod:`~pyeconomics.core.tolerance`), seeded randomness
 (:mod:`~pyeconomics.core.random`), root finding
-(:mod:`~pyeconomics.core.numerics`), and the error and warning taxonomy
+(:mod:`~pyeconomics.core.numerics`), cash-flow discounting and IRR
+(:mod:`~pyeconomics.core.cashflows`), descriptive statistics
+(:mod:`~pyeconomics.core.descriptive`), and the error and warning taxonomy
 (:mod:`~pyeconomics.core.errors`, :mod:`~pyeconomics.core.warnings`). None of
 it does I/O: no network, file, clock or environment access.
 
@@ -31,6 +34,21 @@ from pyeconomics.core.calendars import (
 )
 from pyeconomics.core.canonical import canonical_json, canonical_sha256
 from pyeconomics.core.cards import ModelCard
+from pyeconomics.core.cashflows import (
+    IRR_LOWER,
+    IRR_POLICY,
+    IRR_UPPER,
+    accumulated_annuity_factor,
+    accumulated_growing_annuity_factor,
+    annuity_factor,
+    growing_annuity_factor,
+    growing_perpetuity_factor,
+    growth_factor,
+    internal_rate_of_return,
+    present_value,
+    present_value_factor,
+    sign_changes,
+)
 from pyeconomics.core.compounding import (
     Compounding,
     Frequency,
@@ -49,6 +67,16 @@ from pyeconomics.core.dates import (
     validate_date,
 )
 from pyeconomics.core.daycount import DayCount, year_fraction
+from pyeconomics.core.descriptive import (
+    Drawdown,
+    Moments,
+    max_drawdown,
+    sample_mean,
+    sample_moments,
+    sample_variance,
+    semideviation_below_mean,
+    semideviation_below_target,
+)
 from pyeconomics.core.errors import (
     ConvergenceError,
     DomainError,
@@ -185,6 +213,9 @@ __all__ = [
     "DOMAINS",
     "ENTRY_POINT_GROUP",
     "EXACT",
+    "IRR_LOWER",
+    "IRR_POLICY",
+    "IRR_UPPER",
     "MAX_ARRAY_LENGTH",
     "MAX_BATCH_ROWS",
     "MAX_STRING_LENGTH",
@@ -214,6 +245,7 @@ __all__ = [
     "Days",
     "DaysArray",
     "DomainError",
+    "Drawdown",
     "Evidence",
     "Example",
     "Frequency",
@@ -230,6 +262,7 @@ __all__ = [
     "ModelOutputs",
     "ModelSpec",
     "ModelWarning",
+    "Moments",
     "Money",
     "MoneyArray",
     "Periods",
@@ -262,12 +295,15 @@ __all__ = [
     "VolatilityArray",
     "Years",
     "YearsArray",
+    "accumulated_annuity_factor",
+    "accumulated_growing_annuity_factor",
     "accumulation_factor",
     "actual_days",
     "add_business_days",
     "add_months",
     "add_years",
     "adjust",
+    "annuity_factor",
     "basis_points_to_decimal",
     "bracket_roots",
     "canonical_json",
@@ -287,18 +323,31 @@ __all__ = [
     "format_percent",
     "generate",
     "generator",
+    "growing_annuity_factor",
+    "growing_perpetuity_factor",
+    "growth_factor",
     "implied_rate",
     "input_schema",
+    "internal_rate_of_return",
     "is_business_day",
     "is_end_of_month",
+    "max_drawdown",
     "model",
     "output_schema",
     "percent_to_decimal",
+    "present_value",
+    "present_value_factor",
     "provenance",
     "run",
     "run_batch",
     "run_model",
     "run_model_batch",
+    "sample_mean",
+    "sample_moments",
+    "sample_variance",
+    "semideviation_below_mean",
+    "semideviation_below_target",
+    "sign_changes",
     "validate_date",
     "warn",
     "year_fraction",

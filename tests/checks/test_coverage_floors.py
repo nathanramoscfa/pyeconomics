@@ -64,7 +64,7 @@ def run(
 
 
 def test_the_floors_are_95_on_core_and_90_on_models() -> None:
-    assert {name: floor for name, _, floor, _ in floors.FLOORS} == {
+    assert {name: floor for name, _, floor in floors.FLOORS} == {
         "core": 95.0,
         "models": 90.0,
     }
@@ -118,7 +118,8 @@ def test_both_below_their_floors_reports_both(
 def test_the_floor_itself_passes(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], covered: int, expected: int
 ) -> None:
-    code, _, _ = run(tmp_path, {"files": {CORE: entry(100, covered)}}, capsys)
+    data = {"files": {CORE: entry(100, covered), MODELS: entry(10, 10)}}
+    code, _, _ = run(tmp_path, data, capsys)
     assert code == expected
 
 
@@ -126,7 +127,7 @@ def test_branches_count_with_statements(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     # All 90 statements run, but only 4 of 10 branches: (90 + 4) / 100 = 94%.
-    data = {"files": {CORE: entry(90, 90, 10, 4)}}
+    data = {"files": {CORE: entry(90, 90, 10, 4), MODELS: entry(10, 10)}}
     code, out, _ = run(tmp_path, data, capsys)
     assert code == 1
     assert "core: 94.00% of 100" in out
@@ -139,6 +140,7 @@ def test_files_of_a_package_are_pooled(
         "files": {
             "src/pyeconomics/core/a.py": entry(900, 900),
             "src/pyeconomics/core/b.py": entry(100, 50),
+            MODELS: entry(10, 10),
         }
     }
     code, out, _ = run(tmp_path, data, capsys)
@@ -149,23 +151,24 @@ def test_files_of_a_package_are_pooled(
 # --- a package with nothing measured ------------------------------------------
 
 
-def test_models_with_no_files_passes_with_a_note(
+def test_models_with_no_files_fails(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     code, out, err = run(tmp_path, {"files": {CORE: entry(10, 10)}}, capsys)
-    assert code == 0
-    assert "models: no measured statements (0 file(s)); skipped" in out
-    assert err == ""
+    assert code == 1
+    assert "models: no measured statements (0 file(s))" in out
+    assert "models has no measured statements" in err
+    assert "core" not in err
 
 
-def test_models_with_only_a_docstring_module_passes_with_a_note(
+def test_models_with_only_a_docstring_module_fails(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     init = "src/pyeconomics/models/__init__.py"
     data = {"files": {CORE: entry(10, 10, 0, 0), init: entry(0, 0, 0, 0)}}
     code, out, _ = run(tmp_path, data, capsys)
-    assert code == 0
-    assert "models: no measured statements (1 file(s)); skipped" in out
+    assert code == 1
+    assert "models: no measured statements (1 file(s))" in out
 
 
 @pytest.mark.parametrize(
@@ -255,7 +258,7 @@ def test_a_json_file_that_is_not_a_coverage_report_is_an_error(
 def test_the_default_report_is_coverage_json_in_the_working_directory(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    write(tmp_path, {"files": {CORE: entry(10, 10)}})
+    write(tmp_path, {"files": {CORE: entry(10, 10), MODELS: entry(10, 10)}})
     monkeypatch.chdir(tmp_path)
     assert floors.main(["coverage_floors.py"]) == 0
     assert "core: 100.00%" in capsys.readouterr().out

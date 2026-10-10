@@ -108,8 +108,8 @@ def test_aliases_map_to_canonical_ids_read_only() -> None:
 
 
 def test_a_registry_is_independent_of_the_installed_one() -> None:
-    assert registry.ids() == ()
     assert TOY.ids() != ()
+    assert not set(TOY.ids()) & set(registry.ids())
 
 
 def test_a_conflicted_registry_still_answers_with_the_first_registration() -> None:

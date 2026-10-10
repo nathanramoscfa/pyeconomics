@@ -1,0 +1,260 @@
+# tests/golden/foundations/time_value.toml
+model = "foundations.time_value"
+
+[[sources]]
+key = "microsoft_xirr"
+kind = "official"
+citation = "Microsoft (n.d.). XIRR function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/xirr-function-de1242ec-6477-445b-b11b-a303ad9adc9d"
+
+[[sources]]
+key = "microsoft_xnpv"
+kind = "official"
+citation = "Microsoft (n.d.). XNPV function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/xnpv-function-1b42bbf6-370f-4532-a0eb-d67c16b664b7"
+
+[[sources]]
+key = "microsoft_irr"
+kind = "official"
+citation = "Microsoft (n.d.). IRR function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/irr-function-64925eaa-9988-495b-b290-3ad0c163c1bc"
+
+[[sources]]
+key = "microsoft_pv"
+kind = "official"
+citation = "Microsoft (n.d.). PV function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/pv-function-23879d31-0e02-4321-be01-da16e8168cbd"
+
+[[sources]]
+key = "microsoft_fv"
+kind = "official"
+citation = "Microsoft (n.d.). FV function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/fv-function-2eef9f44-a084-4c61-bdd8-4fe4bb1b71b3"
+
+[[sources]]
+key = "microsoft_pmt"
+kind = "official"
+citation = "Microsoft (n.d.). PMT function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/pmt-function-0214da64-9a63-4996-bc20-214433fa6441"
+
+[[sources]]
+key = "microsoft_rate"
+kind = "official"
+citation = "Microsoft (n.d.). RATE function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/rate-function-9f665657-4a7e-4bb7-a030-83fc59e748ce"
+
+[[sources]]
+key = "microsoft_nper"
+kind = "official"
+citation = "Microsoft (n.d.). NPER function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/nper-function-240535b5-6653-4d2d-bfcf-b6a38151d815"
+
+[[sources]]
+key = "zero_rate_annuity"
+kind = "identity"
+citation = "At a zero rate the annuity factor (1 - (1 + r)^-n) / r tends to n, so n payments are worth n times the payment."
+
+[[sources]]
+key = "level_perpetuity"
+kind = "identity"
+citation = "A level perpetuity in arrears is worth PMT / r for r > 0, the limit of the annuity factor as n grows."
+
+[[sources]]
+key = "single_sum"
+kind = "identity"
+citation = "A single sum F due in n periods is worth F / (1 + r)^n now, and P now is worth P (1 + r)^n then."
+
+[[sources]]
+key = "single_flow"
+kind = "identity"
+citation = "The NPV of one cash flow at time 0 is that cash flow, at any rate."
+
+[[sources]]
+key = "same_sign_flows"
+kind = "identity"
+citation = "A cash-flow series that never changes sign has a present value of one sign at every rate, so it has no IRR."
+
+[[sources]]
+key = "zero_rate_loan"
+kind = "identity"
+citation = "At a zero rate a level-payment loan of P over n periods repays P / n each period and pays no interest."
+
+[[cases]]
+id = "xirr_spreadsheet_example"
+source = "microsoft_xirr"
+locator = "Example (=XIRR(A3:A7, B3:B7, 0.1))"
+edge = false
+inputs = { calculation = "xirr", cash_flows = [-10000, 2750, 4250, 3250, 2750], dates = [2008-01-01, 2008-03-01, 2008-10-30, 2009-02-15, 2009-04-01] }
+expected = { xirr = 0.373362535, sign_changes = 1 }
+tolerance = { xirr = { abs = 2e-8 } }
+note = "Published as 0.373362535. Excel stops iterating once the rate is accurate within 0.000001 percent, so the published digits can differ from the root (0.3733625335) in the ninth decimal; the tolerance allows that."
+
+[[cases]]
+id = "xnpv_spreadsheet_example"
+source = "microsoft_xnpv"
+locator = "Example (=XNPV(.09, A2:A6, B2:B6))"
+edge = false
+inputs = { calculation = "xnpv", rate = 0.09, cash_flows = [-10000, 2750, 4250, 3250, 2750], dates = [2008-01-01, 2008-03-01, 2008-10-30, 2009-02-15, 2009-04-01] }
+expected = { xnpv = 2086.65 }
+tolerance = { xnpv = { abs = 0.005 } }
+note = "Published to the cent."
+
+[[cases]]
+id = "irr_after_five_years"
+source = "microsoft_irr"
+locator = "Example (=IRR(A2:A7))"
+edge = false
+inputs = { calculation = "irr", cash_flows = [-70000, 12000, 15000, 18000, 21000, 26000] }
+expected = { irr = 0.087 }
+tolerance = { irr = { abs = 0.0005 } }
+note = "Published as 8.7%, one decimal of a percent."
+
+[[cases]]
+id = "irr_after_four_years"
+source = "microsoft_irr"
+locator = "Example (=IRR(A2:A6))"
+edge = false
+inputs = { calculation = "irr", cash_flows = [-70000, 12000, 15000, 18000, 21000] }
+expected = { irr = -0.021 }
+tolerance = { irr = { abs = 0.0005 } }
+note = "Published as -2.1%: a negative IRR."
+
+[[cases]]
+id = "irr_after_two_years"
+source = "microsoft_irr"
+locator = "Example (=IRR(A2:A4,-10%))"
+edge = true
+inputs = { calculation = "irr", cash_flows = [-70000, 12000, 15000] }
+expected = { irr = -0.444 }
+tolerance = { irr = { abs = 0.0005 } }
+note = "Published as -44.4%. A strongly negative rate; Excel needs a guess to find it, the bracketed search does not."
+
+[[cases]]
+id = "annuity_present_value"
+source = "microsoft_pv"
+locator = "Example (=PV(A3/12, 12*A4, A2, , 0))"
+edge = false
+inputs = { calculation = "solve", rate = 0.006666666666666667, periods = 240, payment = 500, future_value = 0 }
+expected = { present_value = -59777.15 }
+tolerance = { present_value = { abs = 0.005 } }
+note = "500 a month for 20 years at 8% a year (0.08 / 12 a month). Published as ($59,777.15): the cash-flow sign convention."
+
+[[cases]]
+id = "annuity_due_future_value"
+source = "microsoft_fv"
+locator = "Example 1 (=FV(A2/12, A3, A4, A5, A6))"
+edge = false
+inputs = { calculation = "solve", rate = 0.005, periods = 10, payment = -200, present_value = -500, due = true }
+expected = { future_value = 2581.40 }
+tolerance = { future_value = { abs = 0.005 } }
+note = "6% a year paid monthly (0.005 a month), payments at the start of each period."
+
+[[cases]]
+id = "loan_payment"
+source = "microsoft_pmt"
+locator = "Example 1 (=PMT(A2/12,A3,A4))"
+edge = false
+inputs = { calculation = "solve", rate = 0.006666666666666667, periods = 10, present_value = 10000, future_value = 0 }
+expected = { payment = -1037.03 }
+tolerance = { payment = { abs = 0.005 } }
+
+[[cases]]
+id = "loan_payment_due"
+source = "microsoft_pmt"
+locator = "Example 1 (=PMT(A2/12,A3,A4,,1))"
+edge = false
+inputs = { calculation = "solve", rate = 0.006666666666666667, periods = 10, present_value = 10000, future_value = 0, due = true }
+expected = { payment = -1030.16 }
+tolerance = { payment = { abs = 0.005 } }
+
+[[cases]]
+id = "loan_level_payment"
+source = "microsoft_pmt"
+locator = "Example 1 (=PMT(A2/12,A3,A4))"
+edge = false
+inputs = { calculation = "amortization", principal = 10000, rate = 0.006666666666666667, periods = 10 }
+expected = { level_payment = 1037.03 }
+tolerance = { level_payment = { abs = 0.005 } }
+note = "The amortization schedule's level payment is the PMT example's payment, with the opposite sign."
+
+[[cases]]
+id = "loan_rate"
+source = "microsoft_rate"
+locator = "Example (=RATE(A2*12, A3, A4)*12)"
+edge = false
+inputs = { calculation = "solve", periods = 48, payment = -200, present_value = 8000, future_value = 0 }
+expected = { rate = 0.0077 }
+tolerance = { rate = { abs = 4.2e-6 } }
+note = "Published as an annual rate of 9.24%, twelve times the monthly rate, so the monthly rate is 0.0924 / 12 = 0.0077 within half a unit of the last digit over 12 (4.2e-6)."
+
+[[cases]]
+id = "periods_payments_due"
+source = "microsoft_nper"
+locator = "Example (=NPER(A2/12, A3, A4, A5, 1))"
+edge = false
+inputs = { calculation = "solve", rate = 0.01, payment = -100, present_value = -1000, future_value = 10000, due = true }
+expected = { periods = 59.6738657 }
+tolerance = { periods = { abs = 5e-8 } }
+
+[[cases]]
+id = "periods_payments_in_arrears"
+source = "microsoft_nper"
+locator = "Example (=NPER(A2/12, A3, A4, A5))"
+edge = false
+inputs = { calculation = "solve", rate = 0.01, payment = -100, present_value = -1000, future_value = 10000 }
+expected = { periods = 60.0821229 }
+tolerance = { periods = { abs = 5e-8 } }
+note = "The page's descriptions of this row and the one above are swapped; the formulas (type 1, then the default 0) are what is reproduced."
+
+[[cases]]
+id = "zero_rate_annuity"
+source = "zero_rate_annuity"
+edge = true
+inputs = { calculation = "present_value", rate = 0.0, periods = 10, payment = 100 }
+expected = { present_value = 1000.0 }
+
+[[cases]]
+id = "perpetuity"
+source = "level_perpetuity"
+edge = false
+inputs = { calculation = "present_value", rate = 0.05, payment = 100 }
+expected = { present_value = 2000.0 }
+note = "periods omitted: a perpetuity."
+
+[[cases]]
+id = "negative_rate_single_sum"
+source = "single_sum"
+edge = true
+inputs = { calculation = "present_value", rate = -0.01, periods = 2, future_value = 100 }
+expected = { present_value = 102.03040506070809 }
+note = "100 / 0.99^2, computed exactly in rational arithmetic and rounded once."
+
+[[cases]]
+id = "century_compounding"
+source = "single_sum"
+edge = true
+inputs = { calculation = "future_value", rate = 0.05, periods = 100, present_value = 1 }
+expected = { future_value = 131.50125784630345 }
+note = "1.05^100, computed exactly in rational arithmetic and rounded once: a very long maturity."
+
+[[cases]]
+id = "single_cash_flow"
+source = "single_flow"
+edge = true
+inputs = { calculation = "npv", rate = 0.1, cash_flows = [250.0] }
+expected = { npv = 250.0 }
+
+[[cases]]
+id = "no_sign_change"
+source = "same_sign_flows"
+edge = true
+inputs = { calculation = "irr", cash_flows = [100, 50, 25] }
+expected = { sign_changes = 0 }
+expected_none = ["irr"]
+
+[[cases]]
+id = "zero_rate_loan"
+source = "zero_rate_loan"
+edge = true
+inputs = { calculation = "amortization", principal = 1000, rate = 0.0, periods = 4 }
+expected = { level_payment = 250.0, total_interest = 0.0, interest = [0.0, 0.0, 0.0, 0.0], principal = [250.0, 250.0, 250.0, 250.0], balance = [750.0, 500.0, 250.0, 0.0] }

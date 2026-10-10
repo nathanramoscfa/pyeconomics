@@ -99,7 +99,9 @@ def test_only_the_names_in_all_are_registered(
 
 
 def test_importing_a_module_registers_nothing_by_itself() -> None:
-    assert core_registry.installed().ids() == ()
+    # The toy modules are imported, but only entry points register.
+    toys = {model.id for model in tm.ALL_MODELS}
+    assert not toys & set(core_registry.installed().ids())
 
 
 def test_the_order_is_by_name_then_distribution_not_by_arrival(
@@ -327,10 +329,10 @@ def test_concurrent_first_use_discovers_once(monkeypatch: pytest.MonkeyPatch) ->
     assert len({id(r) for r in seen}) == 1
 
 
-def test_the_installed_registry_holds_no_model_in_this_step() -> None:
-    assert registry.ids() == ()
-    assert registry.models() == ()
-    assert registry.domains() == ()
+def test_the_installed_registry_holds_the_catalog_and_validates() -> None:
+    assert "foundations.time_value" in registry.ids()
+    assert "foundations" in registry.domains()
+    assert len(registry.models()) == len(registry.ids())
     registry.validate()
 
 

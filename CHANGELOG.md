@@ -15,6 +15,33 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
 
 ### Added
 
+- The first catalog models, registered through the `foundations` entry point
+  in the `pyeconomics.models` group:
+  - `foundations.time_value`: present and future values of sums, level and
+    growing annuities and perpetuities; the five-key solve for periods, rate,
+    present value, payment or future value; NPV and IRR; XNPV and XIRR of
+    dated cash flows (ACT/365 Fixed); and level-payment amortization
+    schedules.
+  - `foundations.returns`: holding-period returns; arithmetic, geometric and
+    harmonic means; annualized, log and real (exact Fisher) returns.
+  - `foundations.risk_statistics`: sample volatility and its annualization,
+    semideviation below the mean and below a target, adjusted skewness (G1)
+    and excess kurtosis (G2), and maximum drawdown with its peak and trough.
+  - `foundations.hypothesis_tests`: one-sample, two-sample (pooled and Welch)
+    and paired t tests, the z test, and chi-square and F tests of variances,
+    from summary statistics, with p-values, critical values and confidence
+    intervals.
+  - `foundations.simulation`: seeded Monte Carlo of geometric Brownian motion,
+    with antithetic variates, and the nonparametric bootstrap.
+- `pyeconomics.core.cashflows` (growth, annuity and perpetuity factors,
+  present values summed without overflow, and the IRR) and
+  `pyeconomics.core.descriptive` (corrected two-pass mean and variance,
+  semideviations, G1 and G2, maximum drawdown), the numerics later domains
+  share.
+- Golden files for the five models, citing Microsoft's Excel function
+  examples, NIST's StRD and e-Handbook, Glasserman (2003) and Efron and
+  Tibshirani (1993); property tests for every invariant; SciPy oracle tests.
+
 - Date arithmetic with end-of-month rules, six day-count conventions including
   irregular ICMA coupon periods, backward coupon schedules with short or long
   front stubs, and five holiday calendars with business-day adjustments.
