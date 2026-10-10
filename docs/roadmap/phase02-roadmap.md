@@ -2048,9 +2048,9 @@ conversation per phase-boundary hygiene.
 
 ---
 
-## Step 3 — Model Specification and Registry
+## Step 3 — Model Specification and Registry ✅
 
-**Status:** Not started
+**Status:** Complete — PR #76 (2026-10-09)
 
 > **Goal:** Turn the Overview's model contract into code. Add
 > `core/spec.py` (`ModelSpec`, `Reference`, `Evidence` with `standard`,
@@ -8956,7 +8956,7 @@ workflow above maps directly to the corresponding row below.
 | ------- | -------------------------------- | ----------------- | ------------ | ------------------- | -------- | ---- | ----------- |
 | 1       | ADR-0008 + core conventions      | Claude Opus 5.5   | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #71 |
 | 2       | Dates, day counts, calendars     | GPT-6.1 Sol       | Codex        | Intelligence Medium | --       | New  | Complete — PR #73 |
-| 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Not started |
+| 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #76 |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
