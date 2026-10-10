@@ -21,6 +21,7 @@ build/
 htmlcov/
 .coverage*
 coverage.xml
+coverage.json
 
 # Generated documentation builds
 docs/_build/

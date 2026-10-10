@@ -82,8 +82,17 @@ Rates, returns, yields and percentages are decimals in every API (`0.05`, not
 - Sockets are disabled in tests (`pytest-socket`); no test touches the
   network. Warnings are errors.
 - Golden tests (cited values with tolerances) and property tests (hypothesis)
-  are required for every model from Phase 2.
-- Coverage must stay at or above 95% (branch coverage).
+  are required for every model from Phase 2. Start a model with
+  `uv run python scripts/new_model.py <id>`; the golden format is in
+  `tests/golden/README.md`, and CONTRIBUTING's "How it is checked" lists the
+  checks a model meets.
+- Mark a property test `@pytest.mark.invariant("<model id>", "<invariant id>")`
+  for each invariant a model declares, and an independent-library comparison
+  `@pytest.mark.oracle("<model id>")`. An oracle test never skips: a missing
+  library must fail the suite.
+- Never cite the CFA Program curriculum in a golden source or a reference.
+- Coverage must stay at or above 95% (branch coverage), and `core/` at 95% and
+  `models/` at 90% on their own (`scripts/checks/coverage_floors.py`).
 
 ## File headers
 

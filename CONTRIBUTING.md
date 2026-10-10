@@ -130,6 +130,44 @@ each formula's originators and take golden values from independent sources.
 Requests outside the model layer are closed by citing
 [ADR-0001](docs/adr/0001-product-boundaries.md) and ROADMAP §6.
 
+### How it is checked
+
+Start a model with `uv run python scripts/new_model.py <domain>.<name>`. It
+creates the model module, a golden file and a property-test file, each failing
+until you complete it, and says what to register by hand. Then:
+
+- **`registry.validate()`** rejects an incomplete specification, one line per
+  problem naming the model and the rule. Run it with
+  `uv run python -c "from pyeconomics import registry; registry.validate()"`.
+- **`tests/golden/`** holds the golden cases. `tests/golden/README.md` fixes the
+  format; the harness fails a registered model with no file, fewer than three
+  cases or no edge case (unless the file records why), a case with no source or
+  locator, an expected field the model does not output, and any output outside
+  its tolerance. A textbook value is recomputed independently or quoted at its
+  published precision.
+- **The citation guard** (`tests/golden/test_sources.py`) fails any golden source
+  or model reference that cites the CFA Program curriculum. Papers in the
+  *Financial Analysts Journal* are allowed.
+- **The `invariant` marker.** For each invariant the specification declares,
+  write a hypothesis property test marked
+  `@pytest.mark.invariant("<model id>", "<invariant id>")`.
+  `tests/models/test_invariant_coverage.py` scans the tests and fails on an
+  uncovered invariant, on a marker naming a model or invariant that does not
+  exist, and on a marked test that is not a property test.
+- **The `oracle` marker.** A test that compares the model with an independent
+  library carries `@pytest.mark.oracle("<model id>")`. It never skips: import
+  the library at the top of the module, so a missing oracle fails the suite.
+- **The contract suite** (`tests/models/test_contract.py`) generates valid inputs
+  from each model's fields (`tests/strategies.py`) and checks that outputs stay
+  within their bounds and are finite or `None` with a warning, that nothing but
+  `DomainError` and `ConvergenceError` escapes (and only for a model whose
+  limitations say when), that two runs give the same canonical JSON, and that the
+  result survives a round trip. A model with a rule between fields (a strike
+  below a spot) adds a strategy to `strategies.OVERRIDES`.
+- **The coverage floors.** CI's tests job runs
+  `scripts/checks/coverage_floors.py`: 95% branch coverage on `src/pyeconomics/core/`
+  and 90% on `src/pyeconomics/models/`, beside the overall 95%.
+
 ## How roadmap steps run
 
 The maintainer and coding agents implement the roadmap one step at a time, each
