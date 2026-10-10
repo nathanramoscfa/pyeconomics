@@ -2397,12 +2397,19 @@ Intelligence Extra High. New conversation per phase-boundary hygiene.
       - ModelInputs and ModelOutputs: pydantic BaseModel
         subclasses with frozen=True, extra="forbid",
         allow_inf_nan=False and validate_default=True.
-      - Array field types: a tuple of a unit-typed element
-        with element bounds and max_length, whose
-        before-validator accepts lists, tuples, NumPy arrays
-        and objects exposing the Arrow PyCapsule stream
-        interface (ADR-0008 decision 8), converting without
-        a copy where the layout allows.
+      - Array field types: one tuple alias per unit kind
+        (RateArray, MoneyArray, DateArray and the rest),
+        whose elements carry the unit and its default
+        bounds, and ARRAY_INPUT, the before-validator that
+        accepts lists, tuples, NumPy arrays, one-column
+        frames and objects exposing the Arrow PyCapsule
+        stream interface (ADR-0008 decision 8), converting
+        through NumPy without an intermediate copy where the
+        layout allows (pyarrow, imported on demand, reads a
+        stream with no NumPy view). An alias fixes no
+        length: a field bounds it with Field(max_length=),
+        because constraints stacked on one type do not
+        narrow, the last one wins.
       - Model: an immutable object holding the ModelSpec
         and compute. Calling it — model(inputs) or
         model(**fields) — validates the inputs (a
@@ -2934,6 +2941,24 @@ conversation per phase-boundary hygiene.
       pyeconomics.registry exposes ids, get, models,
       domains, resolve and validate; warn() records into a
       contextvars collector when one is active.
+    - What Step 3 built for this step to use:
+      core/context.collect_warnings() is the context manager
+      run() wraps around compute (it yields the list of
+      ModelWarnings); a Model has validate_inputs,
+      validate_outputs, input_adapter and output_adapter
+      (pydantic TypeAdapters, the schema source), compute
+      (the raw function), and spec; get and resolve both
+      return the canonical Model, and an alias warns with
+      PyeconomicsDeprecationWarning. An out-of-bounds
+      output raises pydantic's ValidationError, not
+      InputError. ChartSpec is id, title, kind (line, bar
+      or scatter), x, y (output field names), x_label,
+      y_label and calculation; validate() holds x and y to
+      array outputs, and this step may extend it. The
+      spec's no_invariants_reason records why a model
+      declares no invariant. pyeconomics.core exports the
+      decorator as `model`, so import the module by path:
+      `from pyeconomics.core.model import Model`.
     - No catalog model is registered yet; the toy models in
       tests/registry/toy_models.py (scalar, array-input and
       multi-calculation) are what this step's tests run.
@@ -4008,7 +4033,9 @@ hygiene.
     </requirement>
 
     <requirement>
-      Package layout: src/pyeconomics/models/__init__.py and
+      Package layout: src/pyeconomics/models/__init__.py
+      (Step 3 added it, a docstring only, so the purity
+      guards had a tree to guard) and
       src/pyeconomics/models/foundations/ with one module per
       entry and an __init__.py whose __all__ lists the five
       Models; pyproject.toml gains
@@ -9255,6 +9282,13 @@ forward whatever is still open here.
   requirement. Step 1 shipped `warn()` in `core/warnings.py`, which
   `find_root` already calls; Step 3 makes it the one collector-aware
   `warn()` instead of adding a second. Owned by Step 3.
+- From Step 3 (2026-10-09). Done in the step: `warn()` is the one in
+  `core/context.py`, and `find_root` records into the collector. Patched:
+  Step 3's array-types requirement (an alias fixes no length, because stacked
+  constraints do not narrow), Step 4's context (the Step 3 API it builds on) and
+  Step 6's package layout (`models/__init__.py` exists). Open: pydantic's lax
+  mode accepts `True` for a float field, so `rate=True` runs as 100%; the fix
+  belongs in the unit markers of Step 1 (issue #75, label `bug`).
 
 ---
 

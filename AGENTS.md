@@ -54,12 +54,26 @@ From Phase 2, which builds the registry (ROADMAP §3; ADR-0001):
   cited golden cases, property tests, units and bounds.
 - Model ids are permanent (ADR-0003). Never copy CFA Program curriculum text,
   questions or worked examples.
+- Declare a model with `@model` from `pyeconomics.core`, list the `Model` object
+  in its module's `__all__`, and name the module in
+  `[project.entry-points."pyeconomics.models"]`. `registry.validate()` must pass
+  (`uv run python -c "from pyeconomics import registry; registry.validate()"`);
+  it reports every problem as `<model>: [<rule>] <detail>`.
+- Bound every array field's length on the field, with `Field(max_length=...)`.
+  Its elements come from the `RateArray` family or `ARRAY_INPUT`; stacked
+  constraints on one type do not narrow, so those aliases fix no length.
+- Under `src/pyeconomics/models/`, imports are held to an allowlist
+  (`tests/registry/test_model_imports.py`) and the `model-purity` semgrep rule
+  bans I/O, the clock, the environment, the network and global randomness.
+  Import an extra's library only inside `compute`.
+- `pyeconomics.core` exports the decorator as `model`, which hides the module
+  of that name. Import by path (`from pyeconomics.core.model import Model`);
+  `import pyeconomics.core.model as m` binds the decorator.
 
 ## Units
 
 Rates, returns, yields and percentages are decimals in every API (`0.05`, not
-`5`), pending ADR-0008, which Phase 2 writes. Every numeric input and output
-declares its unit.
+`5`), as ADR-0008 fixes. Every numeric input and output declares its unit.
 
 ## Testing
 
