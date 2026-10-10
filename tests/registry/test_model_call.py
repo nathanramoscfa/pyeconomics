@@ -159,7 +159,9 @@ def test_a_dict_returned_by_compute_is_validated_as_outputs() -> None:
 def test_a_model_is_immutable() -> None:
     with pytest.raises(AttributeError):
         ZC.spec = tm.time_value.spec  # type: ignore[misc]
-    with pytest.raises(AttributeError):
+    # Python 3.12 raises TypeError here (a frozen slotted dataclass cannot find
+    # its own class in super()); 3.13 and later raise FrozenInstanceError.
+    with pytest.raises((AttributeError, TypeError)):
         ZC.extra_attribute = 1  # type: ignore[attr-defined]
 
 
