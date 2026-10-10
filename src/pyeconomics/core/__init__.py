@@ -29,6 +29,8 @@ from pyeconomics.core.calendars import (
     adjust,
     is_business_day,
 )
+from pyeconomics.core.canonical import canonical_json, canonical_sha256
+from pyeconomics.core.cards import ModelCard
 from pyeconomics.core.compounding import (
     Compounding,
     Frequency,
@@ -56,6 +58,7 @@ from pyeconomics.core.errors import (
     PyeconomicsError,
     RegistryError,
 )
+from pyeconomics.core.manifest import Manifest
 from pyeconomics.core.model import (
     ARRAY_INPUT,
     CorrelationArray,
@@ -108,7 +111,16 @@ from pyeconomics.core.registry import (
     Registry,
     discover,
 )
+from pyeconomics.core.results import BatchResult, Result, ResultWarning
+from pyeconomics.core.runner import (
+    MAX_BATCH_ROWS,
+    run,
+    run_batch,
+    run_model,
+    run_model_batch,
+)
 from pyeconomics.core.schedule import Schedule, generate
+from pyeconomics.core.schema import input_schema, output_schema
 from pyeconomics.core.spec import (
     DOMAINS,
     Alias,
@@ -174,12 +186,14 @@ __all__ = [
     "ENTRY_POINT_GROUP",
     "EXACT",
     "MAX_ARRAY_LENGTH",
+    "MAX_BATCH_ROWS",
     "MAX_STRING_LENGTH",
     "PERCENT_PER_UNIT",
     "SEED_MAX",
     "SEED_MIN",
     "UNIT_SCHEMA_KEY",
     "Alias",
+    "BatchResult",
     "Bounds",
     "BusinessDayConvention",
     "CalendarId",
@@ -207,8 +221,10 @@ __all__ = [
     "IndexLevelArray",
     "InputError",
     "Invariant",
+    "Manifest",
     "MissingOptionalDependencyError",
     "Model",
+    "ModelCard",
     "ModelInputs",
     "ModelNotFoundError",
     "ModelOutputs",
@@ -232,6 +248,8 @@ __all__ = [
     "Reference",
     "Registry",
     "RegistryError",
+    "Result",
+    "ResultWarning",
     "Return",
     "ReturnArray",
     "RootPolicy",
@@ -252,6 +270,8 @@ __all__ = [
     "adjust",
     "basis_points_to_decimal",
     "bracket_roots",
+    "canonical_json",
+    "canonical_sha256",
     "collect_warnings",
     "convert_rate",
     "decimal_to_basis_points",
@@ -268,11 +288,17 @@ __all__ = [
     "generate",
     "generator",
     "implied_rate",
+    "input_schema",
     "is_business_day",
     "is_end_of_month",
     "model",
+    "output_schema",
     "percent_to_decimal",
     "provenance",
+    "run",
+    "run_batch",
+    "run_model",
+    "run_model_batch",
     "validate_date",
     "warn",
     "year_fraction",

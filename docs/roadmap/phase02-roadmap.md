@@ -2640,9 +2640,9 @@ Intelligence Extra High. New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 4 — Results, Provenance and Schemas
+## Step 4 — Results, Provenance and Schemas ✅
 
-**Status:** Not started
+**Status:** Complete — PR #77 (2026-10-09)
 
 > **Goal:** Make every model run produce a `Result` other software can
 > trust and reproduce. Add `pyeconomics.run(model_id, inputs=None, /,
@@ -3480,6 +3480,22 @@ hygiene.
       describe() exist; the contract tests in
       tests/registry/ and the schema tests iterate over the
       registry, which still holds no catalog model.
+    - What Step 4 built for this step to use: run(model_id,
+      ...) looks the model up in the installed registry, so
+      the harness's own tests, which use toy models, call
+      pyeconomics.core.run_model(model, inputs) (and
+      run_model_batch) instead; both return a Result with
+      .inputs, .outputs (validated models), .warnings
+      (code, message), .manifest and .to_dict()/.to_json().
+      Warnings land in the Result, never in Python's
+      warnings machinery. Canonical JSON writes a
+      whole-number double such as 5.78e16 without an
+      exponent, so json.loads returns an exact int: compare
+      with float(loaded), and canonicalize parsed data again
+      only through json.loads(text, parse_int=float).
+      tests/results/ shows the pattern (schemas, round
+      trips, conversions over the registry plus
+      tests/registry/toy_results_models.py).
     - ModelSpec declares invariants (snake_case ids with a
       statement), examples, references and a cost class;
       ADR-0008 decision 6 fixes the tolerance semantics and
@@ -8963,7 +8979,7 @@ workflow above maps directly to the corresponding row below.
 | 1       | ADR-0008 + core conventions      | Claude Opus 5.5   | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #71 |
 | 2       | Dates, day counts, calendars     | GPT-6.1 Sol       | Codex        | Intelligence Medium | --       | New  | Complete — PR #73 |
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #76 |
-| 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
+| 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #77 |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 7       | Cards + docs preview             | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |

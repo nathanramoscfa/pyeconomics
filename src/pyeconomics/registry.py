@@ -21,12 +21,22 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from pyeconomics.core import registry as _core
+from pyeconomics.core.describe import describe as _describe
 from pyeconomics.core.registry import refresh, validate
 
 if TYPE_CHECKING:
     from pyeconomics.core.model import Model
 
-__all__ = ["domains", "get", "ids", "models", "refresh", "resolve", "validate"]
+__all__ = [
+    "describe",
+    "domains",
+    "get",
+    "ids",
+    "models",
+    "refresh",
+    "resolve",
+    "validate",
+]
 
 # The facade's own frames sit between the caller and Registry.get, so the
 # deprecation warning is aimed one frame further out.
@@ -65,3 +75,19 @@ def models(domain: str | None = None) -> tuple[Model[Any, Any], ...]:
 def domains() -> tuple[str, ...]:
     """Return the domains that have a registered model."""
     return _core.installed().domains()
+
+
+def describe(model_id: str) -> dict[str, Any]:
+    """Describe a model as JSON-ready values.
+
+    The dictionary holds the specification, the input and output JSON Schemas
+    and the card's Markdown (see :mod:`pyeconomics.core.describe` for the keys);
+    :func:`~pyeconomics.core.canonical.canonical_json` accepts it. An alias
+    resolves to the canonical model and warns.
+
+    Raises
+    ------
+    ModelNotFoundError
+        If no model or alias has the id.
+    """
+    return _describe(_core.installed().resolve(model_id, stacklevel=_CALLER))

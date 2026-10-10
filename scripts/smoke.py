@@ -1,11 +1,12 @@
 # scripts/smoke.py
 # Copyright 2026 Nathan Ramos, CFA
 # SPDX-License-Identifier: Apache-2.0
-"""Smoke-test an installed pyeconomics: import it and exercise the core.
+"""Smoke-test an installed pyeconomics: import it, exercise the core, run models.
 
 CI runs this script against the built wheel, from a directory outside the
 checkout, in a clean virtual environment (ci.yml's ``package`` job) and in
-Pyodide (the ``pyodide`` job; ADR-0002, ADR-0008 decision 14). It:
+Pyodide (the ``pyodide`` job; ADR-0002, ADR-0008 decision 14);
+release-smoke.yml runs it against every published release. It:
 
 1. imports ``pyeconomics`` and refuses to run when the package resolves
    inside a checkout's ``src/`` tree, so it only ever tests an installed
@@ -15,26 +16,39 @@ Pyodide (the ``pyodide`` job; ADR-0002, ADR-0008 decision 14). It:
    the closed form;
 4. checks the default rate tolerance accepts a rounding error and refuses a
    real difference;
-5. checks ACT/360 and an observed federal holiday adjustment.
+5. checks ACT/360 and an observed federal holiday adjustment;
+6. checks ``registry.validate()`` passes, then, for every registered domain,
+   runs the first model's first example through ``pyeconomics.run`` twice and
+   requires identical canonical JSON and manifests.
+
+A model whose spec names an extra that is not installed is exercised by
+asserting that running it raises ``MissingOptionalDependencyError`` naming the
+extra, which covers its domain in an environment with no extras installed
+(ADR-0002).
 
 It prints one line per check and exits 0 when every check passes, 1 when one
-fails and 2 when it refuses to run. Phase 2 Step 4 extends it to run one
-model per domain. Usage, from outside the checkout:
+fails and 2 when it refuses to run. Usage, from outside the checkout:
 
-    python smoke.py
+    python smoke.py [--all] [--min-domains N] [--extras]
+
+--all            run every example of every model, not one model per domain
+--min-domains N  fail when fewer than N domains were covered
+--extras         fail unless every model that names an extra ran and returned
+                 outputs, so the extras must be installed
 """
 
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import platform
 import sys
 from importlib import metadata
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from types import ModuleType
 
 # (1 + 0.06 / 12) ** 12 - 1, computed independently with 40-digit decimals.
@@ -106,6 +120,83 @@ def check_dates(package: ModuleType) -> str:
     return "ACT/360 and holidays-backed federal adjustment agree"
 
 
+def run_twice(package: ModuleType, model: Any, example: Any) -> str:  # noqa: ANN401
+    """Run one example twice; require identical bytes and manifests."""
+    first = package.run(model.id, example.inputs)
+    second = package.run(model.id, example.inputs)
+    if first.to_json().encode() != second.to_json().encode():
+        msg = f"{model.id} gave different canonical JSON on two runs"
+        raise AssertionError(msg)
+    if first.manifest != second.manifest:
+        msg = f"{model.id} gave different manifests on two runs"
+        raise AssertionError(msg)
+    return first.manifest.result_sha256[:12]
+
+
+def exercise(
+    package: ModuleType,
+    registration: Any,  # noqa: ANN401
+    *,
+    run_all: bool,
+    extras: bool,
+) -> str:
+    """Exercise one model; return a line saying how it was covered."""
+    model = registration.model
+    examples = model.spec.examples if run_all else model.spec.examples[:1]
+    if not examples:
+        msg = f"{model.id} declares no example"
+        raise AssertionError(msg)
+    extra = model.spec.extra
+    if extra and not registration.provider.installed(extra):
+        if extras:
+            msg = f"{model.id} needs the {extra!r} extra, which is not installed"
+            raise AssertionError(msg)
+        try:
+            package.run(model.id, examples[0].inputs)
+        except package.core.MissingOptionalDependencyError as error:
+            if error.extra != extra:
+                msg = f"{model.id} named {error.extra!r}, not the extra {extra!r}"
+                raise AssertionError(msg) from error
+            return f"{model.id}: raises, naming pyeconomics[{extra}]"
+        msg = f"{model.id} ran although its {extra!r} extra is not installed"
+        raise AssertionError(msg)
+    hashes = [run_twice(package, model, example) for example in examples]
+    return f"{model.id}: {len(hashes)} example(s) reproduce (result {hashes[0]})"
+
+
+def check_models(
+    package: ModuleType,
+    *,
+    run_all: bool = False,
+    min_domains: int = 0,
+    extras: bool = False,
+) -> str:
+    """Validate the registry and run one model per registered domain.
+
+    Raises ``AssertionError`` when validation fails, a model does not
+    reproduce, or fewer than ``min_domains`` domains were covered.
+    """
+    from pyeconomics.core import registry as core_registry  # noqa: PLC0415
+
+    package.registry.validate()
+    registrations = {r.model.id: r for r in core_registry.installed().registrations}
+    domains = package.registry.domains()
+    for domain in domains:
+        chosen = package.registry.models(domain)
+        for model in chosen if run_all else chosen[:1]:
+            line = exercise(
+                package, registrations[model.id], run_all=run_all, extras=extras
+            )
+            print(f"        {line}")
+    if len(domains) < min_domains:
+        msg = (
+            f"{len(domains)} domain(s) were covered, not the {min_domains} "
+            f"required: {', '.join(domains) or 'none'}"
+        )
+        raise AssertionError(msg)
+    return f"registry valid; {len(domains)} domain(s) covered"
+
+
 CHECKS: tuple[tuple[str, Callable[[ModuleType], str]], ...] = (
     ("version", check_version),
     ("compounding", check_compounding),
@@ -114,8 +205,18 @@ CHECKS: tuple[tuple[str, Callable[[ModuleType], str]], ...] = (
 )
 
 
-def main() -> int:
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
+    """Read the command line."""
+    parser = argparse.ArgumentParser(description="Smoke-test an installed pyeconomics.")
+    parser.add_argument("--all", action="store_true", dest="run_all")
+    parser.add_argument("--min-domains", type=int, default=0, metavar="N")
+    parser.add_argument("--extras", action="store_true")
+    return parser.parse_args(argv)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
     """Run every check; return the process exit status."""
+    options = parse_args(sys.argv[1:] if argv is None else argv)
     import pyeconomics  # noqa: PLC0415 - imported here so a failure is reported
     import pyeconomics.core  # noqa: PLC0415 - loads the core subpackage
 
@@ -130,8 +231,17 @@ def main() -> int:
             file=sys.stderr,
         )
         return 2
+
+    def models(package: ModuleType) -> str:
+        return check_models(
+            package,
+            run_all=options.run_all,
+            min_domains=options.min_domains,
+            extras=options.extras,
+        )
+
     failed = 0
-    for name, check in CHECKS:
+    for name, check in (*CHECKS, ("models", models)):
         try:
             detail = check(pyeconomics)
         except Exception as error:  # noqa: BLE001 - every failure is reported

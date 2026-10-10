@@ -466,6 +466,23 @@ class Model[I: ModelInputs, O: ModelOutputs]:
         """
         return self.output_adapter.validate_python(outputs)
 
+    def parse_inputs(self, inputs: object = None, /, **fields: object) -> I:
+        """Validate inputs given as one argument or as keyword fields.
+
+        Raises
+        ------
+        TypeError
+            If both an argument and keyword fields are given.
+        InputError
+            As :meth:`validate_inputs`.
+        """
+        if inputs is None:
+            return self.validate_inputs(fields)
+        if fields:
+            msg = "pass the inputs as one argument or as keyword fields, not both"
+            raise TypeError(msg)
+        return self.validate_inputs(inputs)
+
     @overload
     def __call__(self, inputs: I, /) -> O: ...
 
@@ -477,14 +494,7 @@ class Model[I: ModelInputs, O: ModelOutputs]:
 
     def __call__(self, inputs: object = None, /, **fields: object) -> O:
         """Run the model on an input model, a mapping, or keyword fields."""
-        if inputs is None:
-            data: object = fields
-        elif fields:
-            msg = "pass the inputs as one argument or as keyword fields, not both"
-            raise TypeError(msg)
-        else:
-            data = inputs
-        return self.validate_outputs(self.compute(self.validate_inputs(data)))
+        return self.validate_outputs(self.compute(self.parse_inputs(inputs, **fields)))
 
     def __repr__(self) -> str:
         """Show the id and version."""
