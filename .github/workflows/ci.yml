@@ -135,6 +135,12 @@ jobs:
       # 95% branch floor in pyproject.toml fails the job.
       - name: Run the tests with coverage
         run: uv run --locked pytest --cov
+      # The overall floor above can hide a thin tree: core/ must keep 95% and
+      # models/ 90% of their own statements and branches (ROADMAP §4 2.4).
+      - name: Write the coverage report
+        run: uv run --locked coverage json -o coverage.json
+      - name: Coverage floors for core/ and models/
+        run: uv run --locked python scripts/checks/coverage_floors.py coverage.json
       # The licence check skips runtime packages whose markers exclude the
       # running platform, so each OS checks its own.
       - name: Runtime licence allowlist

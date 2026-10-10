@@ -105,6 +105,22 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
 - Test-only dependencies: `rfc8785` and `jsonschema` (oracle and validator),
   `plotly`, and `polars` and `pyarrow` (so the conversions are tested against
   the real libraries).
+- The verification harness every catalog model must pass (test-only, not part of
+  the wheel). Golden files (`tests/golden/<domain>/<name>.toml`, format in
+  `tests/golden/README.md`) hold cited cases with edge cases and per-output
+  tolerances, are read with `tomllib` only and reject unknown keys; the harness
+  requires a file for every registered model, three cases with an edge case or a
+  recorded reason, a source and locator for each case, and outputs within
+  ADR-0008's tolerance through `pyeconomics.run`. A citation guard rejects the
+  CFA Program curriculum and allows the Financial Analysts Journal. The
+  `invariant` and `oracle` pytest markers, and a meta-test that holds every
+  declared invariant to a marked property test. `tests/strategies.py` generates
+  valid inputs from a model's fields, and a contract suite fuzzes every
+  registered model for bounds, documented errors, determinism and round trips.
+  `scripts/checks/coverage_floors.py` holds branch coverage to 95% on `core/` and
+  90% on `models/` in CI, and `scripts/new_model.py <id>` scaffolds a model, its
+  golden file and its property test. CONTRIBUTING and the pull request template
+  carry the mechanics and a model checklist.
 
 ### Changed
 

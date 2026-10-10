@@ -3187,9 +3187,9 @@ conversation per phase-boundary hygiene.
 
 ---
 
-## Step 5 — Verification Harness
+## Step 5 — Verification Harness ✅
 
-**Status:** Not started
+**Status:** Complete — PR #78 (2026-10-10)
 
 > **Goal:** Build the machinery that holds every catalog model to the
 > definition of done before a single model exists. Define the golden-case
@@ -4020,6 +4020,25 @@ hygiene.
       use).
     - scripts/new_model.py scaffolds a model, its golden
       file and its property tests.
+    - Harness facts from Step 5: tests/golden/_loader.py
+      holds the rules and tests/contract.py the contract.
+      A golden file's `min_cases_reason` also waives its
+      edge-case requirement; a per-field `tolerance`
+      replaces the unit default, and an omitted `abs` or
+      `rel` is zero. The contract suite draws inputs from
+      tests/strategies.py field by field, so a model with a
+      rule between fields (a strike below a spot) adds a
+      strategy to `strategies.OVERRIDES`; it lets
+      DomainError and ConvergenceError through only for a
+      model whose `limitations` are not empty, and its
+      fuzz fails when valid inputs push an output past its
+      own bound (the toy growth, time-value and zero-coupon
+      models do, so size each output bound to the input
+      bounds). Test file basenames stay unique across
+      tests/ (mypy). An id `domain.family.name` uses the
+      file stem `family_name`. The scaffold creates a new
+      domain's `__init__.py` and prints the entry-point
+      line; it never edits pyproject.toml.
 
     Files to read (every file before drafting):
     - This roadmap's Overview: the model contract, the
@@ -8980,7 +8999,7 @@ workflow above maps directly to the corresponding row below.
 | 2       | Dates, day counts, calendars     | GPT-6.1 Sol       | Codex        | Intelligence Medium | --       | New  | Complete — PR #73 |
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #76 |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #77 |
-| 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Not started |
+| 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 7       | Cards + docs preview             | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
