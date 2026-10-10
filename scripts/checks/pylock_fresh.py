@@ -15,7 +15,7 @@ Usage, from the repository root (the `pylock-fresh` prek hook runs it):
 
 Re-export with uv's `--no-config` flag, as lock_index.py explains:
 
-    uv export --no-config --format pylock.toml --output-file pylock.toml
+    uv export --no-config --all-groups --format pylock.toml --output-file pylock.toml
 """
 
 from __future__ import annotations
@@ -26,8 +26,19 @@ import sys
 from pathlib import Path
 
 PYLOCK = Path("pylock.toml")
-EXPORT = ("export", "--no-config", "--frozen", "--no-header", "--format", "pylock.toml")
-FIX = "uv export --no-config --format pylock.toml --output-file pylock.toml"
+# Audit every group, including the code-executing documentation toolchain.
+EXPORT = (
+    "export",
+    "--no-config",
+    "--frozen",
+    "--all-groups",
+    "--no-header",
+    "--format",
+    "pylock.toml",
+)
+FIX = (
+    "uv export --no-config --all-groups --format pylock.toml --output-file pylock.toml"
+)
 
 
 def body(text: str) -> str:

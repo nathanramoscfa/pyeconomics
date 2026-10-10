@@ -371,9 +371,17 @@ c19() {
   local p bad=""
   for p in setup.py requirements.txt __version__.py pytest.ini MANIFEST.in \
     .coveragerc .readthedocs.yml Dockerfile .dockerignore start.sh \
-    test_import.py pyeconomics/ examples/ media/ markdown/ docs/conf.py; do
+    test_import.py pyeconomics/ examples/ media/ markdown/; do
     tracked "$p" && bad="$bad $p"
   done
+  # Phase 2 Step 7 adds a new site. Reject the legacy config, while requiring
+  # the new static API generator and executed MyST notebooks (ADR-0007).
+  if tracked docs/conf.py; then
+    for p in myst_nb autoapi.extension pydata_sphinx_theme model_pages; do
+      grep -qF "$p" docs/conf.py || bad="$bad docs/conf.py:$p"
+    done
+    grep -qF '../src/pyeconomics' docs/conf.py || bad="$bad docs/conf.py:src-layout"
+  fi
   [ -z "$(git ls-files 'docs/roadmap*.rst')" ] || bad="$bad docs/roadmap*.rst"
   [ -z "$bad" ] || fail "tracked:$bad"
 }

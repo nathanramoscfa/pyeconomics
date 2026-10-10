@@ -53,6 +53,11 @@ def test_body_drops_only_the_leading_header() -> None:
     assert pylock_fresh.body(HEADER + BODY + "# trailing\n") == BODY + "# trailing"
 
 
+def test_export_audits_every_dependency_group() -> None:
+    assert "--all-groups" in pylock_fresh.EXPORT
+    assert "--all-groups" in pylock_fresh.FIX
+
+
 def test_matching_export_passes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

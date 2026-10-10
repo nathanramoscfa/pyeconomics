@@ -79,6 +79,7 @@ test = [
     "pytest-socket>=0.8.1",
     "quantlib>=1.43",
     "rfc8785>=0.1.4",
+    "sybil>=10.1.0",
     "syrupy>=6.1.1",
 ]
 dev = [
@@ -95,7 +96,12 @@ dev = [
     "scipy-stubs>=1.18.1.1",
     "ty>=0.0.85",
 ]
-docs = []
+docs = [
+    "myst-nb>=1.4.0",
+    "pydata-sphinx-theme>=0.23.0",
+    "sphinx>=9.1.0",
+    "sphinx-autoapi>=3.8.1",
+]
 
 [tool.uv.build-backend]
 module-name = "pyeconomics"
@@ -116,7 +122,7 @@ extend-exclude = [".semgrep/tests", "scripts/legacy", "tests/fixtures/legacy"]
 force-exclude = true
 # Neither is a package: pytest imports tests with --import-mode=importlib, and
 # the checks run as scripts. Declaring them keeps INP001 for real packages.
-namespace-packages = ["tests", "scripts"]
+namespace-packages = ["tests", "scripts", "docs"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -229,7 +235,7 @@ addopts = [
     "--disable-socket",
     "--benchmark-disable",
 ]
-testpaths = ["tests", "src"]
+testpaths = ["tests", "src", "docs"]
 # tests/registry/toy_models.py is the toy catalog the registry tests share;
 # tests/strategies.py and tests/contract.py are the input strategies and the
 # contract check, and tests/golden/_loader.py the golden-file loader. Only these

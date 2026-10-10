@@ -21,7 +21,7 @@ Change the lock files only with uv's `--no-config` flag:
 
     uv lock --no-config
     uv add --no-config <package>
-    uv export --no-config --format pylock.toml --output-file pylock.toml
+    uv export --no-config --all-groups --format pylock.toml --output-file pylock.toml
 """
 
 from __future__ import annotations
@@ -127,7 +127,7 @@ def main(root: Path) -> int:
             print(f"  {problem}", file=sys.stderr)
         print(
             "Re-lock with uv's --no-config flag (uv lock --no-config; uv export "
-            "--no-config --format pylock.toml --output-file pylock.toml).",
+            "--no-config --all-groups --format pylock.toml --output-file pylock.toml).",
             file=sys.stderr,
         )
         return 1

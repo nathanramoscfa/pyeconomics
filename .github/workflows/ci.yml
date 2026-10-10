@@ -282,6 +282,29 @@ jobs:
           "$RUNNER_TEMP/pyodide-venv/bin/python" -c 'import numpy, pandas, pydantic, scipy; print("numpy", numpy.__version__, "scipy", scipy.__version__, "pandas", pandas.__version__, "pydantic", pydantic.VERSION)'
           "$RUNNER_TEMP/pyodide-venv/bin/python" smoke.py --min-domains 1
 
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up uv and Python 3.14
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.15"
+          python-version: "3.14"
+          enable-cache: true
+      - name: Build the preview and execute its notebook
+        run: uv run --locked --group docs --all-extras sphinx-build -W --keep-going -b html docs docs/_build/html
+
   lockfile:
     name: lockfile
     runs-on: ubuntu-latest
@@ -382,7 +405,7 @@ jobs:
     # skipped by design (pr-title and dco on a push) passes; a failed or
     # cancelled one does not.
     if: always()
-    needs: [lint, types, tests, package, pyodide, lockfile, pr-title, dco]
+    needs: [lint, types, tests, package, pyodide, docs, lockfile, pr-title, dco]
     runs-on: ubuntu-latest
     permissions: {}
     steps:

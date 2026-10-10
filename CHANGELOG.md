@@ -15,6 +15,10 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
 
 ### Added
 
+- A Sphinx documentation preview with generated model cards, an executed
+  tutorial, Sybil-tested examples and a warnings-as-errors CI build. Read the
+  Docs version `main` previews 1.0 while `stable` and `latest` keep serving 0.2.x.
+
 - The first catalog models, registered through the `foundations` entry point
   in the `pyeconomics.models` group:
   - `foundations.time_value`: present and future values of sums, level and

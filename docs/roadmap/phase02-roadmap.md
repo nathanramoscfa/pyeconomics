@@ -4256,9 +4256,9 @@ hygiene.
 
 ---
 
-## Step 7 — Model Cards and Documentation Preview
+## Step 7 — Model Cards and Documentation Preview ✅
 
-**Status:** Not started
+**Status:** Complete — PR #80 (2026-10-10)
 
 > **Goal:** Stand up the documentation site ADR-0007 chose and publish it
 > as a preview that never displaces 0.2.x. Add `docs/conf.py` (Sphinx with
@@ -4286,11 +4286,13 @@ hygiene.
 
 | Setting      | Value                                           |
 | ------------ | ----------------------------------------------- |
-| Model        | GPT-6 Sol                                       |
+| Model        | GPT-6.1 Sol                                       |
 | Backup       | Claude Sonnet 5.5 — Claude Code · Effort Medium |
 | Platform     | Codex                                           |
 | Intelligence | Medium                                          |
 | Conversation | **New**                                         |
+
+> Settings updated 2026-10-10: was GPT-6 Sol · Medium. GPT-6.1 Sol supersedes GPT-6 Sol; verified rollout effort medium.
 
 **Model rationale:** Coding is PRIMARY — Sphinx configuration, a
 page-generating extension, Sybil collection, a CI job and the Read the
@@ -4623,6 +4625,10 @@ New conversation per phase-boundary hygiene.
       test sybil`; every one installs on every CI cell and
       passes pip-audit. sphinx-gallery is not added (Phase
       5).
+      Export pylock.toml with --all-groups and update the
+      pylock-fresh hook's export command, so pip-audit also
+      audits the code-executing docs toolchain, not only
+      the default dev/test environment.
     </requirement>
 
     <requirement>
@@ -9137,7 +9143,7 @@ workflow above maps directly to the corresponding row below.
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #77 |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #79 |
-| 7       | Cards + docs preview             | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
+| 7       | Cards + docs preview             | GPT-6.1 Sol         | Codex        | Intelligence Medium | --       | New  | Complete — PR #80 |
 | 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 9       | Catalog: derivatives + intl      | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 10      | Catalog: equity, corp., acct.    | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
