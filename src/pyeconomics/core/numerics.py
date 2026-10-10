@@ -42,8 +42,8 @@ from typing import TYPE_CHECKING, Final
 
 import numpy as np
 
+from pyeconomics.core.context import warn
 from pyeconomics.core.errors import ConvergenceError, InputError
-from pyeconomics.core.warnings import warn
 
 if TYPE_CHECKING:
     from collections.abc import Callable

@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """pyeconomics: open economics and finance models.
 
-This is the 1.0 package skeleton. The version is read from the installed
-distribution's metadata, so ``pyproject.toml`` is its only source.
+The version is read from the installed distribution's metadata, so
+``pyproject.toml`` is its only source. :mod:`pyeconomics.registry` finds the
+registered models; importing the package discovers none of them.
 
 Examples
 --------
@@ -20,4 +21,6 @@ from importlib.metadata import version
 
 __version__: str = version("pyeconomics")
 
-__all__ = ["__version__"]
+from pyeconomics import registry
+
+__all__ = ["__version__", "registry"]
