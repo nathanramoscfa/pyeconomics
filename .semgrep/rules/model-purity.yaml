@@ -1,0 +1,51 @@
+# .semgrep/rules/model-purity.yaml
+rules:
+  - id: model-purity
+    languages: [python]
+    severity: ERROR
+    paths:
+      include:
+        - src/pyeconomics/models/
+    message: >-
+      A model is a pure function (ADR-0001; ROADMAP section 4 2.2): it reads no
+      file, clock, environment variable or network, prints and logs nothing,
+      calls no subprocess, and draws no unseeded random number. Take data as an
+      input, report a condition with pyeconomics.core.warn, and draw random
+      numbers only from pyeconomics.core.random.generator(seed).
+    metadata:
+      category: security
+      cwe: "CWE-918: Server-Side Request Forgery (SSRF)"
+    pattern-either:
+      # Files, console and logging.
+      - pattern: open(...)
+      - pattern: builtins.open(...)
+      - pattern: print(...)
+      - pattern: input(...)
+      - pattern: warnings.warn(...)
+      - pattern: warnings.warn_explicit(...)
+      - pattern: logging.$FUNC(...)
+      # The clock.
+      - pattern: time.$FUNC(...)
+      - pattern: datetime.datetime.now(...)
+      - pattern: datetime.datetime.utcnow(...)
+      - pattern: datetime.datetime.today(...)
+      - pattern: datetime.date.today(...)
+      # Randomness: the stdlib module, numpy's global state and an unseeded
+      # default_rng. A seeded Generator is only built by pyeconomics.core.random.
+      - pattern: random.$FUNC(...)
+      - patterns:
+          - pattern: numpy.random.$FUNC(...)
+          - metavariable-regex:
+              metavariable: $FUNC
+              regex: ^(?!default_rng$|Generator$|PCG64$|SeedSequence$|BitGenerator$)
+      - pattern: numpy.random.default_rng()
+      - pattern: numpy.random.default_rng(None)
+      # The environment, other processes and the network.
+      - pattern: os.environ
+      - pattern: os.environb
+      - pattern: os.getenv(...)
+      - pattern: os.putenv(...)
+      - pattern: os.system(...)
+      - pattern: os.popen(...)
+      - pattern: subprocess.$FUNC(...)
+      - pattern: socket.$FUNC(...)
