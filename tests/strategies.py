@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import datetime as dt
 import enum
+import importlib
 import math
 import string
 import types
@@ -303,3 +304,80 @@ def inputs(model: Model[Any, Any]) -> SearchStrategy[Mapping[str, Any]]:
     )
     examples = [dict(example.inputs) for example in model.spec.examples]
     return st.one_of(generated, st.sampled_from(examples)) if examples else generated
+
+
+# --- overrides for catalog models with rules between fields ---------------------
+
+
+def _drop_none(annotation: object) -> object:
+    """Return a nullable annotation without its ``None`` member."""
+    annotation, _ = _unwrap(annotation, [])
+    if get_origin(annotation) in {Union, types.UnionType}:
+        members = [m for m in get_args(annotation) if m is not type(None)]
+        return members[0] if len(members) == 1 else annotation
+    return annotation
+
+
+def _field(cls: type[BaseModel], name: str) -> SearchStrategy[Any]:
+    """Draw one field's value, never ``None``."""
+    info = cls.model_fields[name]
+    return _strategy(_drop_none(info.annotation), _flatten(info.metadata))
+
+
+@st.composite
+def _one_omitted(
+    draw: st.DrawFn, cls: type[BaseModel], names: Sequence[str]
+) -> dict[str, Any]:
+    """Draw ``cls``'s inputs with exactly one of ``names`` left out."""
+    omitted = draw(st.sampled_from(names))
+    drawn = draw(_fields(cls))
+    for name in names:
+        drawn.pop(name, None)
+        if name != omitted:
+            drawn[name] = draw(_field(cls, name))
+    return drawn
+
+
+@st.composite
+def _same_length(
+    draw: st.DrawFn, cls: type[BaseModel], names: Sequence[str]
+) -> dict[str, Any]:
+    """Draw ``cls``'s inputs with the arrays ``names`` all of one length."""
+    drawn = draw(_fields(cls))
+    first = cls.model_fields[names[0]]
+    limits = _limits(_flatten(first.metadata))
+    size = draw(st.integers(*_sizes(limits)).filter(lambda n: n >= 1))
+    for name in names:
+        info = cls.model_fields[name]
+        annotation, _ = _unwrap(info.annotation, [])
+        item = get_args(annotation)[0]
+        drawn[name] = draw(st.lists(_strategy(item, []), min_size=size, max_size=size))
+    return drawn
+
+
+def _time_value() -> SearchStrategy[dict[str, Any]]:
+    """``foundations.time_value``: solve omits one key; dated flows need dates."""
+    # The package exports the Model under the module's name, so import by path.
+    module = importlib.import_module("pyeconomics.models.foundations.time_value")
+    tv = module.time_value
+    special = {module.SolveInputs, module.XnpvInputs, module.XirrInputs}
+    plain = [
+        _fields(member)
+        for member in tv.spec.input_models
+        if isinstance(member, type)
+        and issubclass(member, BaseModel)
+        and member not in special
+    ]
+    return st.one_of(
+        *plain,
+        _one_omitted(
+            module.SolveInputs,
+            ("periods", "rate", "present_value", "payment", "future_value"),
+        ),
+        _same_length(module.XnpvInputs, ("cash_flows", "dates")),
+        _same_length(module.XirrInputs, ("cash_flows", "dates")),
+        st.sampled_from([dict(example.inputs) for example in tv.spec.examples]),
+    )
+
+
+OVERRIDES["foundations.time_value"] = _time_value

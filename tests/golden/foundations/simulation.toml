@@ -1,0 +1,79 @@
+# tests/golden/foundations/simulation.toml
+model = "foundations.simulation"
+
+[[sources]]
+key = "glasserman2003"
+kind = "textbook"
+citation = "Glasserman, P. (2003). Monte Carlo Methods in Financial Engineering. Springer."
+isbn = "9780387004518"
+recomputed_with = "the closed-form lognormal moments and quantiles of GBM, evaluated with math.exp and scipy.stats.norm"
+
+[[sources]]
+key = "efron1993"
+kind = "textbook"
+citation = "Efron, B. and Tibshirani, R. J. (1993). An Introduction to the Bootstrap. Chapman & Hall."
+isbn = "9780412042317"
+recomputed_with = "the ideal (B = infinity) bootstrap standard error of a mean, sqrt(sum((x - mean)^2)) / n, evaluated directly"
+
+[[sources]]
+key = "constant_sample"
+kind = "identity"
+citation = "Every resample of a constant sample is that constant, so its bootstrap standard error is 0 and its percentile interval a point."
+
+[[cases]]
+id = "gbm_mean"
+source = "glasserman2003"
+locator = "Section 3.2.1, E[S(T)] = S(0) exp(mu T)"
+edge = false
+inputs = { calculation = "gbm", initial_value = 100, drift = 0.05, volatility = 0.2, horizon = 1, steps = 12, paths = 100000, seed = 1 }
+expected = { terminal_mean = 105.12710963760242, probability_below = 0.4403823076297575 }
+tolerance = { terminal_mean = { abs = 0.27 }, probability_below = { abs = 0.0063 } }
+note = "Closed forms: E[S] = 100 e^0.05; P(S < 100) = Phi((ln 1 - (0.05 - 0.02)) / 0.2). Each tolerance is four standard errors at 100,000 paths (sd 21.24 / sqrt(N) = 0.067; sqrt(p (1 - p) / N) = 0.00157). At seed 1 the errors are -0.5 and 0.4 standard errors."
+
+[[cases]]
+id = "gbm_antithetic_mean"
+source = "glasserman2003"
+locator = "Section 3.2.1 (the moments) and Section 4.2 (antithetic variates)"
+edge = false
+inputs = { calculation = "gbm", initial_value = 100, drift = 0.05, volatility = 0.2, horizon = 1, steps = 12, paths = 100000, antithetic = true, seed = 1 }
+expected = { terminal_mean = 105.12710963760242, paths_simulated = 100000 }
+tolerance = { terminal_mean = { abs = 0.054 } }
+note = "Four antithetic standard errors (0.0133, against 0.067 without); the error at seed 1 is -0.24 of them."
+
+[[cases]]
+id = "gbm_extreme_volatility_median"
+source = "glasserman2003"
+locator = "Section 3.2.1, ln S(T) is normal with mean ln S(0) + (mu - sigma^2 / 2) T"
+edge = true
+inputs = { calculation = "gbm", initial_value = 100, drift = 0.0, volatility = 2.0, horizon = 1, steps = 1, paths = 100000, level = 13.53352832366127, seed = 1 }
+expected = { probability_below = 0.5 }
+tolerance = { probability_below = { abs = 0.0063 } }
+note = "An extreme volatility (200%) and a zero drift: the median is 100 e^-2 = 13.5335, so half the paths end below it. Four standard errors of a proportion at 100,000 paths; the error at seed 1 is 1.4 of them."
+
+[[cases]]
+id = "mouse_treatment_mean"
+source = "efron1993"
+locator = "Table 2.1 (the mouse data, treatment group)"
+edge = false
+inputs = { calculation = "bootstrap", sample = [94, 197, 16, 38, 99, 141, 23], statistic = "mean", resamples = 10000, seed = 1 }
+expected = { estimate = 86.85714285714286, standard_error = 23.3635234372996 }
+tolerance = { standard_error = { abs = 1.0 } }
+note = "The ideal bootstrap standard error of the mean is 23.36. At 10,000 resamples the estimate's own standard error is about 0.17, so the tolerance is six of those; at seed 1 it is 23.39."
+
+[[cases]]
+id = "mouse_control_mean"
+source = "efron1993"
+locator = "Table 2.1 (the mouse data, control group)"
+edge = false
+inputs = { calculation = "bootstrap", sample = [52, 104, 146, 10, 51, 30, 40, 27, 46], statistic = "mean", resamples = 10000, seed = 1 }
+expected = { estimate = 56.22222222222222, standard_error = 13.348859273201871 }
+tolerance = { standard_error = { abs = 0.6 } }
+note = "Ideal standard error 13.35; about six Monte Carlo standard errors (0.1) of tolerance; at seed 1 it is 13.43."
+
+[[cases]]
+id = "constant_sample"
+source = "constant_sample"
+edge = true
+inputs = { calculation = "bootstrap", sample = [5, 5, 5], statistic = "median", resamples = 100, seed = 1 }
+expected = { estimate = 5.0, standard_error = 0.0, interval_lower = 5.0, interval_upper = 5.0 }
+note = "Zero variance."

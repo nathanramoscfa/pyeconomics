@@ -10,7 +10,9 @@ any member that is not allowlisted, and on a version that differs from
 pyproject.toml's. The CI `package` job runs it after `uv build`.
 
 - The wheel holds `pyeconomics/**/*.py`, `pyeconomics/py.typed` and a
-  dist-info directory with METADATA, WHEEL, RECORD, LICENSE and NOTICE.
+  dist-info directory with METADATA, WHEEL, RECORD, LICENSE, NOTICE and
+  `entry_points.txt`, which declares the `pyeconomics.models` entry points model
+  discovery reads (Phase 2 Step 6); a wheel without it would register no model.
 - The sdist holds PKG-INFO, pyproject.toml, README.md, LICENSE, NOTICE and
   `src/pyeconomics/**/*.py` plus `py.typed`, under `pyeconomics-<version>/`.
   It also holds the `pyproject.toml.orig` that uv_build 0.12 always writes,
@@ -45,7 +47,7 @@ def wheel_allowed(version: str) -> re.Pattern[str]:
     return re.compile(
         rf"{PACKAGE}/__init__\.py"
         rf"|{SOURCE}"
-        rf"|{info}/(?:METADATA|WHEEL|RECORD)"
+        rf"|{info}/(?:METADATA|WHEEL|RECORD|entry_points\.txt)"
         rf"|{info}/licenses/(?:LICENSE|NOTICE)"
     )
 
@@ -80,10 +82,13 @@ def check_wheel(path: Path, version: str) -> list[str]:
             problems.append(f"{path.name}: {meta} is missing")
         elif (found := metadata_version(wheel.read(meta).decode())) != version:
             problems.append(f"{path.name}: version {found!r}, expected {version!r}")
+        required = (
+            f"{PACKAGE}/__init__.py",
+            f"{PACKAGE}/py.typed",
+            f"{PACKAGE}-{version}.dist-info/entry_points.txt",
+        )
         problems += [
-            f"{path.name}: {required} is missing"
-            for required in (f"{PACKAGE}/__init__.py", f"{PACKAGE}/py.typed")
-            if required not in names
+            f"{path.name}: {name} is missing" for name in required if name not in names
         ]
     return problems
 

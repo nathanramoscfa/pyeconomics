@@ -1,0 +1,85 @@
+# tests/golden/foundations/risk_statistics.toml
+model = "foundations.risk_statistics"
+
+[[sources]]
+key = "nist_numacc1"
+kind = "certified"
+citation = "NIST (1999). Statistical Reference Datasets, univariate summary statistics: NumAcc1 (certified values)."
+url = "https://www.itl.nist.gov/div898/strd/univ/numacc1.html"
+
+[[sources]]
+key = "g1_g2_exact"
+kind = "identity"
+citation = "G1 and G2 as Joanes and Gill (1998, The Statistician 47(1), section 2) define them, evaluated by hand in exact rational arithmetic."
+
+[[sources]]
+key = "downside_deviation"
+kind = "identity"
+citation = "The downside deviation below a target T is sqrt(sum(min(r - T, 0)^2) / n), and below the mean sqrt(sum(min(r - mean, 0)^2) / (n - 1)); the values are computed by hand."
+
+[[sources]]
+key = "drawdown_definition"
+kind = "identity"
+citation = "The maximum drawdown is the largest 1 - V_j / max(V_i, i <= j); a series that never falls has none."
+
+[[sources]]
+key = "constant_series"
+kind = "identity"
+citation = "A constant series has zero variance, so zero volatility at any annualization."
+
+[[cases]]
+id = "numacc1_scaled"
+source = "nist_numacc1"
+locator = "Certified values: sample mean 10000002, sample standard deviation (n - 1) 1"
+edge = false
+inputs = { calculation = "volatility", returns = [10.000001, 10.000003, 10.000002], periods_per_year = 1 }
+expected = { mean = 10.000002, volatility = 1e-6, annualized_volatility = 1e-6, degrees_of_freedom = 2 }
+note = "NumAcc1 (10000001, 10000003, 10000002) divided by 10^6, so the values fit a return's bounds: the mean scales to 10.000002 and the standard deviation to 1e-6, exactly. The large offset against a tiny spread is the dataset's point: a one-pass variance loses every digit here."
+
+[[cases]]
+id = "skewed_sample"
+source = "g1_g2_exact"
+edge = true
+inputs = { calculation = "moments", returns = [0.0, 0.0, 0.0, 0.01] }
+expected = { skewness = 2.0, excess_kurtosis = 4.0, observations = 4 }
+note = "The smallest sample G2 allows. In exact rational arithmetic m2 = 3/16, m3 = 3/32 and m4 = 21/256 (of the data divided by 0.01), so g1 = 2/sqrt(3), G1 = 2 and G2 = 4."
+
+[[cases]]
+id = "symmetric_sample"
+source = "g1_g2_exact"
+edge = false
+inputs = { calculation = "moments", returns = [0.01, 0.02, 0.03, 0.04] }
+expected = { skewness = 0.0, excess_kurtosis = -1.2, observations = 4 }
+tolerance = { skewness = { abs = 1e-12 } }
+note = "Symmetric, so G1 = 0; m2 = 5/4 and m4 = 41/16 (in hundredths) give G2 = -6/5 exactly."
+
+[[cases]]
+id = "four_month_downside"
+source = "downside_deviation"
+edge = false
+inputs = { calculation = "semideviation", returns = [-0.02, 0.01, 0.03, -0.04], target = 0.0 }
+expected = { below_target = 0.022360679774997897, below_mean = 0.0219848432637882 }
+note = "Below 0: sqrt((0.0004 + 0.0016) / 4) = sqrt(0.0005). Below the mean (-0.005): sqrt((0.000225 + 0.001225) / 3)."
+
+[[cases]]
+id = "index_drawdown"
+source = "drawdown_definition"
+edge = false
+inputs = { calculation = "drawdown", values = [100, 120, 90, 130, 117] }
+expected = { max_drawdown = 0.25, peak_index = 1, trough_index = 2 }
+note = "From 120 to 90 is a fall of a quarter; the later fall from 130 to 117 is a tenth."
+
+[[cases]]
+id = "rising_series"
+source = "drawdown_definition"
+edge = true
+inputs = { calculation = "drawdown", values = [1, 2, 3] }
+expected = { max_drawdown = 0.0, peak_index = 0, trough_index = 0 }
+
+[[cases]]
+id = "constant_returns"
+source = "constant_series"
+edge = true
+inputs = { calculation = "volatility", returns = [0.01, 0.01, 0.01], periods_per_year = 12 }
+expected = { volatility = 0.0, annualized_volatility = 0.0 }
+note = "Zero variance."

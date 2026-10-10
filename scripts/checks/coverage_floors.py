@@ -12,10 +12,10 @@ model, or the other way round.
 It reads the JSON report `coverage json` writes. Coverage is coverage.py's own
 measure with branch coverage on: covered statements plus covered branches, over
 all statements plus all branches, the figure `coverage report` prints and
-`fail_under` compares. `models/` with no measured statements passes with a note
-(until Phase 2 Step 6 adds the first model); `core/` with none fails, because it
+`fail_under` compares. A package with no measured statements fails, because it
 means the report's paths or coverage's `source_pkgs` no longer point at the
-package, and a floor that measures nothing proves nothing.
+package, and a floor that measures nothing proves nothing. (`models/` was allowed
+to be empty until Phase 2 Step 6 registered the first catalog models.)
 
 Usage, from the repository root after `pytest --cov` (CI's tests job runs it):
 
@@ -30,11 +30,10 @@ import sys
 from pathlib import Path
 from typing import Any, Final
 
-#: Each package, the path segments that identify its files, its floor in percent,
-#: and whether it may be empty (`models/` until Step 6).
+#: Each package, the path segments that identify its files, and its floor in percent.
 FLOORS: Final = (
-    ("core", "/pyeconomics/core/", 95.0, False),
-    ("models", "/pyeconomics/models/", 90.0, True),
+    ("core", "/pyeconomics/core/", 95.0),
+    ("models", "/pyeconomics/models/", 90.0),
 )
 
 DEFAULT_REPORT = "coverage.json"
@@ -85,11 +84,8 @@ def check(report: dict[str, Any]) -> tuple[list[str], list[str]]:
     """Return the report lines and the failures, one per package below its floor."""
     lines: list[str] = []
     failures: list[str] = []
-    for name, marker, floor, may_be_empty in FLOORS:
+    for name, marker, floor in FLOORS:
         files, covered, total = totals(report, marker)
-        if total == 0 and may_be_empty:
-            lines.append(f"{name}: no measured statements ({files} file(s)); skipped")
-            continue
         if total == 0:
             lines.append(f"{name}: no measured statements ({files} file(s))")
             failures.append(

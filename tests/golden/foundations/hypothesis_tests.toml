@@ -1,0 +1,101 @@
+# tests/golden/foundations/hypothesis_tests.toml
+model = "foundations.hypothesis_tests"
+
+[[sources]]
+key = "nist_mean"
+kind = "official"
+citation = "NIST/SEMATECH (2012). e-Handbook of Statistical Methods, section 1.3.5.2, Confidence Limits for the Mean (a US-government public-domain work)."
+url = "https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm"
+
+[[sources]]
+key = "nist_two_sample"
+kind = "official"
+citation = "NIST/SEMATECH (2012). e-Handbook of Statistical Methods, section 1.3.5.3, Two-Sample t-Test for Equal Means."
+url = "https://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm"
+
+[[sources]]
+key = "nist_chi_square"
+kind = "official"
+citation = "NIST/SEMATECH (2012). e-Handbook of Statistical Methods, section 1.3.5.8, Chi-Square Test for the Variance."
+url = "https://www.itl.nist.gov/div898/handbook/eda/section3/eda358.htm"
+
+[[sources]]
+key = "nist_f"
+kind = "official"
+citation = "NIST/SEMATECH (2012). e-Handbook of Statistical Methods, section 1.3.5.9, F-Test for Equality of Two Variances."
+url = "https://www.itl.nist.gov/div898/handbook/eda/section3/eda359.htm"
+
+[[sources]]
+key = "cauchy_t"
+kind = "identity"
+citation = "Student's t with one degree of freedom is the standard Cauchy distribution, so P(|T| > t) = 1 - 2 arctan(t) / pi."
+
+[[sources]]
+key = "normal_quantile"
+kind = "identity"
+citation = "The standard normal 97.5% quantile is 1.959963984540054, so a z statistic equal to it has a two-sided p-value of 0.05."
+
+[[cases]]
+id = "zarr13_against_five"
+source = "nist_mean"
+locator = "Section 1.3.5.2, sample output for ZARR13.DAT (the t test of mu = 5)"
+edge = false
+inputs = { calculation = "one_sample_t", n = 195, mean = 9.26146, sd = 0.022789, hypothesized_mean = 5 }
+expected = { statistic = 2611.284, degrees_of_freedom = 194.0, critical_values = [-1.9723, 1.9723], reject = true }
+tolerance = { statistic = { rel = 3e-5 }, critical_values = { abs = 5e-5 } }
+note = "NIST computes T from the raw data; the published standard deviation has five significant digits (a relative error up to 2.2e-5), so the statistic from the summary agrees to that precision. Critical values are published to four decimals."
+
+[[cases]]
+id = "zarr13_interval"
+source = "nist_mean"
+locator = "Section 1.3.5.2, the 95% confidence interval (9.258242, 9.264679)"
+edge = false
+inputs = { calculation = "one_sample_t", n = 195, mean = 9.26146, sd = 0.022789, hypothesized_mean = 5 }
+expected = { ci_lower = 9.258242, ci_upper = 9.264679 }
+tolerance = { ci_lower = { abs = 2e-6 }, ci_upper = { abs = 2e-6 } }
+note = "Six published decimals; the rounded standard deviation moves the ends by under 1e-6."
+
+[[cases]]
+id = "auto83b_pooled"
+source = "nist_two_sample"
+locator = "Section 1.3.5.3, sample output for AUTO83B.DAT"
+edge = false
+inputs = { calculation = "two_sample_t", n1 = 249, mean1 = 20.14458, sd1 = 6.4147, n2 = 79, mean2 = 30.48101, sd2 = 6.10771, equal_variances = true }
+expected = { statistic = -12.62059, degrees_of_freedom = 326.0, critical_values = [-1.9673, 1.9673], reject = true }
+tolerance = { statistic = { abs = 2e-5 }, critical_values = { abs = 5e-5 } }
+note = "The statistic is published to five decimals and the summary statistics are rounded, which moves it by up to 1e-5."
+
+[[cases]]
+id = "gear_variance"
+source = "nist_chi_square"
+locator = "Section 1.3.5.8, sample output for GEAR.DAT (H0: sigma = 0.1)"
+edge = false
+inputs = { calculation = "chi_square_variance", n = 100, sd = 0.0063, hypothesized_sd = 0.1, alpha = 0.05 }
+expected = { statistic = 0.3903, degrees_of_freedom = 99.0, critical_values = [73.361, 128.422], reject = true }
+tolerance = { statistic = { abs = 0.004 }, critical_values = { abs = 5e-4 } }
+note = "The page prints the standard deviation as 0.0063 (two significant digits), so the statistic from it (0.3929) agrees with the published 0.3903 only to that precision; the critical values depend on n and alpha alone and agree to their three decimals."
+
+[[cases]]
+id = "jahanmi2_batches"
+source = "nist_f"
+locator = "Section 1.3.5.9, sample output for JAHANMI2.DAT (batch 1 against batch 2)"
+edge = false
+inputs = { calculation = "f_variances", n1 = 240, sd1 = 65.54909, n2 = 240, sd2 = 61.85425, alpha = 0.05 }
+expected = { statistic = 1.123037, df_numerator = 239.0, df_denominator = 239.0, critical_values = [0.7756, 1.2894], reject = false }
+tolerance = { statistic = { abs = 1e-6 }, critical_values = { abs = 5e-5 } }
+note = "Six published decimals of F from standard deviations with seven significant digits."
+
+[[cases]]
+id = "smallest_sample"
+source = "cauchy_t"
+edge = true
+inputs = { calculation = "one_sample_t", n = 2, mean = 1.0, sd = 1.0, hypothesized_mean = 0.0 }
+expected = { statistic = 1.4142135623730951, degrees_of_freedom = 1.0, p_value = 0.39182655203060723 }
+note = "n = 2 gives one degree of freedom and t = sqrt(2): p = 1 - 2 arctan(sqrt(2)) / pi."
+
+[[cases]]
+id = "z_at_the_quantile"
+source = "normal_quantile"
+edge = false
+inputs = { calculation = "z_mean", n = 1, mean = 1.959963984540054, sigma = 1.0, hypothesized_mean = 0.0 }
+expected = { statistic = 1.959963984540054, p_value = 0.05 }

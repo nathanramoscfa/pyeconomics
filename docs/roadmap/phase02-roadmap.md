@@ -3715,9 +3715,9 @@ hygiene.
 
 ---
 
-## Step 6 — Launch Catalog: Foundations
+## Step 6 — Launch Catalog: Foundations ✅
 
-**Status:** Not started
+**Status:** Complete — PR #79 (2026-10-10)
 
 > **Goal:** Register the five foundations entries and prove the contract
 > end to end. Add `src/pyeconomics/models/foundations/` with
@@ -4567,6 +4567,12 @@ New conversation per phase-boundary hygiene.
       fails on a workflow named docs.yml or tests.yml.
     - The `docs` dependency group is empty; pytest's
       testpaths are tests and src.
+    - Step 6 facts (2026-10-10): five foundations models
+      are registered; tests/models/test_catalog_documents.py
+      renders every installed model's card and checks its
+      schemas against 2020-12, and
+      tests/models/test_registry_is_not_empty.py fails an
+      empty registry.
 
     Files to read (every file before drafting):
     - docs/adr/0007-documentation-tooling.md and this
@@ -5054,6 +5060,32 @@ Intelligence High. New conversation per phase-boundary hygiene.
       harness, the invariant meta-test, the contract
       suite, the coverage floors and the docs build's page
       count.
+    - Step 6 facts (2026-10-10): core/cashflows.py
+      (growth, annuity and perpetuity factors,
+      present_value, internal_rate_of_return under
+      IRR_POLICY, sign_changes) and core/descriptive.py
+      (sample_mean and _variance, semideviations,
+      sample_moments' G1 and G2, max_drawdown) are the
+      shared numerics; reuse them. Where compounding makes
+      an output's bounds impossible to size to the inputs,
+      models/foundations/_common.py's bounded() raises
+      DomainError, listed in limitations. A rule between
+      fields is a model_validator plus a
+      tests/strategies.py OVERRIDES entry built from its
+      _one_omitted and _same_length helpers. Invariant and
+      oracle markers take string literals, never a
+      constant (the meta-test reads them with ast). Import
+      scipy.stats inside compute: discovery imports every
+      models module. gitleaks' generic-api-key rule flags
+      long snake_case Reference keys (joanes_gill1998):
+      keep keys short; never allowlist. The contract
+      suite's 50/25/10 draws missed four boundary defects
+      the Step 6 review found (an output rounding past
+      its bound, NaN from an overflowing exponent, an
+      underflowing variance): before the PR, run
+      contract.check_model(model, max_examples=1500) on
+      each new model and have an independent reviewer
+      read the diff.
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -5536,6 +5568,32 @@ High. New conversation per phase-boundary hygiene.
     - The harness, invariant meta-test, contract suite,
       coverage floors and docs page count hold every new
       model.
+    - Step 6 facts (2026-10-10): core/cashflows.py
+      (growth, annuity and perpetuity factors,
+      present_value, internal_rate_of_return under
+      IRR_POLICY, sign_changes) and core/descriptive.py
+      (sample_mean and _variance, semideviations,
+      sample_moments' G1 and G2, max_drawdown) are the
+      shared numerics; reuse them. Where compounding makes
+      an output's bounds impossible to size to the inputs,
+      models/foundations/_common.py's bounded() raises
+      DomainError, listed in limitations. A rule between
+      fields is a model_validator plus a
+      tests/strategies.py OVERRIDES entry built from its
+      _one_omitted and _same_length helpers. Invariant and
+      oracle markers take string literals, never a
+      constant (the meta-test reads them with ast). Import
+      scipy.stats inside compute: discovery imports every
+      models module. gitleaks' generic-api-key rule flags
+      long snake_case Reference keys (joanes_gill1998):
+      keep keys short; never allowlist. The contract
+      suite's 50/25/10 draws missed four boundary defects
+      the Step 6 review found (an output rounding past
+      its bound, NaN from an overflowing exponent, an
+      underflowing variance): before the PR, run
+      contract.check_model(model, max_examples=1500) on
+      each new model and have an independent reviewer
+      read the diff.
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -6015,6 +6073,32 @@ knowledge. New conversation per phase-boundary hygiene.
     - The harness, invariant meta-test, contract suite,
       coverage floors and docs page count hold every new
       model.
+    - Step 6 facts (2026-10-10): core/cashflows.py
+      (growth, annuity and perpetuity factors,
+      present_value, internal_rate_of_return under
+      IRR_POLICY, sign_changes) and core/descriptive.py
+      (sample_mean and _variance, semideviations,
+      sample_moments' G1 and G2, max_drawdown) are the
+      shared numerics; reuse them. Where compounding makes
+      an output's bounds impossible to size to the inputs,
+      models/foundations/_common.py's bounded() raises
+      DomainError, listed in limitations. A rule between
+      fields is a model_validator plus a
+      tests/strategies.py OVERRIDES entry built from its
+      _one_omitted and _same_length helpers. Invariant and
+      oracle markers take string literals, never a
+      constant (the meta-test reads them with ast). Import
+      scipy.stats inside compute: discovery imports every
+      models module. gitleaks' generic-api-key rule flags
+      long snake_case Reference keys (joanes_gill1998):
+      keep keys short; never allowlist. The contract
+      suite's 50/25/10 draws missed four boundary defects
+      the Step 6 review found (an output rounding past
+      its bound, NaN from an overflowing exponent, an
+      underflowing variance): before the PR, run
+      contract.check_model(model, max_examples=1500) on
+      each new model and have an independent reviewer
+      read the diff.
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -6483,6 +6567,32 @@ hygiene.
     - The harness, invariant meta-test, contract suite,
       coverage floors and docs page count hold every new
       model.
+    - Step 6 facts (2026-10-10): core/cashflows.py
+      (growth, annuity and perpetuity factors,
+      present_value, internal_rate_of_return under
+      IRR_POLICY, sign_changes) and core/descriptive.py
+      (sample_mean and _variance, semideviations,
+      sample_moments' G1 and G2, max_drawdown) are the
+      shared numerics; reuse them. Where compounding makes
+      an output's bounds impossible to size to the inputs,
+      models/foundations/_common.py's bounded() raises
+      DomainError, listed in limitations. A rule between
+      fields is a model_validator plus a
+      tests/strategies.py OVERRIDES entry built from its
+      _one_omitted and _same_length helpers. Invariant and
+      oracle markers take string literals, never a
+      constant (the meta-test reads them with ast). Import
+      scipy.stats inside compute: discovery imports every
+      models module. gitleaks' generic-api-key rule flags
+      long snake_case Reference keys (joanes_gill1998):
+      keep keys short; never allowlist. The contract
+      suite's 50/25/10 draws missed four boundary defects
+      the Step 6 review found (an output rounding past
+      its bound, NaN from an overflowing exponent, an
+      underflowing variance): before the PR, run
+      contract.check_model(model, max_examples=1500) on
+      each new model and have an independent reviewer
+      read the diff.
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -6960,6 +7070,32 @@ Intelligence High. New conversation per phase-boundary hygiene.
     - The import allowlist (tests/registry/
       test_model_imports.py) admits an extra's library only
       lazily and per domain.
+    - Step 6 facts (2026-10-10): core/cashflows.py
+      (growth, annuity and perpetuity factors,
+      present_value, internal_rate_of_return under
+      IRR_POLICY, sign_changes) and core/descriptive.py
+      (sample_mean and _variance, semideviations,
+      sample_moments' G1 and G2, max_drawdown) are the
+      shared numerics; reuse them. Where compounding makes
+      an output's bounds impossible to size to the inputs,
+      models/foundations/_common.py's bounded() raises
+      DomainError, listed in limitations. A rule between
+      fields is a model_validator plus a
+      tests/strategies.py OVERRIDES entry built from its
+      _one_omitted and _same_length helpers. Invariant and
+      oracle markers take string literals, never a
+      constant (the meta-test reads them with ast). Import
+      scipy.stats inside compute: discovery imports every
+      models module. gitleaks' generic-api-key rule flags
+      long snake_case Reference keys (joanes_gill1998):
+      keep keys short; never allowlist. The contract
+      suite's 50/25/10 draws missed four boundary defects
+      the Step 6 review found (an output rounding past
+      its bound, NaN from an overflowing exponent, an
+      underflowing variance): before the PR, run
+      contract.check_model(model, max_examples=1500) on
+      each new model and have an independent reviewer
+      read the diff.
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -9000,7 +9136,7 @@ workflow above maps directly to the corresponding row below.
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #76 |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #77 |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
-| 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
+| 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #79 |
 | 7       | Cards + docs preview             | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 9       | Catalog: derivatives + intl      | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
@@ -9333,6 +9469,15 @@ forward whatever is still open here.
   number for a date, so `rate=True` runs as 100% and `when=86400` as
   1970-01-02; the fix belongs in the unit markers of Step 1 (issue #75, label
   `bug`).
+- From Step 6 (2026-10-10). No contract change was needed: the five
+  foundations models fit Steps 1-5 as built, with cross-field rules expressed
+  as `model_validator`s plus `strategies.OVERRIDES` entries, as Step 5
+  designed. Done in the step, as Step 5 planned for it: the `models/` coverage
+  floor now fails when nothing is measured, and the contract and golden suites
+  drop their empty-registry skips, guarded by
+  `tests/models/test_registry_is_not_empty.py`. Patched: the context of Steps
+  7-12 (the Step 6 facts: shared numerics, the out-of-bounds rule, overrides,
+  literal markers, short reference keys).
 
 ---
 

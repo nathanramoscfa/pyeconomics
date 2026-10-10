@@ -8,9 +8,9 @@ bounds, returns finite numbers or a documented ``None``, raises only the
 documented errors, repeats itself exactly and survives a round trip through its
 canonical JSON. The inputs per model are bounded by its cost class.
 
-No catalog model is registered yet, so this collects no case and says so in its
-skip reason; ``test_contract_rules.py`` holds the checks themselves to account
-with toy models.
+``test_contract_rules.py`` holds the checks themselves to account with toy
+models, and ``test_registry_is_not_empty.py`` fails if discovery finds nothing
+to parametrize over.
 """
 
 from __future__ import annotations
@@ -27,17 +27,7 @@ if TYPE_CHECKING:
 
 MODELS = installed().models()
 
-_NONE_YET = pytest.param(
-    None,
-    marks=pytest.mark.skip(
-        reason="no catalog model is registered yet; Step 6 registers the first"
-    ),
-    id="no-catalog-model",
-)
 
-
-@pytest.mark.parametrize(
-    "model", [pytest.param(m, id=m.id) for m in MODELS] or [_NONE_YET]
-)
+@pytest.mark.parametrize("model", [pytest.param(m, id=m.id) for m in MODELS])
 def test_the_model_keeps_the_contract(model: Model[Any, Any]) -> None:
     contract.check_model(model)

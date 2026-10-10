@@ -99,7 +99,7 @@ def test_it_passes_when_every_check_does(
 
 # --- the model checks (Phase 2 Step 4) -------------------------------------------
 # These run against isolated toy registries, installed as the registry for the
-# duration of a test, because the package registers no catalog model yet.
+# duration of a test, so each check meets a model built to break it.
 
 
 @pytest.fixture
@@ -148,7 +148,11 @@ def test_min_domains_fails_when_too_few_are_covered(
         smoke.check_models(pyeconomics, min_domains=11)
 
 
-def test_an_empty_registry_covers_no_domain_and_fails_any_minimum() -> None:
+def test_an_empty_registry_covers_no_domain_and_fails_any_minimum(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    empty = Registry.from_models(distribution="toy-dist")
+    monkeypatch.setattr(core_registry._CACHE, "registry", empty)  # noqa: SLF001
     assert smoke.check_models(pyeconomics) == "registry valid; 0 domain(s) covered"
     with pytest.raises(AssertionError, match=r"0 domain.*none"):
         smoke.check_models(pyeconomics, min_domains=1)
@@ -252,5 +256,5 @@ def test_argv_defaults_to_the_process_arguments(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(smoke, "inside_a_checkout", lambda _: False)
-    monkeypatch.setattr(sys, "argv", ["smoke.py", "--min-domains", "1"])
-    assert smoke.main() == 1  # the registry is empty here
+    monkeypatch.setattr(sys, "argv", ["smoke.py", "--min-domains", "99"])
+    assert smoke.main() == 1  # the catalog spans fewer domains than that

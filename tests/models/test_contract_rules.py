@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """The contract suite holds its own clauses: each one has a model that breaks it.
 
-``test_contract.py`` fuzzes the catalog, which is empty until Step 6. These tests
-fuzz the toy models, and rebuild one with a defect for each clause, so the suite
-cannot pass vacuously when the catalog arrives.
+``test_contract.py`` fuzzes the catalog. These tests fuzz the toy models, and
+rebuild one with a defect for each clause, so the suite cannot pass vacuously
+over models that happen to be correct.
 """
 
 from __future__ import annotations

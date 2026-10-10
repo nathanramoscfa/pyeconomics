@@ -45,6 +45,11 @@ Issues = "https://github.com/pyeconomics-dev/pyeconomics/issues"
 Changelog = "https://github.com/pyeconomics-dev/pyeconomics/blob/main/CHANGELOG.md"
 Roadmap = "https://github.com/pyeconomics-dev/pyeconomics/blob/main/docs/roadmap/ROADMAP.md"
 
+# Model discovery (pyeconomics.core.registry): each module named here lists its
+# Model objects in __all__.
+[project.entry-points."pyeconomics.models"]
+foundations = "pyeconomics.models.foundations"
+
 # ADR-0002: each extra exists from Phase 1 Step 7 as an empty list, so the
 # names are stable before their contents arrive. [app] and [bloomberg] are
 # added only when their packages exist (Phases 5 and 6).
@@ -138,8 +143,10 @@ convention = "numpy"
 "scripts/checks/*.py" = ["T201"]
 "scripts/smoke.py" = ["T201"]
 "scripts/new_model.py" = ["T201"]
-# eradicate mistakes the path in this file's header comment for code.
+# eradicate mistakes the path in these files' header comments for code.
 "tests/registry/test_model_imports.py" = ["ERA001"]
+"src/pyeconomics/models/foundations/returns.py" = ["ERA001"]
+"tests/models/foundations/test_returns.py" = ["ERA001"]
 # ADR-0008 names these modules; they are only ever imported as
 # pyeconomics.core.random and pyeconomics.core.warnings, never top-level.
 "src/pyeconomics/core/random.py" = ["A005"]

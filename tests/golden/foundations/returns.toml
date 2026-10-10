@@ -1,0 +1,87 @@
+# tests/golden/foundations/returns.toml
+model = "foundations.returns"
+
+[[sources]]
+key = "microsoft_effect"
+kind = "official"
+citation = "Microsoft (n.d.). EFFECT function. Microsoft Support (Excel function reference)."
+url = "https://support.microsoft.com/en-us/office/effect-function-910d4e4c-79e2-4009-95e6-507e04f11bc4"
+
+[[sources]]
+key = "holding_period_definition"
+kind = "identity"
+citation = "The holding-period return is (V1 - V0 + D) / V0: the change in value plus income, over the starting value."
+
+[[sources]]
+key = "means_of_gross_returns"
+kind = "identity"
+citation = "The geometric mean return is (product of (1 + r))^(1/n) - 1 and the harmonic mean return n / sum(1 / (1 + r)) - 1; the values are computed in exact rational arithmetic, the cube root last."
+
+[[sources]]
+key = "fisher_relation"
+kind = "identity"
+citation = "Fisher's exact relation (1 + i) = (1 + r)(1 + pi) gives r = (i - pi) / (1 + pi)."
+
+[[sources]]
+key = "log_return_definition"
+kind = "identity"
+citation = "A log return is ln(1 + r), so a simple return of 0 has a log return of 0 and e^l - 1 inverts it."
+
+[[sources]]
+key = "total_loss"
+kind = "identity"
+citation = "A gross return of 0 (a return of -100%) makes the product of gross returns 0, so the geometric mean return is -1."
+
+[[cases]]
+id = "effective_annual_rate"
+source = "microsoft_effect"
+locator = "Example (=EFFECT(A2,A3))"
+edge = false
+inputs = { calculation = "annualized", period_return = 0.013125, periods_per_year = 4 }
+expected = { annualized_return = 0.0535427 }
+tolerance = { annualized_return = { abs = 5e-8 } }
+note = "A nominal 5.25% compounded quarterly is 1.3125% a quarter; its annualized return is the effective annual rate, published to seven decimals."
+
+[[cases]]
+id = "stock_with_dividend"
+source = "holding_period_definition"
+edge = false
+inputs = { calculation = "holding_period", beginning_value = 100, ending_value = 108, income = 2 }
+expected = { holding_period_return = 0.1, income_return = 0.02, price_return = 0.08 }
+
+[[cases]]
+id = "three_year_means"
+source = "means_of_gross_returns"
+edge = false
+inputs = { calculation = "means", returns = [0.1, -0.05, 0.2] }
+expected = { arithmetic = 0.08333333333333333, geometric = 0.07836515339093597, harmonic = 0.07332382310984298, observations = 3 }
+note = "The product of the gross returns is exactly 627/500."
+
+[[cases]]
+id = "real_rate"
+source = "fisher_relation"
+edge = false
+inputs = { calculation = "real", nominal = 0.05, inflation = 0.03 }
+expected = { real = 0.019417475728155338 }
+
+[[cases]]
+id = "negative_real_rate"
+source = "fisher_relation"
+edge = true
+inputs = { calculation = "real", nominal = 0.0, inflation = 0.02 }
+expected = { real = -0.0196078431372549 }
+note = "A zero nominal rate: the real rate is -0.02 / 1.02."
+
+[[cases]]
+id = "zero_returns_to_log"
+source = "log_return_definition"
+edge = true
+inputs = { calculation = "log", returns = [0.0, 0.0] }
+expected = { converted = [0.0, 0.0] }
+
+[[cases]]
+id = "total_loss_means"
+source = "total_loss"
+edge = true
+inputs = { calculation = "means", returns = [0.5, -1.0] }
+expected = { arithmetic = -0.25, geometric = -1.0, harmonic = -1.0, observations = 2 }
