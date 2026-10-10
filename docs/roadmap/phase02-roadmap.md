@@ -4623,6 +4623,10 @@ New conversation per phase-boundary hygiene.
       test sybil`; every one installs on every CI cell and
       passes pip-audit. sphinx-gallery is not added (Phase
       5).
+      Export pylock.toml with --all-groups and update the
+      pylock-fresh hook's export command, so pip-audit also
+      audits the code-executing docs toolchain, not only
+      the default dev/test environment.
     </requirement>
 
     <requirement>

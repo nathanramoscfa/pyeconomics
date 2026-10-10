@@ -7442,3 +7442,7 @@ invariant it protected, never deletes it, and adds one line here.
   `tests/checks/test_licences.py` pinned an empty
   `licence_exceptions.toml`; it now pins the four exceptions the maintainer
   reviewed in Phase 2 Step 1 (numpy, scipy, pandas, python-dateutil).
+
+- Static check 19 (Phase 2 Step 7): permits the new `docs/conf.py` only with
+  MyST-NB, sphinx-autoapi over `src/pyeconomics`, the PyData theme and the
+  model-page extension. All other legacy paths remain forbidden.

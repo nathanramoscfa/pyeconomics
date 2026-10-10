@@ -1,0 +1,37 @@
+# Results and manifests
+
+`pyeconomics.run()` returns a frozen `Result` holding validated inputs,
+validated outputs, recorded warnings and a provenance manifest. `run_batch()`
+returns a `BatchResult` for a table or iterable of mappings (at most 100,000 rows).
+
+The manifest records the schema version, model id and version, package and
+numerical-library versions, and the seed and bit generator when applicable.
+Its `data_sources` list is empty for these data-free models. It includes no
+timestamp, filesystem path, host, username or environment value.
+
+`inputs_sha256` hashes canonical JSON of the model id, model version and inputs.
+`result_sha256` hashes those values plus outputs and warnings. The manifest
+itself is outside the hashed body. Canonical JSON follows RFC 8785: key ordering,
+number formatting and UTF-8 bytes are deterministic; NaN and infinity are refused.
+
+```python
+import pyeconomics
+
+fields = dict(
+    calculation="holding_period", beginning_value=100, ending_value=108, income=2
+)
+first = pyeconomics.run("foundations.returns", **fields)
+second = pyeconomics.run("foundations.returns", **fields)
+assert first.to_json() == second.to_json()
+assert first.manifest.result_sha256 == second.manifest.result_sha256
+assert first.to_pandas().shape[0] == 1
+```
+
+Use `to_dict()`, `to_json()` or `to_pandas()` for ordinary exports. Optional
+integrations provide `to_polars()`, `to_arrow()` and `to_parquet()`; missing
+libraries produce an error naming the required package. Table columns use
+`inputs.<field>` and `outputs.<field>`, with arrays in list-valued cells.
+Single-result Arrow and Parquet exports preserve manifest metadata.
+
+`result.card()` explains the model. `result.plot()` uses its declared chart
+specifications and requires the `plot` extra.

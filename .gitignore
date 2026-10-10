@@ -25,6 +25,9 @@ coverage.json
 
 # Generated documentation builds
 docs/_build/
+docs/reference/models/
+docs/autoapi/
+docs/.jupyter_cache/
 /site/
 
 # Secrets: environment files are never committed

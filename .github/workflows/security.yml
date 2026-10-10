@@ -180,8 +180,14 @@ jobs:
           #   permissive; the licences hook allows it only through the
           #   reviewed entry in scripts/checks/licence_exceptions.toml, which
           #   the maintainer approved in Phase 2 Step 1.
+          # - certifi (MPL-2.0) and docutils (mixed licence classifiers) are
+          #   docs-group dependencies only. The licences hook confirms both
+          #   are outside the runtime/all-extras closure; pip-audit audits
+          #   them through pylock.toml's --all-groups export.
           allow-dependencies-licenses: >-
             pkg:githubactions/trufflesecurity/trufflehog,
+            pkg:pypi/certifi,
+            pkg:pypi/docutils,
             pkg:pypi/hypothesis,
             pkg:pypi/numpy,
             pkg:pypi/pathspec,
