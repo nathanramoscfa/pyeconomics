@@ -74,6 +74,7 @@ from pyeconomics.core.errors import InputError, MissingOptionalDependencyError
 from pyeconomics.core.spec import Alias, ModelSpec
 from pyeconomics.core.units import (
     DEFAULT_DATE_BOUNDS,
+    MAX_ARRAY_LENGTH,
     Correlation,
     Count,
     DateValue,
@@ -157,6 +158,57 @@ class ModelOutputs(_Closed):
 # --- array fields ---------------------------------------------------------
 
 
+#: The most items an array-like may hold before it is converted. A field's own
+#: ``max_length`` is checked after conversion, so this ceiling keeps a huge
+#: array from being copied into Python objects first. It is ten times the
+#: default array length (ADR-0008 decision 3), room for a field that widens it.
+MAX_ARRAY_INPUT: Final = 10 * MAX_ARRAY_LENGTH
+
+_SECONDS_PER_YEAR: Final = 365.2425 * 86_400
+_YEARS_PER_UNIT: Final = {
+    "Y": 1.0,
+    "M": 1 / 12,
+    **{
+        unit: seconds / _SECONDS_PER_YEAR
+        for unit, seconds in {
+            "W": 604_800.0,
+            "D": 86_400.0,
+            "h": 3_600.0,
+            "m": 60.0,
+            "s": 1.0,
+            "ms": 1e-3,
+            "us": 1e-6,
+            "ns": 1e-9,
+            "ps": 1e-12,
+            "fs": 1e-15,
+            "as": 1e-18,
+        }.items()
+    },
+}
+_MAX_YEARS_FROM_1970: Final = 100_000
+
+
+def _datetimes_as_microseconds(array: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+    """Cast a datetime64 array to microseconds, refusing what would overflow.
+
+    NumPy wraps a year or month count that does not fit, so a far-future value
+    could land inside the date bounds. The check is on the raw counts, before
+    the cast.
+    """
+    unit, count = np.datetime_data(array.dtype)
+    years_per_unit = _YEARS_PER_UNIT.get(unit)
+    if years_per_unit is None:
+        msg = "a datetime array needs a unit (days, seconds, ...)"
+        raise ValueError(msg)
+    known = array[~np.isnat(array)].astype("int64")
+    if known.size:
+        peak = max(abs(int(known.min())), abs(int(known.max())))
+        if peak * count * years_per_unit > _MAX_YEARS_FROM_1970:
+            msg = f"dates must lie within {_MAX_YEARS_FROM_1970} years of 1970"
+            raise ValueError(msg)
+    return array.astype("datetime64[us]")
+
+
 def _ndarray_items(array: np.ndarray[Any, Any], *, table: bool = False) -> list[Any]:
     """Return a one-dimensional array's items as Python values.
 
@@ -171,10 +223,13 @@ def _ndarray_items(array: np.ndarray[Any, Any], *, table: bool = False) -> list[
             f"got shape {array.shape}"
         )
         raise ValueError(msg)
+    if array.size > MAX_ARRAY_INPUT:
+        msg = f"an array may hold at most {MAX_ARRAY_INPUT} items, got {array.size}"
+        raise ValueError(msg)
     if array.dtype.kind == "M":
         # tolist() turns nanosecond datetimes into integers; microseconds keep
         # the datetime objects pydantic reads as dates.
-        array = array.astype("datetime64[us]")
+        array = _datetimes_as_microseconds(array)
     return array.tolist()  # type: ignore[no-any-return] # NumPy types it as Any
 
 
@@ -189,11 +244,19 @@ def _arrow_items(stream: object) -> list[Any]:
         table = pyarrow.table(stream)
     except ValueError:
         # A stream of arrays (a column), not of record batches (a table).
-        return pyarrow.chunked_array(stream).to_pylist()  # type: ignore[no-any-return]
+        return _arrow_list(pyarrow.chunked_array(stream))
     if table.num_columns != 1:
         msg = f"expected one column, got {table.num_columns}"
         raise ValueError(msg)
-    return table.column(0).to_pylist()  # type: ignore[no-any-return] # pyarrow is Any
+    return _arrow_list(table.column(0))
+
+
+def _arrow_list(column: Any) -> list[Any]:  # noqa: ANN401 - a pyarrow column
+    """Convert an Arrow column to Python values, unless it is too long."""
+    if len(column) > MAX_ARRAY_INPUT:
+        msg = f"an array may hold at most {MAX_ARRAY_INPUT} items, got {len(column)}"
+        raise ValueError(msg)
+    return column.to_pylist()  # type: ignore[no-any-return] # pyarrow is Any
 
 
 def _numpy_items(value: object, to_numpy: Callable[[], object]) -> list[Any]:
@@ -206,7 +269,7 @@ def _numpy_items(value: object, to_numpy: Callable[[], object]) -> list[Any]:
         to_pylist = getattr(value, "to_pylist", None)
         if not callable(to_pylist):
             raise
-        return to_pylist()  # type: ignore[no-any-return] # pyarrow is Any
+        return _arrow_list(value)
     return _ndarray_items(array, table=True)
 
 

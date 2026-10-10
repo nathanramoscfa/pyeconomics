@@ -18,20 +18,42 @@ rules:
     pattern-either:
       # Files, console and logging.
       - pattern: open(...)
-      - pattern: builtins.open(...)
+      - pattern: builtins.$FUNC(...)
       - pattern: print(...)
       - pattern: input(...)
+      - pattern: compile(...)
+      - pattern: __import__(...)
+      - pattern: importlib.$FUNC(...)
       - pattern: warnings.warn(...)
       - pattern: warnings.warn_explicit(...)
       - pattern: logging.$FUNC(...)
+      # Files and datasets, through the libraries a model may import.
+      - patterns:
+          - pattern: pandas.$FUNC(...)
+          - metavariable-regex:
+              metavariable: $FUNC
+              regex: ^read_
+      - patterns:
+          - pattern: numpy.$FUNC(...)
+          - metavariable-regex:
+              metavariable: $FUNC
+              regex: ^(load|loadtxt|genfromtxt|fromregex|save|savetxt|savez|savez_compressed|fromfile|memmap)$
+      - pattern: scipy.io.$FUNC(...)
+      - pattern: scipy.datasets.$FUNC(...)
+      - patterns:
+          - pattern: $OBJ.$METHOD(...)
+          - metavariable-regex:
+              metavariable: $METHOD
+              regex: ^(to_csv|to_parquet|to_pickle|to_sql|to_excel|to_hdf|to_feather|to_orc|to_stata|to_clipboard|tofile|dump)$
       # The clock.
       - pattern: time.$FUNC(...)
       - pattern: datetime.datetime.now(...)
       - pattern: datetime.datetime.utcnow(...)
       - pattern: datetime.datetime.today(...)
       - pattern: datetime.date.today(...)
-      # Randomness: the stdlib module, numpy's global state and an unseeded
-      # default_rng. A seeded Generator is only built by pyeconomics.core.random.
+      # Randomness: the stdlib module, numpy's global state, and anything seeded
+      # from the operating system. A seeded Generator is built by
+      # pyeconomics.core.random.
       - pattern: random.$FUNC(...)
       - patterns:
           - pattern: numpy.random.$FUNC(...)
@@ -40,6 +62,21 @@ rules:
               regex: ^(?!default_rng$|Generator$|PCG64$|SeedSequence$|BitGenerator$)
       - pattern: numpy.random.default_rng()
       - pattern: numpy.random.default_rng(None)
+      - pattern: numpy.random.default_rng(seed=None)
+      - pattern: numpy.random.PCG64()
+      - pattern: numpy.random.PCG64(None)
+      - pattern: numpy.random.PCG64(seed=None)
+      - pattern: numpy.random.SeedSequence()
+      - pattern: numpy.random.SeedSequence(None)
+      - pattern: numpy.random.SeedSequence(entropy=None)
+      # scipy.stats draws and pandas sampling use numpy's global state unless
+      # they are given a random_state.
+      - patterns:
+          - pattern: $OBJ.rvs(...)
+          - pattern-not: $OBJ.rvs(..., random_state=$STATE, ...)
+      - patterns:
+          - pattern: $OBJ.sample(...)
+          - pattern-not: $OBJ.sample(..., random_state=$STATE, ...)
       # The environment, other processes and the network.
       - pattern: os.environ
       - pattern: os.environb

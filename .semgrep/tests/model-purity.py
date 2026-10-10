@@ -1,8 +1,10 @@
 # .semgrep/tests/model-purity.py
 # Test cases for .semgrep/rules/model-purity.yaml (semgrep --test).
 # Deliberately impure code: excluded from the bandit and semgrep hooks.
+import builtins
 import datetime
 import datetime as dt
+import importlib
 import logging
 import math
 import os
@@ -15,6 +17,12 @@ from datetime import date, datetime as clock
 
 import numpy
 import numpy as np
+import pandas as pd
+import scipy.datasets
+import scipy.io
+from pandas import read_parquet
+from scipy import stats
+from scipy.stats import norm
 
 
 def files_and_console(path, text):
@@ -97,6 +105,83 @@ def the_environment(command, host):
     socket.socket()
     # ruleid: model-purity
     socket.create_connection((host, 80))
+
+
+def library_io(frame, array, path):
+    # ruleid: model-purity
+    pd.read_csv(path)
+    # ruleid: model-purity
+    read_parquet("https://example.org/data.parquet")
+    # ruleid: model-purity
+    pd.read_pickle(path)
+    # ruleid: model-purity
+    np.load(path)
+    # ruleid: model-purity
+    np.savetxt(path, array)
+    # ruleid: model-purity
+    np.fromfile(path)
+    # ruleid: model-purity
+    scipy.io.loadmat(path)
+    # ruleid: model-purity
+    scipy.datasets.face()
+    # ruleid: model-purity
+    frame.to_csv(path)
+    # ruleid: model-purity
+    frame.to_parquet(path)
+    # ruleid: model-purity
+    array.tofile(path)
+
+
+def library_randomness(frame, rng):
+    # ruleid: model-purity
+    norm.rvs(size=3)
+    # ruleid: model-purity
+    stats.norm.rvs(0.0, 1.0, 5)
+    # ruleid: model-purity
+    frame.sample(3)
+    # ruleid: model-purity
+    np.random.default_rng(seed=None)
+    # ruleid: model-purity
+    np.random.PCG64()
+    # ruleid: model-purity
+    np.random.Generator(np.random.PCG64(None))
+    # ruleid: model-purity
+    np.random.SeedSequence()
+    # ruleid: model-purity
+    np.random.SeedSequence(entropy=None)
+
+
+def reaching_out(source, name):
+    # ruleid: model-purity
+    compile(source, "<model>", "exec")
+    # ruleid: model-purity
+    __import__(name)
+    # ruleid: model-purity
+    importlib.import_module(name)
+    # ruleid: model-purity
+    builtins.open(name)
+
+
+def pure_library_use(frame, rng):
+    # ok: model-purity
+    drawn = norm.rvs(size=3, random_state=rng)
+    # ok: model-purity
+    sampled = frame.sample(3, random_state=rng)
+    # ok: model-purity
+    density = stats.norm.pdf(0.0)
+    # ok: model-purity
+    quantile = stats.norm.ppf(0.975)
+    # ok: model-purity
+    seeded = np.random.default_rng(seed=7)
+    # ok: model-purity
+    sequence = np.random.SeedSequence(7)
+    # ok: model-purity
+    stream = np.random.Generator(np.random.PCG64(sequence))
+    # ok: model-purity
+    table = pd.DataFrame({"a": [1.0, 2.0]})
+    # ok: model-purity
+    text = frame.to_string()
+    return drawn, sampled, density, quantile, seeded, stream, table, text
 
 
 def pure(values, generator):

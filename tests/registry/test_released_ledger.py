@@ -124,3 +124,24 @@ def test_problems_come_out_in_id_order() -> None:
         "risk.a": Released("risk.a", "1.0.0"),
     }
     assert [p.model for p in check_released(ledger, set(), {})] == ["risk.a", "risk.b"]
+
+
+def test_a_retargeted_alias_is_reported() -> None:
+    # macro.x shipped as an alias of macro.y; it now points at macro.z.
+    ledger = {"macro.x": Released("macro.y", "1.0.0a1")}
+    [problem] = check_released(ledger, {"macro.y", "macro.z"}, {"macro.x": "macro.z"})
+    assert problem.rule == "released"
+    assert "retargeted" in problem.detail
+    assert "'macro.z'" in problem.detail
+    assert "'macro.y'" in problem.detail
+
+
+def test_a_renamed_target_keeps_its_aliases_valid() -> None:
+    # macro.y was renamed macro.y2 with macro.y as an alias, and macro.x, which
+    # shipped as an alias of macro.y, moved with it.
+    ledger = {
+        "macro.x": Released("macro.y", "1.0.0a1"),
+        "macro.y": Released("macro.y", "1.0.0a1"),
+    }
+    aliases = {"macro.x": "macro.y2", "macro.y": "macro.y2"}
+    assert check_released(ledger, {"macro.y2"}, aliases) == []

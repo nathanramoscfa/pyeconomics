@@ -158,3 +158,10 @@ def test_the_facade_raises_not_found() -> None:
 def test_the_facade_validates_the_installed_registry_by_default() -> None:
     registry.validate()
     registry.validate(TOY)
+
+
+@pytest.mark.parametrize("bad", [None, 5, 1.5, ("a", "b")])
+def test_an_id_that_is_not_a_string_is_not_found(bad: object) -> None:
+    with pytest.raises(ModelNotFoundError) as caught:
+        TOY.get(bad)  # type: ignore[arg-type]
+    assert caught.value.close_matches == ()

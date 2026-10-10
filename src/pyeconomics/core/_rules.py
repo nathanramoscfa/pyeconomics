@@ -30,6 +30,7 @@ from typing import (
     Any,
     Final,
     Literal,
+    TypeAliasType,
     Union,
     cast,
     get_args,
@@ -37,7 +38,14 @@ from typing import (
 )
 
 from annotated_types import Ge, GroupedMetadata, Gt, Le, Lt, MaxLen
-from pydantic import BaseModel
+from pydantic import (
+    AllowInfNan,
+    BaseModel,
+    InstanceOf,
+    PlainValidator,
+    SkipValidation,
+    WrapValidator,
+)
 from pydantic.fields import FieldInfo
 
 from pyeconomics.core.context import collect_warnings
@@ -100,6 +108,7 @@ RULES: Final = (
     "bindings",
     "released",
     "duplicate-id",
+    "spec",
 )
 
 _DOI = re.compile(r"10\.\d{4,9}/\S+")
@@ -111,6 +120,10 @@ _VERSION = re.compile(r"\d+(?:\.\d+)*(?:(?:a|b|rc)\d+)?")
 _MAX_TAG_LENGTH = 40
 _MAX_TAGS = 10
 _UNIONS: Final = (Union, types.UnionType)
+#: Pydantic metadata that replaces or skips a field's own validation.
+_BYPASS: Final = cast(
+    "tuple[type, ...]", (PlainValidator, SkipValidation, WrapValidator, InstanceOf)
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -228,6 +241,9 @@ def _check_numeric(tp: object, metadata: Sequence[object], site: _Site) -> None:
             site.report.add(
                 "field-unit", f"{site.path}: unit '{kind.value}' needs {expected}"
             )
+    finite = [m for m in metadata if isinstance(m, AllowInfNan)]
+    if finite and finite[-1].allow_inf_nan:
+        site.report.add("field-bounds", f"{site.path} allows NaN and infinity")
     _check_bounds(metadata, site, dates=False)
 
 
@@ -343,12 +359,27 @@ _DISPATCH: Final[Mapping[str, Callable[[object, Sequence[object], _Site], None]]
 }
 
 
+def _report_bypass(items: Iterable[object], site: _Site) -> None:
+    """Report metadata that could skip the field's bounds."""
+    for item in items:
+        if isinstance(item, _BYPASS) or item is SkipValidation:
+            name = getattr(item, "__name__", type(item).__name__)
+            site.report.add(
+                "field-type", f"{site.path} uses {name}, which can skip its bounds"
+            )
+
+
 def _walk(tp: object, metadata: Sequence[object], site: _Site) -> None:
     """Check one type annotation, with the metadata that applies to it."""
-    while get_origin(tp) is Annotated:
+    while get_origin(tp) is Annotated or isinstance(tp, TypeAliasType):
+        if isinstance(tp, TypeAliasType):  # type X = Annotated[...]
+            tp = tp.__value__
+            continue
         args = get_args(tp)
         tp = args[0]
-        metadata = [*metadata, *_flatten(args[1:])]
+        added = _flatten(args[1:])
+        _report_bypass(added, site)
+        metadata = [*metadata, *added]
     origin = get_origin(tp)
     if origin in _UNIONS:
         for member in get_args(tp):
@@ -360,18 +391,55 @@ def _walk(tp: object, metadata: Sequence[object], site: _Site) -> None:
 
 def _check_fields(cls: type[BaseModel], site: _Site) -> None:
     """Check every field of one input or output model."""
-    config = cls.model_config
-    if not config.get("frozen") or config.get("extra") != "forbid":
-        site.report.add(
-            "io-types", f"{cls.__name__} must be frozen and forbid extra fields"
-        )
+    _check_config(cls, site)
     for name, info in cls.model_fields.items():
         field_site = site.under(f".{name}" if site.path else name)
         if not (info.description and info.description.strip()):
             site.report.add(
                 "field-description", f"{field_site.path} has no description"
             )
-        _walk(info.annotation, _flatten(info.metadata), field_site)
+        metadata = _flatten(info.metadata)
+        _report_bypass(metadata, field_site)
+        _walk(info.annotation, metadata, field_site)
+
+
+_CONFIG_PINS: Final = {
+    "frozen": True,
+    "extra": "forbid",
+    "revalidate_instances": "always",
+    "allow_inf_nan": False,
+}
+
+
+def _check_config(cls: type[BaseModel], site: _Site) -> None:
+    """Hold a model to the closed, finite, re-validated configuration."""
+    if any(cls.model_config.get(key) != value for key, value in _CONFIG_PINS.items()):
+        site.report.add(
+            "io-types",
+            f"{cls.__name__} must be frozen, forbid extra fields, re-validate "
+            "instances and reject NaN and infinity",
+        )
+    for name in cls.model_computed_fields:
+        site.report.add(
+            "field-type",
+            f"{site.path or cls.__name__}.{name} is a computed field, which is not "
+            "validated; compute the value in compute and declare it as a field",
+        )
+    decorators = cls.__pydantic_decorators__
+    for validator in decorators.field_validators.values():
+        if validator.info.mode in {"plain", "wrap"}:
+            site.report.add(
+                "field-type",
+                f"{cls.__name__}.{validator.cls_var_name} is a {validator.info.mode} "
+                "validator, which can skip a field's bounds",
+            )
+    for model_validator in decorators.model_validators.values():
+        if model_validator.info.mode == "wrap":
+            site.report.add(
+                "field-type",
+                f"{cls.__name__}.{model_validator.cls_var_name} is a wrap "
+                "validator, which can skip the bounds",
+            )
 
 
 # --- the rules ---------------------------------------------------------------
@@ -484,9 +552,9 @@ class _Checker:
         keys: set[str] = set()
         for reference in self.spec.references:
             label = f"reference {reference.key!r}"
-            if not reference.key or reference.key in keys:
+            if not _is_str(reference.key) or not reference.key or reference.key in keys:
                 self.report.add("reference", f"{label}: the key is empty or repeated")
-            keys.add(reference.key)
+            keys.add(str(reference.key))
             self.text(
                 reference.citation,
                 "reference",
@@ -494,23 +562,26 @@ class _Checker:
                 MAX_TEXT_LENGTH,
             )
             self.reference_target(reference.doi, reference.url, label)
-            if not reference.locator or not reference.locator.strip():
+            locator = reference.locator
+            if not _is_str(locator) or not str(locator).strip():
                 self.report.add(
                     "reference", f"{label} has no locator (page, table, section, ...)"
                 )
-            if reference.isbn and not _ISBN.fullmatch(
-                reference.isbn.replace("-", "").replace(" ", "")
-            ):
-                self.report.add(
-                    "reference", f"{label}: isbn {reference.isbn!r} is invalid"
-                )
+            self.reference_isbn(reference.isbn, label)
 
-    def reference_target(self, doi: str | None, url: str | None, label: str) -> None:
+    def reference_isbn(self, isbn: object, label: str) -> None:
+        if isbn is not None and (
+            not _is_str(isbn)
+            or not _ISBN.fullmatch(str(isbn).replace("-", "").replace(" ", ""))
+        ):
+            self.report.add("reference", f"{label}: isbn {isbn!r} is invalid")
+
+    def reference_target(self, doi: object, url: object, label: str) -> None:
         if not doi and not url:
             self.report.add("reference", f"{label} has neither a doi nor a url")
-        if doi and not _DOI.fullmatch(doi):
+        if doi and not (_is_str(doi) and _DOI.fullmatch(str(doi))):
             self.report.add("reference", f"{label}: doi {doi!r} is not a DOI")
-        if url and not _URL.fullmatch(url):
+        if url and not (_is_str(url) and _URL.fullmatch(str(url))):
             self.report.add("reference", f"{label}: url {url!r} is not an http(s) URL")
 
     def extra(self) -> None:
@@ -800,7 +871,11 @@ def _check_examples(
         _check_example(model, example, report, extra_missing=extra_missing)
     if len(spec.input_models) > 1:
         known = _member_calculations(spec.input_models, "inputs", _Report(spec.id))
-        covered = {example.inputs.get(CALCULATION_FIELD) for example in spec.examples}
+        covered = {
+            c
+            for example in spec.examples
+            if _is_str(c := example.inputs.get(CALCULATION_FIELD))
+        }
         for name in sorted(set(known or {}) - covered):
             report.add(
                 "example-calculations", f"no example runs the calculation {name!r}"
@@ -813,10 +888,17 @@ def _check_examples(
 def check_model(model: Model[Any, Any], provider: Provider | None) -> list[Problem]:
     """Return every problem with one model, in a fixed order."""
     checker = _Checker(model.spec, provider)
-    problems = checker.run()
-    if checker.types_ok:
-        _check_examples(model, provider, checker.report)
-    return problems
+    try:
+        checker.run()
+        if checker.types_ok:
+            _check_examples(model, provider, checker.report)
+    except Exception as error:  # noqa: BLE001 - a malformed spec must not hide the rest
+        checker.report.add(
+            "spec",
+            f"cannot be checked, a value has the wrong type: {type(error).__name__}: "
+            f"{error}",
+        )
+    return checker.report.problems
 
 
 def check_released(
@@ -857,6 +939,15 @@ def check_released(
             )
         elif not resolves(entry.canonical_id):
             detail = f"the model it named, {entry.canonical_id!r}, no longer resolves"
+        elif aliases.get(released_id, released_id) != aliases.get(
+            entry.canonical_id, entry.canonical_id
+        ):
+            detail = (
+                f"now resolves to {aliases.get(released_id, released_id)!r}, but it "
+                f"named {entry.canonical_id!r}, which is now "
+                f"{aliases.get(entry.canonical_id, entry.canonical_id)!r} "
+                "(an alias was retargeted; ADR-0003)"
+            )
         if detail is not None:
             problems.append(Problem(released_id, "released", detail))
     return problems

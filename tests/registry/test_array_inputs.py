@@ -32,7 +32,7 @@ from pyeconomics.core import (
     UnitKind,
     VolatilityArray,
 )
-from pyeconomics.core.model import ARRAY_KINDS
+from pyeconomics.core.model import ARRAY_KINDS, MAX_ARRAY_INPUT
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -97,6 +97,9 @@ class ArrowStream:
 
 
 class FakeColumn:
+    def __len__(self) -> int:
+        return 3
+
     def to_pylist(self) -> list[float]:
         return [0.1, 0.2, 0.3]
 
@@ -127,6 +130,9 @@ class NullableColumn:
     def to_numpy(self) -> np.ndarray[Any, Any]:
         msg = "Needed to copy 1 chunks with 1 nulls, but zero_copy_only was True"
         raise ValueError(msg)
+
+    def __len__(self) -> int:
+        return 2
 
     def to_pylist(self) -> list[float | None]:
         return [0.1, None]
@@ -334,6 +340,66 @@ def test_a_stream_of_arrays_is_read_as_a_column(
     module.chunked_array = lambda _stream: FakeColumn()  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "pyarrow", module)
     assert Rates.model_validate({"rates": ArrowStream()}).rates == (0.1, 0.2, 0.3)
+
+
+def test_a_huge_year_count_cannot_wrap_into_the_date_bounds() -> None:
+    # 6,165,218,490,125 years wraps to 1900 when cast to microseconds.
+    wraps = np.array([6165218490125], dtype="datetime64[Y]")
+    assert "within 100000 years of 1970" in str(rejected(Dates, dates=wraps))
+    wraps_months = np.array([2**62], dtype="datetime64[M]")
+    rejected(Dates, dates=wraps_months)
+
+
+def test_a_huge_day_count_is_a_validation_error_not_an_overflow() -> None:
+    error = rejected(Dates, dates=np.array([2**62], dtype="datetime64[D]"))
+    assert "within 100000 years of 1970" in str(error)
+
+
+def test_not_a_time_does_not_trip_the_range_check() -> None:
+    values = np.array(["2026-01-02", "NaT"], dtype="datetime64[D]")
+    error = rejected(Dates, dates=values)
+    assert error.errors()[0]["loc"] == ("dates", 1)
+
+
+def test_a_datetime_array_without_a_unit_is_rejected() -> None:
+    assert "needs a unit" in str(
+        rejected(Dates, dates=np.array([], dtype="datetime64"))
+    )
+
+
+def test_an_array_larger_than_the_ceiling_is_refused_before_conversion() -> None:
+    huge = np.zeros(MAX_ARRAY_INPUT + 1, dtype=np.int8)
+    error = rejected(Whole, days=huge)
+    assert f"at most {MAX_ARRAY_INPUT} items" in str(error)
+
+
+def test_an_arrow_column_larger_than_the_ceiling_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Big:
+        def __len__(self) -> int:
+            return MAX_ARRAY_INPUT + 1
+
+        def to_pylist(self) -> list[float]:
+            msg = "must not be converted"
+            raise AssertionError(msg)
+
+    module = ModuleType("pyarrow")
+    module.table = lambda _stream: FakeBigTable(Big())  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "pyarrow", module)
+    assert f"at most {MAX_ARRAY_INPUT} items" in str(
+        rejected(Rates, rates=ArrowStream())
+    )
+
+
+class FakeBigTable:
+    num_columns = 1
+
+    def __init__(self, column: object) -> None:
+        self._column = column
+
+    def column(self, _index: int) -> object:
+        return self._column
 
 
 # --- the aliases -------------------------------------------------------------

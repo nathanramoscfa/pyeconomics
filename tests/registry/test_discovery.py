@@ -399,3 +399,45 @@ def test_the_extras_of_a_real_distribution_are_read() -> None:
     assert provider.name == "pyeconomics"
     assert provider.declares("econometrics")
     assert provider.installed("econometrics")  # an empty list in this step
+
+
+def test_a_models_module_that_uses_the_registry_at_import_fails_instead_of_hanging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = "from pyeconomics import registry\nregistry.ids()\n__all__ = []\n"
+    (tmp_path / "toy_reentrant.py").write_text(source, encoding="utf-8")
+    monkeypatch.syspath_prepend(str(tmp_path))
+    monkeypatch.setattr(
+        importlib.metadata,
+        "entry_points",
+        lambda **_selection: [FakeEntryPoint("toy", "toy_reentrant")],
+    )
+    done: list[BaseException | None] = []
+
+    def attempt() -> None:
+        try:
+            registry.ids()
+        except RegistryError as error:
+            done.append(error)
+
+    worker = threading.Thread(target=attempt, daemon=True)
+    worker.start()
+    worker.join(timeout=20)
+    assert not worker.is_alive(), "discovery deadlocked"
+    [error] = done
+    assert "while it was being discovered" in str(error)
+    # The failed attempt leaves no half-built registry and no held lock.
+    monkeypatch.setattr(importlib.metadata, "entry_points", lambda **_selection: [])
+    registry.refresh()
+    assert registry.ids() == ()
+
+
+def test_extra_names_match_after_normalization() -> None:
+    dist = FakeDist(
+        "toy-dist",
+        requires=['toy-lib>=1 ; extra == "my_extra"', 'other ; extra == "Stats"'],
+        provides_extra=("my-extra", "stats"),
+    )
+    provider = Provider.from_distribution(cast("Any", dist))
+    assert dict(provider.extras) == {"my-extra": ("toy-lib",), "stats": ("other",)}
+    assert not provider.installed("my_extra")  # toy-lib is not installed

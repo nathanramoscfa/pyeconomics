@@ -39,7 +39,7 @@ from pyeconomics.core import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
 
 FISHER = Reference(
     key="fisher1930",
@@ -280,3 +280,11 @@ def variant[I: ModelInputs, O: ModelOutputs](
 def with_inputs(base: Model[Any, Any], **fields: object) -> Mapping[str, object]:
     """Return an example's inputs with some fields replaced."""
     return {**base.spec.examples[0].inputs, **fields}
+
+
+def rebuilt(
+    base: Model[Any, Any], compute: Callable[[Any], Any], **changes: object
+) -> Registry:
+    """A registry of one model with a changed specification and its own compute."""
+    spec = dataclasses.replace(base.spec, **cast("dict[str, Any]", changes))
+    return toy_registry(Model(spec, compute))

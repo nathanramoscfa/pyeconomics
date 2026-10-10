@@ -124,11 +124,15 @@ class Provider:
         extras: dict[str, list[str]] = {
             name: [] for name in distribution.metadata.get_all("Provides-Extra") or []
         }
+        by_normal_name = {_normalize(name): name for name in extras}
         for requirement in distribution.requires or []:
             package = _REQUIREMENT_NAME.match(requirement)
             marker = _REQUIREMENT_EXTRA.search(requirement)
-            if package and marker and marker.group(1) in extras:
-                extras[marker.group(1)].append(package.group(1))
+            declared = (
+                by_normal_name.get(_normalize(marker.group(1))) if marker else None
+            )
+            if package and declared is not None:
+                extras[declared].append(package.group(1))
         return cls(
             name=distribution.name or _UNKNOWN,
             extras=MappingProxyType({k: tuple(v) for k, v in extras.items()}),
@@ -272,10 +276,14 @@ class Registry:
             return registration.model
         found = self._aliases.get(model_id)
         if found is None:
-            matches = difflib.get_close_matches(
-                model_id, [*self._by_id, *self._aliases], n=3
+            asked: object = model_id  # a caller may pass something that is no str
+            known = [*self._by_id, *self._aliases]
+            matches = (
+                difflib.get_close_matches(asked, known, n=3)
+                if isinstance(asked, str)
+                else []
             )
-            raise ModelNotFoundError(model_id, close_matches=matches)
+            raise ModelNotFoundError(str(asked), close_matches=matches)
         registration, removed_in = found
         deprecated(
             model_id,
@@ -457,17 +465,35 @@ class _Cache:
     """The installed registry, built on first use."""
 
     registry: Registry | None = None
-    lock: threading.Lock = field(default_factory=threading.Lock)
+    loading: bool = False
+    lock: threading.RLock = field(default_factory=threading.RLock)
 
 
 _CACHE: Final = _Cache()
 
 
 def installed() -> Registry:
-    """Return the registry of installed distributions, discovering it once."""
+    """Return the registry of installed distributions, discovering it once.
+
+    Raises
+    ------
+    RegistryError
+        If a models module calls the registry while it is being imported, which
+        would wait on its own discovery.
+    """
     with _CACHE.lock:
         if _CACHE.registry is None:
-            _CACHE.registry = discover()
+            if _CACHE.loading:
+                msg = (
+                    "a models module used the registry while it was being "
+                    "discovered; build models at import time, and look them up later"
+                )
+                raise RegistryError(msg)
+            _CACHE.loading = True
+            try:
+                _CACHE.registry = discover()
+            finally:
+                _CACHE.loading = False
         return _CACHE.registry
 
 

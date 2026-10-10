@@ -14,6 +14,7 @@ from __future__ import annotations
 import ast
 import re
 import tomllib
+from importlib import metadata
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -47,7 +48,38 @@ STDLIB = frozenset(
 THIRD_PARTY = frozenset({"numpy", "scipy", "pandas", "pydantic"})
 DYNAMIC_IMPORTS = frozenset({"__import__", "import_module"})
 
-Extras = "Mapping[str, frozenset[str]]"
+#: Modules inside an allowed package that reach files, datasets, compilers or
+#: the registry. An allowed package is not a licence to import all of it.
+DENIED_PREFIXES = (
+    ("pandas", "io"),
+    ("numpy", "f2py"),
+    ("numpy", "ctypeslib"),
+    ("numpy", "distutils"),
+    ("numpy", "lib", "npyio"),
+    ("scipy", "io"),
+    ("scipy", "datasets"),
+    ("scipy", "_lib"),
+    ("pyeconomics", "core", "registry"),
+    ("pyeconomics", "core", "_rules"),
+    ("pyeconomics", "core", "_released"),
+)
+#: Names that an allowed module exports but a model must not import.
+DENIED_NAMES = {
+    "pandas": re.compile(r"read_\w+|HDFStore|ExcelFile|ExcelWriter"),
+    "numpy": re.compile(
+        r"load|loadtxt|genfromtxt|fromregex|save|savetxt|savez|savez_compressed"
+        r"|fromfile|memmap"
+    ),
+    "pyeconomics.core": re.compile(r"Registry|Provider|Registration|discover"),
+}
+
+
+def denied(target: list[str]) -> bool:
+    """Return whether an import reaches a module or name a model must not use."""
+    if any(target[: len(prefix)] == list(prefix) for prefix in DENIED_PREFIXES):
+        return True
+    pattern = DENIED_NAMES.get(".".join(target[:-1]))
+    return pattern is not None and pattern.fullmatch(target[-1]) is not None
 
 
 def module_parts(path: Path, models_root: Path = MODELS) -> list[str]:
@@ -103,6 +135,8 @@ class ImportChecker(ast.NodeVisitor):
 
     def allowed(self, target: list[str]) -> bool:
         top = target[0]
+        if denied(target):
+            return False
         if top in STDLIB or top in THIRD_PARTY:
             return True
         if target[:2] == ["pyeconomics", "core"]:
@@ -144,6 +178,11 @@ class ImportChecker(ast.NodeVisitor):
                 self.check([*anchor, alias.name], node.lineno)
         else:
             self.check(anchor, node.lineno)
+            for alias in node.names:
+                if denied([*anchor, alias.name]):
+                    self.problems.append(
+                        f"line {node.lineno}: imports {'.'.join(anchor)}.{alias.name}"
+                    )
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         extras = [e for e in map(is_model_decorator, node.decorator_list) if e]
@@ -174,6 +213,22 @@ def import_problems(
     return checker.problems
 
 
+def import_names(distribution: str) -> frozenset[str]:
+    """Return the top-level modules a distribution installs.
+
+    An installed distribution says so (``scikit-learn`` installs ``sklearn``);
+    one that is not installed is assumed to import under its own name.
+    """
+    wanted = re.sub(r"[-_.]+", "-", distribution).lower()
+    installed = {
+        module
+        for module, dists in metadata.packages_distributions().items()
+        for dist in dists
+        if re.sub(r"[-_.]+", "-", dist).lower() == wanted
+    }
+    return frozenset(installed or {distribution.lower().replace("-", "_")})
+
+
 def extras_from_pyproject() -> dict[str, frozenset[str]]:
     """Map each extra to the import names of the packages it installs."""
     data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
@@ -181,9 +236,10 @@ def extras_from_pyproject() -> dict[str, frozenset[str]]:
     name = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
     return {
         extra: frozenset(
-            match.group().lower().replace("-", "_").replace(".", "_")
+            module
             for requirement in requirements
             if (match := name.match(requirement))
+            for module in import_names(match.group())
         )
         for extra, requirements in extras.items()
     }
@@ -239,6 +295,9 @@ TOP = MODELS / "__init__.py"
         "from pyeconomics import core",
         "from pyeconomics.models.fixed_income import helpers",
         "from pyeconomics.models.fixed_income.helpers import accrued",
+        "from pandas import DataFrame",
+        "from numpy import linspace",
+        "from scipy.optimize import brentq",
         "from . import helpers",
         "from .helpers import accrued",
         "from .sub.module import thing",
@@ -277,6 +336,21 @@ def test_allowed_imports_pass(line: str) -> None:
         "from ..foundations import returns",
         "import importlib",
         "from importlib import import_module",
+        "import pandas.io.sql",
+        "from pandas.io import sql",
+        "from pandas import read_csv",
+        "from pandas import read_parquet as load",
+        "import numpy.f2py",
+        "from numpy import load",
+        "from numpy import savetxt",
+        "from numpy.lib import npyio",
+        "from scipy import io",
+        "from scipy.io import loadmat",
+        "import scipy.datasets",
+        "from pyeconomics.core.registry import installed",
+        "from pyeconomics.core import discover",
+        "from pyeconomics.core import Registry",
+        "from pyeconomics.core import registry",
     ],
 )
 def test_disallowed_imports_fail(line: str) -> None:
@@ -364,3 +438,9 @@ def test_the_extras_come_from_pyproject() -> None:
     extras = extras_from_pyproject()
     assert "econometrics" in extras
     assert all(isinstance(libraries, frozenset) for libraries in extras.values())
+
+
+def test_an_installed_distribution_says_what_it_imports() -> None:
+    assert import_names("python-dateutil") == {"dateutil"}
+    assert import_names("PyYAML-not-installed") == {"pyyaml_not_installed"}
+    assert "pydantic" in import_names("pydantic")

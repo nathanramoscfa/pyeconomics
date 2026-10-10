@@ -435,6 +435,7 @@ CASES: dict[str, list[Case]] = {
     ],
     "bindings": [case(lambda: broken(ZC, bindings=(object(),)))],
     "duplicate-id": [case(_duplicate_id)],
+    "spec": [case(lambda: broken(ZC, references=(object(),)))],
 }
 
 

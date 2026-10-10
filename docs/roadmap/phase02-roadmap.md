@@ -7984,7 +7984,13 @@ Opus 5.5. New conversation per phase-boundary hygiene.
       when a registered id is missing from the ledger;
       tests/checks/test_release_ledger.py covers it. Run it
       for 1.0.0a1, so the ledger lists the 32 ids, and show
-      validate() passing with it.
+      validate() passing with it. A ledger entry is
+      Released(canonical_id, first_version) and holds no
+      model identity, so validate() cannot see a released id
+      that a different model took over; decide here whether
+      an entry also records a fingerprint (a hash of the
+      model's input and output schemas at release), and if
+      so extend check_released in the same pull request.
     </requirement>
 
     <requirement>
@@ -9286,9 +9292,12 @@ forward whatever is still open here.
   `core/context.py`, and `find_root` records into the collector. Patched:
   Step 3's array-types requirement (an alias fixes no length, because stacked
   constraints do not narrow), Step 4's context (the Step 3 API it builds on) and
-  Step 6's package layout (`models/__init__.py` exists). Open: pydantic's lax
-  mode accepts `True` for a float field, so `rate=True` runs as 100%; the fix
-  belongs in the unit markers of Step 1 (issue #75, label `bug`).
+  Step 6's package layout (`models/__init__.py` exists) and Step 14's ledger
+  requirement (a released id reused by another model is invisible without a
+  fingerprint). Open: pydantic's lax mode accepts `True` for a float field and a
+  number for a date, so `rate=True` runs as 100% and `when=86400` as
+  1970-01-02; the fix belongs in the unit markers of Step 1 (issue #75, label
+  `bug`).
 
 ---
 
