@@ -31,6 +31,7 @@ from typing import (
     Final,
     Literal,
     Union,
+    cast,
     get_args,
     get_origin,
 )
@@ -546,7 +547,7 @@ class _Checker:
             return
         self.calculations()
         for side, members, _ in sides:
-            for member in members:
+            for member in cast("Sequence[type[BaseModel]]", members):
                 scoped = _Report(spec.id)
                 _check_fields(member, _Site(scoped, "", frozenset({member})))
                 for problem in scoped.problems:

@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING, Final
 from pyeconomics.core.warnings import ModelWarning
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
 __all__ = ["collect_warnings", "warn"]
 
@@ -46,7 +46,7 @@ _COLLECTOR: Final[ContextVar[list[ModelWarning] | None]] = ContextVar(
 
 
 @contextmanager
-def collect_warnings() -> Iterator[list[ModelWarning]]:
+def collect_warnings() -> Generator[list[ModelWarning], None, None]:
     """Record the warnings :func:`warn` issues inside the ``with`` block.
 
     The runner installs one around each model call. Collectors nest: the
