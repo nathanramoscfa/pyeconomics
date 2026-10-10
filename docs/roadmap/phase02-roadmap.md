@@ -3715,9 +3715,9 @@ hygiene.
 
 ---
 
-## Step 6 — Launch Catalog: Foundations
+## Step 6 — Launch Catalog: Foundations ✅
 
-**Status:** Not started
+**Status:** Complete — PR #79 (2026-10-10)
 
 > **Goal:** Register the five foundations entries and prove the contract
 > end to end. Add `src/pyeconomics/models/foundations/` with
@@ -9136,7 +9136,7 @@ workflow above maps directly to the corresponding row below.
 | 3       | Spec + registry                  | Claude Sonnet 5.5 | Claude Code  | Effort XHigh        | On       | New  | Complete — PR #76 |
 | 4       | Results, provenance, schemas     | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #77 |
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
-| 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
+| 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #79 |
 | 7       | Cards + docs preview             | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 9       | Catalog: derivatives + intl      | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
