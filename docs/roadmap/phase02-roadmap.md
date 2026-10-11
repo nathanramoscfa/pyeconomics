@@ -5601,8 +5601,10 @@ High. New conversation per phase-boundary hygiene.
       each new model and have an independent reviewer
       read the diff.
     - Step 8 facts (2026-10-10): core/curves.py holds
-      interpolate_rate (linear in zero rates, flat beyond
-      the nodes), curve_discount_factors, forward_rate (its
+      interpolate_rate and interpolate_rates (linear in zero
+      rates, flat beyond the nodes; the second checks the
+      nodes once for many times), curve_discount_factors,
+      forward_rate (in log space; its
       frequency is keyword-only) and par_rate, (1 - d_n) /
       sum(alpha_i d_i), which is also a par swap rate: reuse
       them for swap valuation. A date field needs both ge

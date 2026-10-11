@@ -61,7 +61,7 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
     spread and hazard rate, survival probabilities and the approximate excess
     return from a spread.
 - `pyeconomics.core.curves`: zero-rate interpolation (linear, flat beyond the
-  nodes), discount factors off a zero curve, forward rates and par rates, for
+  nodes, one time or many), discount factors off a zero curve, forward rates and par rates, for
   the fixed-income models and Step 9's swap valuation.
 - `pyeconomics.core.cashflows` (growth, annuity and perpetuity factors,
   present values summed without overflow, and the IRR) and
