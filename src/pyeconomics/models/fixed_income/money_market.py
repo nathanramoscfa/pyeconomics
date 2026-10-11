@@ -70,7 +70,7 @@ def _days(description: str, high: int = _DAYS_MAX) -> Any:  # noqa: ANN401 - pyd
 
 def _face() -> Any:  # noqa: ANN401 - pydantic's Field
     return Field(
-        100.0, gt=0.0, le=_MONEY_IN, description="Face value repaid at maturity"
+        100.0, ge=0.01, le=_MONEY_IN, description="Face value repaid at maturity"
     )
 
 
@@ -297,7 +297,9 @@ def _investment_rate(inputs: InvestmentRateInputs) -> InvestmentRateOutputs:
 def _effective_annual_yield(
     inputs: EffectiveAnnualYieldInputs,
 ) -> EffectiveAnnualYieldOutputs:
-    exponent = _YEAR / inputs.days * math.log(inputs.face_value / inputs.price)
+    exponent = (
+        _YEAR / inputs.days * (math.log(inputs.face_value) - math.log(inputs.price))
+    )
     if exponent > math.log1p(_RATE_MAX):
         msg = (
             f"the effective annual yield exceeds {_RATE_MAX}: the price is far "
@@ -388,8 +390,8 @@ _AUCTION = Reference(
     limitations=(
         (
             "A yield outside [-0.99, 10] (a price far from the face value over a "
-            "few days) raises DomainError, as does a discount that takes the whole "
-            "face value."
+            "few days), a holding-period yield above 100, and a discount that "
+            "takes the whole face value raise DomainError."
         ),
         "Prices are not rounded; Treasury rounds prices per 100 to six decimals.",
     ),

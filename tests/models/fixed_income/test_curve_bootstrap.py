@@ -207,6 +207,25 @@ def test_curves_with_no_representable_rate_are_refused(inputs: dict[str, Any]) -
         run(**inputs)
 
 
+@pytest.mark.parametrize(
+    ("near", "near_years", "far", "far_years", "frequency"),
+    [(0.0, 99.99, 0.7864, 100.0, "quarterly"), (-0.1, 50.0, 1.0, 50.01, "annual")],
+)
+def test_a_forward_over_a_short_span_is_refused_not_overflowed(
+    near: float, near_years: float, far: float, far_years: float, frequency: str
+) -> None:
+    # Found by the Step 8 review: the ratio of factors overflowed math.pow.
+    with pytest.raises(DomainError):
+        run(
+            calculation="forward_rate",
+            near_rate=near,
+            near_years=near_years,
+            far_rate=far,
+            far_years=far_years,
+            frequency=frequency,
+        )
+
+
 def test_a_forward_must_run_forward() -> None:
     with pytest.raises(InputError, match="far maturity"):
         run(

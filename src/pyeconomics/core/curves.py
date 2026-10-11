@@ -35,17 +35,17 @@ from __future__ import annotations
 
 import bisect
 import math
+import sys
 from itertools import pairwise
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from pyeconomics.core.compounding import (
     Compounding,
     Frequency,
     accumulation_factor,
     discount_factor,
-    implied_rate,
 )
-from pyeconomics.core.errors import InputError
+from pyeconomics.core.errors import DomainError, InputError
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -54,8 +54,12 @@ __all__ = [
     "curve_discount_factors",
     "forward_rate",
     "interpolate_rate",
+    "interpolate_rates",
     "par_rate",
 ]
+
+#: The largest argument ``math.exp`` takes without overflowing.
+_LOG_MAX: Final = math.log(sys.float_info.max)
 
 
 def _check_nodes(tenors: Sequence[float], rates: Sequence[float]) -> None:
@@ -92,7 +96,28 @@ def interpolate_rate(
     0.04
 
     """
+    return interpolate_rates(tenors, rates, (time,))[0]
+
+
+def interpolate_rates(
+    tenors: Sequence[float], rates: Sequence[float], times: Sequence[float]
+) -> list[float]:
+    """Return the zero rate at each time, checking the nodes once.
+
+    The same as :func:`interpolate_rate` at each time, for a model that prices
+    many cash flows off one curve.
+
+    Examples
+    --------
+    >>> interpolate_rates((1.0, 2.0), (0.03, 0.04), (0.5, 1.5, 3.0))
+    [0.03, 0.035, 0.04]
+
+    """
     _check_nodes(tenors, rates)
+    return [_interpolate(tenors, rates, time) for time in times]
+
+
+def _interpolate(tenors: Sequence[float], rates: Sequence[float], time: float) -> float:
     if not math.isfinite(time):
         msg = f"the time must be finite, not {time!r}"
         raise InputError(msg)
@@ -140,8 +165,8 @@ def curve_discount_factors(
 
     """
     return [
-        discount_factor(interpolate_rate(tenors, rates, t), t, compounding, frequency)
-        for t in times
+        discount_factor(rate, t, compounding, frequency)
+        for rate, t in zip(interpolate_rates(tenors, rates, times), times, strict=True)
     ]
 
 
@@ -182,12 +207,29 @@ def forward_rate(  # noqa: PLR0913 - two (rate, time) points and the compounding
             f"got {years_1!r} to {years_2!r}"
         )
         raise InputError(msg)
+    span = years_2 - years_1
     if compounding is Compounding.CONTINUOUS:
         # Exact in rates: no ratio of factors that could overflow.
-        return (rate_2 * years_2 - rate_1 * years_1) / (years_2 - years_1)
+        return (rate_2 * years_2 - rate_1 * years_1) / span
     near = accumulation_factor(rate_1, years_1, compounding, frequency)
     far = accumulation_factor(rate_2, years_2, compounding, frequency)
-    return implied_rate(far / near, years_2 - years_1, compounding, frequency)
+    if compounding is Compounding.SIMPLE:
+        return (far - near) / (near * span)
+    # Periodic: the forward's log growth per period, formed from the two log
+    # growths, so a short span neither overflows nor loses the rate's digits.
+    m = _periods_per_year(frequency)
+    per_period = (
+        years_2 * math.log1p(rate_2 / m) - years_1 * math.log1p(rate_1 / m)
+    ) / span
+    if per_period > _LOG_MAX:
+        msg = f"the forward rate from {years_1!r} to {years_2!r} years overflows"
+        raise DomainError(msg)
+    return m * math.expm1(per_period)
+
+
+def _periods_per_year(frequency: Frequency | None) -> int:
+    # accumulation_factor has already refused periodic compounding without one.
+    return 1 if frequency is None else frequency.periods_per_year
 
 
 def par_rate(discount_factors: Sequence[float], accruals: Sequence[float]) -> float:

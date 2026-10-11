@@ -51,7 +51,7 @@ from pyeconomics.core import (
     Years,
     add_months,
     find_root,
-    interpolate_rate,
+    interpolate_rates,
     year_fraction,
 )
 from pyeconomics.core.errors import ConvergenceError
@@ -383,8 +383,10 @@ def bond_flows(
         accrued = face * coupon * elapsed / f
         regular_part = 0.0
     # The time to the first payment is the period less the part accrued (DSC = E
-    # - A); under ACT/ACT that is the days left over the days in the period,
-    # and under 30/360 it is what QuantLib and the street use.
+    # - A); under ACT/ACT that is the days left over the days in the period.
+    # Under 30/360, E is the period's own 30/360 count, as QuantLib takes it;
+    # the SIA rule fixes E at 360/f, which differs only for a period touching a
+    # February month end.
     first_time = period - elapsed
     return _assemble(
         terms,
@@ -571,13 +573,14 @@ def curve_price(
     ``z(t)``, plus ``shift(t)``, compounded at the coupon frequency.
     """
     f = flows.periods_per_year
+    years = [periods / f for periods in flows.times]
+    curve = interpolate_rates(tenors, rates, years)
     total = []
-    for amount, periods in zip(flows.amounts, flows.times, strict=True):
-        years = periods / f
-        rate = interpolate_rate(tenors, rates, years)
-        if shift is not None:
-            rate += shift(years)
-        total.append(amount * math.exp(-periods * math.log1p(rate / f)))
+    for amount, periods, t, rate in zip(
+        flows.amounts, flows.times, years, curve, strict=True
+    ):
+        shifted = rate if shift is None else rate + shift(t)
+        total.append(amount * math.exp(-periods * math.log1p(shifted / f)))
     return math.fsum(total)
 
 

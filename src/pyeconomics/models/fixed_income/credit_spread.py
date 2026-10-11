@@ -242,7 +242,8 @@ def _expected_loss(inputs: ExpectedLossInputs) -> ExpectedLossOutputs:
 
 
 def _hazard_from_spread(inputs: HazardFromSpreadInputs) -> HazardFromSpreadOutputs:
-    hazard = inputs.spread / (1.0 - inputs.recovery_rate)
+    # At the input bounds, 1.0 / (1 - 0.9) rounds to 10.000000000000002.
+    hazard = min(inputs.spread / (1.0 - inputs.recovery_rate), _HAZARD_MAX)
     return HazardFromSpreadOutputs(
         hazard_rate=hazard, one_year_default_probability=-math.expm1(-hazard)
     )

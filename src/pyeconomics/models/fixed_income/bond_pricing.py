@@ -428,17 +428,21 @@ _BOND = {
     ),
     limitations=(
         (
-            "Yields are solved in [-0.1, 1]; a price no yield in that range gives "
-            "raises DomainError, and a call whose yield is above it is skipped by "
-            "yield_to_worst with a warning."
+            "Yields are solved in [-0.1, 1]. A price no yield in that range gives "
+            "raises DomainError, including in yield_to_worst a call whose yield "
+            "is below -0.1; a call whose yield is above 1 is skipped there, with "
+            "a warning."
         ),
         (
             "Only a first period may be irregular; odd last periods, floating or "
             "step-up coupons, sinking funds, and ex-dividend periods are out of scope."
         ),
         (
-            "Day counts are ACT/ACT (ICMA), US 30/360 and 30E/360; a regular "
-            "coupon is c/f even where a 30/360 count of its days is not 360/f."
+            "Day counts are ACT/ACT (ICMA), US 30/360 and 30E/360. A regular "
+            "coupon is c/f, and payments after the first are whole periods apart, "
+            "even where a 30/360 count of a period touching a February month end "
+            "is not 360/f; QuantLib, which sums each period's 30/360 fraction, "
+            "differs there."
         ),
     ),
     references=(_CFR, _FABOZZI, _QUANTLIB),

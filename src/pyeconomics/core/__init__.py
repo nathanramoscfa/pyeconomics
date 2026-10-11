@@ -64,6 +64,7 @@ from pyeconomics.core.curves import (
     curve_discount_factors,
     forward_rate,
     interpolate_rate,
+    interpolate_rates,
     par_rate,
 )
 from pyeconomics.core.dates import (
@@ -339,6 +340,7 @@ __all__ = [
     "input_schema",
     "internal_rate_of_return",
     "interpolate_rate",
+    "interpolate_rates",
     "is_business_day",
     "is_end_of_month",
     "max_drawdown",

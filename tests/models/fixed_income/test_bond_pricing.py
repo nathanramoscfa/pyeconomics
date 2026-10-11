@@ -101,12 +101,18 @@ def test_the_full_price_is_flat_plus_accrued(
     )
     back = run(
         calculation="yield_from_price",
-        price=result.flat_price,
+        price=result.full_price,
+        price_type="full",
         convention=convention,
         **terms,
     )
-    assume(result.flat_price > 0)
-    assert math.isclose(back.full_price, result.full_price, rel_tol=1e-12)
+    assert math.isclose(
+        back.flat_price, result.flat_price, rel_tol=1e-12, abs_tol=1e-12
+    )
+    # A bond days from maturity barely moves with its yield, so the yield is
+    # checked only where the price pins it down.
+    if (terms["maturity"] - terms["settlement"]).days > 90:
+        assert math.isclose(back.yield_to_maturity, y, abs_tol=1e-8)
 
 
 @pytest.mark.invariant(

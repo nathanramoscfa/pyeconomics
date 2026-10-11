@@ -121,6 +121,15 @@ def test_a_negative_yield_bill_prices_above_face() -> None:
             "exceeds",
         ),
         (
+            {
+                "calculation": "effective_annual_yield",
+                "price": 1e12,
+                "days": 1,
+                "face_value": 0.01,
+            },
+            "effective annual",
+        ),
+        (
             {"calculation": "effective_annual_yield", "price": 1e6, "days": 30},
             "effective annual",
         ),

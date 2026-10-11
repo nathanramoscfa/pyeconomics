@@ -20,6 +20,7 @@ from pyeconomics.core import (
     discount_factor,
     forward_rate,
     interpolate_rate,
+    interpolate_rates,
     par_rate,
 )
 
@@ -95,6 +96,33 @@ def test_forwards_link_the_two_discount_factors(
     except DomainError:
         return  # a simple rate whose factor is not positive
     assert math.isclose(d1 * df, d2, rel_tol=1e-9)
+
+
+def test_a_short_periodic_forward_keeps_its_digits_and_never_overflows() -> None:
+    for span in (1e-6, 1e-14, 1e-17):
+        rate = forward_rate(
+            0.03, 0.0, 0.05, span, Compounding.PERIODIC, frequency=Frequency.ANNUAL
+        )
+        assert rate == pytest.approx(0.05, rel=1e-9)
+    simple = forward_rate(0.03, 1.0, 0.04, 2.0, Compounding.SIMPLE)
+    assert simple == pytest.approx((1.08 / 1.03 - 1) / 1.0)
+    with pytest.raises(DomainError, match="overflows"):
+        forward_rate(
+            -0.99,
+            50.0,
+            10.0,
+            50.0 + 1e-6,
+            Compounding.PERIODIC,
+            frequency=Frequency.ANNUAL,
+        )
+
+
+def test_interpolating_many_times_checks_the_nodes_once() -> None:
+    assert interpolate_rates(TENORS, RATES, (0.1, 1.5, 50.0)) == [
+        interpolate_rate(TENORS, RATES, t) for t in (0.1, 1.5, 50.0)
+    ]
+    with pytest.raises(InputError, match="strictly increasing"):
+        interpolate_rates((2.0, 1.0), (0.01, 0.02), ())
 
 
 def test_a_continuous_forward_is_exact_in_rates() -> None:

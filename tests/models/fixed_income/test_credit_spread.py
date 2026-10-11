@@ -95,6 +95,12 @@ def test_the_spread_return_adds_up() -> None:
     assert math.isclose(result.spread_return, 0.03)
 
 
+def test_the_hazard_at_the_input_bounds_stays_within_its_own() -> None:
+    # 1.0 / (1 - 0.9) rounds to 10.000000000000002; found by the Step 8 review.
+    result = run(calculation="hazard_from_spread", spread=1.0, recovery_rate=0.9)
+    assert result.hazard_rate == 10.0
+
+
 def test_a_recovery_of_all_par_is_refused() -> None:
     with pytest.raises(InputError, match="recovery_rate"):
         run(calculation="hazard_from_spread", spread=0.02, recovery_rate=1.0)
