@@ -1,0 +1,75 @@
+# tests/golden/fixed_income/credit_spread.toml
+model = "fixed_income.credit_spread"
+
+[[sources]]
+key = "hull2018"
+kind = "textbook"
+citation = "Hull, J. C. (2018). Options, Futures, and Other Derivatives, 10th ed. Pearson."
+isbn = "9780134472089"
+published_digits = 4
+
+[[sources]]
+key = "credit_triangle"
+kind = "identity"
+citation = "Under a constant hazard rate and continuous compounding, with recovery R of par at default, the spread is s = lambda (1 - R)."
+
+[[sources]]
+key = "exponential_survival"
+kind = "identity"
+citation = "At a constant hazard rate lambda, survival to T is exp(-lambda T) and the cumulative default probability is 1 - exp(-lambda T)."
+
+[[sources]]
+key = "expected_loss"
+kind = "identity"
+citation = "Expected loss is the probability of default times the loss given default times the exposure at default."
+
+[[sources]]
+key = "spread_return"
+kind = "identity"
+citation = "The approximate excess return is the spread times the holding period, less the spread duration times the spread change, less the probability of default times the loss given default."
+
+[[cases]]
+id = "hazard_from_200_basis_points"
+source = "hull2018"
+locator = "Chapter 24, Credit Risk: the average hazard rate implied by a 200-basis-point spread and a 40% recovery rate"
+edge = false
+inputs = { calculation = "hazard_from_spread", spread = 0.02, recovery_rate = 0.4 }
+expected = { hazard_rate = 0.0333 }
+tolerance = { hazard_rate = { abs = 0.00005 } }
+note = "Printed as 3.33% a year: 0.02 / (1 - 0.4)."
+
+[[cases]]
+id = "spread_from_hazard"
+source = "credit_triangle"
+edge = false
+inputs = { calculation = "spread_from_hazard", hazard_rate = 0.05, recovery_rate = 0.4 }
+expected = { spread = 0.03 }
+
+[[cases]]
+id = "five_year_survival"
+source = "exponential_survival"
+edge = false
+inputs = { calculation = "survival", hazard_rate = 0.02, horizon = 5.0 }
+expected = { survival_probability = 0.9048374180359595, default_probability = 0.09516258196404043 }
+
+[[cases]]
+id = "zero_hazard"
+source = "exponential_survival"
+edge = true
+inputs = { calculation = "survival", hazard_rate = 0.0, horizon = 100.0 }
+expected = { survival_probability = 1.0, default_probability = 0.0 }
+note = "No default risk over 100 years."
+
+[[cases]]
+id = "loan_expected_loss"
+source = "expected_loss"
+edge = false
+inputs = { calculation = "expected_loss", probability_of_default = 0.02, loss_given_default = 0.6, exposure = 1000000.0 }
+expected = { expected_loss = 12000.0, loss_rate = 0.012 }
+
+[[cases]]
+id = "one_year_excess_return"
+source = "spread_return"
+edge = false
+inputs = { calculation = "spread_return", spread = 0.015, holding_period = 1.0, spread_duration = 6.5, spread_change = 0.0025, probability_of_default = 0.01, loss_given_default = 0.6 }
+expected = { carry = 0.015, spread_change_return = -0.01625, expected_loss = 0.006, spread_return = -0.00725 }

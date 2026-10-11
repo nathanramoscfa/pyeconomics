@@ -1,0 +1,66 @@
+# tests/golden/fixed_income/curve_bootstrap.toml
+model = "fixed_income.curve_bootstrap"
+
+[[sources]]
+key = "hull2018"
+kind = "textbook"
+citation = "Hull, J. C. (2018). Options, Futures, and Other Derivatives, 10th ed. Pearson."
+isbn = "9780134472089"
+recomputed_with = "the continuous-compounding identity F = (R2 T2 - R1 T1) / (T2 - T1), evaluated independently of the model"
+
+[[sources]]
+key = "flat_par_curve"
+kind = "identity"
+citation = "When every par yield is y, the bond paying y/f each period is worth par at every tenor, so d_k = (1 + y/f)^-k and every spot and one-period forward rate, compounded at f, is y."
+
+[[sources]]
+key = "two_point_forward"
+kind = "identity"
+citation = "With periodic compounding, (1 + F)^(T2 - T1) = (1 + s2)^T2 / (1 + s1)^T1 for annual rates."
+
+[[cases]]
+id = "forwards_from_zero_rates"
+source = "hull2018"
+locator = "Chapter 4, Table 4.5 (calculation of forward rates from the zero rates 3.0, 4.0, 4.6, 5.0 and 5.3%)"
+edge = false
+inputs = { calculation = "from_spot", spot_rates = [0.03, 0.04, 0.046, 0.05, 0.053], frequency = "annual", compounding = "continuous" }
+expected = { forward_rates = [0.03, 0.05, 0.058, 0.062, 0.065], tenors = [1.0, 2.0, 3.0, 4.0, 5.0] }
+note = "Table 4.5 prints the forwards for years 2 to 5; the first year's forward is its zero rate."
+
+[[cases]]
+id = "one_forward_from_two_zeros"
+source = "hull2018"
+locator = "Chapter 4, Table 4.5 (the forward rate for the second year)"
+edge = false
+inputs = { calculation = "forward_rate", near_rate = 0.03, near_years = 1.0, far_rate = 0.04, far_years = 2.0, compounding = "continuous" }
+expected = { forward_rate = 0.05 }
+
+[[cases]]
+id = "flat_semiannual_par_curve"
+source = "flat_par_curve"
+edge = false
+inputs = { calculation = "from_par", par_yields = [0.05, 0.05, 0.05, 0.05] }
+expected = { discount_factors = [0.9756097560975611, 0.9518143961927426, 0.928599410919749, 0.9059506447997552], spot_rates = [0.05, 0.05, 0.05, 0.05], forward_rates = [0.05, 0.05, 0.05, 0.05] }
+
+[[cases]]
+id = "flat_curve_fifty_years"
+source = "flat_par_curve"
+edge = true
+inputs = { calculation = "from_par", par_yields = [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03], frequency = "annual" }
+expected = { spot_rates = [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03] }
+note = "Fifty annual tenors."
+
+[[cases]]
+id = "zero_par_curve"
+source = "flat_par_curve"
+edge = true
+inputs = { calculation = "from_par", par_yields = [0.0, 0.0, 0.0] }
+expected = { discount_factors = [1.0, 1.0, 1.0], spot_rates = [0.0, 0.0, 0.0], forward_rates = [0.0, 0.0, 0.0] }
+
+[[cases]]
+id = "annual_forward"
+source = "two_point_forward"
+edge = false
+inputs = { calculation = "forward_rate", near_rate = 0.04, near_years = 1.0, far_rate = 0.05, far_years = 2.0 }
+expected = { forward_rate = 0.060096153846153744 }
+note = "1.05^2 / 1.04 - 1."

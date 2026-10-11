@@ -48,6 +48,7 @@ Roadmap = "https://github.com/pyeconomics-dev/pyeconomics/blob/main/docs/roadmap
 # Model discovery (pyeconomics.core.registry): each module named here lists its
 # Model objects in __all__.
 [project.entry-points."pyeconomics.models"]
+fixed_income = "pyeconomics.models.fixed_income"
 foundations = "pyeconomics.models.foundations"
 
 # ADR-0002: each extra exists from Phase 1 Step 7 as an empty list, so the

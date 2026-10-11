@@ -4767,9 +4767,9 @@ New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 8 — Launch Catalog: Fixed Income
+## Step 8 — Launch Catalog: Fixed Income ✅
 
-**Status:** Not started
+**Status:** Complete — PR #82 (2026-10-10)
 
 > **Goal:** Register the six fixed-income entries on Step 2's date layer.
 > Add `src/pyeconomics/models/fixed_income/` with
@@ -5600,6 +5600,27 @@ High. New conversation per phase-boundary hygiene.
       contract.check_model(model, max_examples=1500) on
       each new model and have an independent reviewer
       read the diff.
+    - Step 8 facts (2026-10-10): core/curves.py holds
+      interpolate_rate and interpolate_rates (linear in zero
+      rates, flat beyond the nodes; the second checks the
+      nodes once for many times), curve_discount_factors,
+      forward_rate (in log space; its
+      frequency is keyword-only) and par_rate, (1 - d_n) /
+      sum(alpha_i d_i), which is also a par swap rate: reuse
+      them for swap valuation. A date field needs both ge
+      and le (validate()'s field-bounds rule). A numeric
+      Literal passes validate() but fails the schema test
+      (issue #81): use a unit-typed field with bounds.
+      QuantLib's dates run from 1901 to 2199, and its bond
+      functions time the first payment as the period less
+      the part accrued, which differs from a direct count
+      under 30/360. When inputs must agree across fields,
+      the tests/strategies.py _accepts(cls) filter keeps a
+      composite draw valid; tests/fixed_income_draws.py
+      builds the same bond in QuantLib. A DomainError branch
+      no valid input reaches is dead code: size the bound
+      instead (a bond priced at -10% for a century stays
+      below 1e15).
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
@@ -9144,7 +9165,7 @@ workflow above maps directly to the corresponding row below.
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #79 |
 | 7       | Cards + docs preview             | GPT-6.1 Sol         | Codex        | Intelligence Medium | --       | New  | Complete — PR #80 |
-| 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
+| 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #82 |
 | 9       | Catalog: derivatives + intl      | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 10      | Catalog: equity, corp., acct.    | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 11      | Catalog: portfolio + performance | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |

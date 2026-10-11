@@ -381,3 +381,122 @@ def _time_value() -> SearchStrategy[dict[str, Any]]:
 
 
 OVERRIDES["foundations.time_value"] = _time_value
+
+
+# --- fixed income: dates that describe a bond, curves, calls ----------------------
+
+_BOND_EARLIEST: Final = dt.date(1902, 1, 1)
+_BOND_LATEST: Final = DEFAULT_DATE_BOUNDS.upper
+
+
+def _accepts(cls: type[BaseModel]) -> Callable[[dict[str, Any]], bool]:
+    """Return a filter that keeps the mappings ``cls`` validates."""
+
+    def accepted(drawn: dict[str, Any]) -> bool:
+        try:
+            cls.model_validate(drawn)
+        except ValueError:
+            return False
+        return True
+
+    return accepted
+
+
+@st.composite
+def _increasing(draw: st.DrawFn, low: float, high: float, size: int) -> list[float]:
+    """Draw ``size`` strictly increasing values in ``[low, high]``, two places apart."""
+    values = draw(
+        st.lists(
+            st.floats(min_value=low, max_value=high).map(lambda x: round(x, 2)),
+            min_size=size,
+            max_size=size,
+            unique=True,
+        )
+    )
+    return sorted(values)
+
+
+@st.composite
+def _bond(draw: st.DrawFn, cls: type[BaseModel]) -> dict[str, Any]:
+    """Draw ``cls``'s inputs with dates, calls and a curve that fit together."""
+    drawn = draw(_fields(cls))
+    settlement = draw(
+        st.dates(min_value=_BOND_EARLIEST, max_value=dt.date(2190, 12, 31))
+    )
+    term = draw(st.integers(min_value=1, max_value=36_525))
+    maturity = min(settlement + dt.timedelta(days=term), _BOND_LATEST)
+    drawn.update(settlement=settlement, maturity=maturity)
+    drawn.pop("issue_date", None)
+    if draw(st.booleans()):
+        before = dt.timedelta(days=draw(st.integers(min_value=0, max_value=800)))
+        drawn["issue_date"] = max(settlement - before, _BOND_EARLIEST)
+    fields = cls.model_fields
+    if "curve_tenors" in fields:
+        size = draw(st.integers(min_value=1, max_value=8))
+        drawn["curve_tenors"] = draw(_increasing(0.01, 100.0, size))
+        drawn["curve_rates"] = draw(
+            st.lists(
+                st.floats(min_value=-0.1, max_value=1.0), min_size=size, max_size=size
+            )
+        )
+    if "key_tenors" in fields:
+        size = draw(st.integers(min_value=1, max_value=6))
+        drawn["key_tenors"] = draw(_increasing(0.01, 100.0, size))
+    if "call_date" in fields or "call_dates" in fields:
+        bonds = importlib.import_module("pyeconomics.models.fixed_income._bonds")
+        terms = {k: v for k, v in drawn.items() if k in bonds.BondTerms.model_fields}
+        try:
+            dates = bonds.payment_dates(bonds.BondTerms.model_validate(terms))
+        except ValueError:
+            dates = (maturity,)
+        if "call_date" in fields:
+            drawn["call_date"] = draw(st.sampled_from(dates))
+        else:
+            size = draw(st.integers(min_value=1, max_value=4))
+            drawn["call_dates"] = draw(
+                st.lists(st.sampled_from(dates), min_size=size, max_size=size)
+            )
+            drawn["call_prices"] = draw(
+                st.lists(
+                    st.floats(min_value=1.0, max_value=200.0),
+                    min_size=size,
+                    max_size=size,
+                )
+            )
+    return drawn
+
+
+def _fixed_income(model_id: str) -> Callable[[], SearchStrategy[dict[str, Any]]]:
+    """A strategy for a fixed-income model whose inputs describe bonds or curves."""
+
+    def strategy() -> SearchStrategy[dict[str, Any]]:
+        name = model_id.removeprefix("fixed_income.")
+        module = importlib.import_module(f"pyeconomics.models.fixed_income.{name}")
+        found = getattr(module, name)
+        bonds = importlib.import_module("pyeconomics.models.fixed_income._bonds")
+        members = [
+            member
+            for member in found.spec.input_models
+            if isinstance(member, type) and issubclass(member, BaseModel)
+        ]
+        drawn = [
+            (
+                _bond(member)
+                if issubclass(member, bonds.BondTerms)
+                else _fields(member)
+            ).filter(_accepts(member))
+            for member in members
+        ]
+        examples = [dict(example.inputs) for example in found.spec.examples]
+        return st.one_of(*drawn, st.sampled_from(examples))
+
+    return strategy
+
+
+for _id in (
+    "fixed_income.bond_pricing",
+    "fixed_income.curve_bootstrap",
+    "fixed_income.duration",
+    "fixed_income.convexity",
+):
+    OVERRIDES[_id] = _fixed_income(_id)

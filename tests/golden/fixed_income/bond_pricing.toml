@@ -1,0 +1,131 @@
+# tests/golden/fixed_income/bond_pricing.toml
+model = "fixed_income.bond_pricing"
+
+[[sources]]
+key = "cfr356b"
+kind = "official"
+citation = "US Department of the Treasury. 31 CFR Part 356, Appendix B: Formulas and Tables. Electronic Code of Federal Regulations, as amended through 87 FR 40440 (July 7, 2022)."
+url = "https://www.ecfr.gov/current/title-31/subtitle-B/chapter-II/subchapter-B/part-356/appendix-Appendix%20B%20to%20Part%20356"
+
+[[sources]]
+key = "par_bond"
+kind = "identity"
+citation = "On a coupon date, a bond whose yield equals its coupon rate and that repays its face value is worth its face value: c/f times the annuity factor at c/f, plus the discount factor, is one."
+
+[[sources]]
+key = "zero_coupon"
+kind = "identity"
+citation = "A zero-coupon bond n coupon periods from maturity, settled on a coupon date, is worth F / (1 + y/f)^n."
+
+[[cases]]
+id = "regular_first_period"
+source = "cfr356b"
+locator = "Section II.A, example (8 3/4% 30-year bond issued May 15, 1990, at 8.84%)"
+edge = true
+inputs = { calculation = "price_from_yield", settlement = 1990-05-15, maturity = 2020-05-15, coupon_rate = 0.0875, yield_to_maturity = 0.0884, convention = "treasury" }
+expected = { flat_price = 99.057893, accrued_interest = 0.0 }
+tolerance = { flat_price = { abs = 1e-6 } }
+note = "Settlement on a coupon date. Treasury prints P to six decimals; the tolerance is one unit in the sixth."
+
+[[cases]]
+id = "short_first_period"
+source = "cfr356b"
+locator = "Section II.B, example (8 1/2% 2-year note issued April 2, 1990, at 8.59%)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1990-04-02, maturity = 1992-03-31, coupon_rate = 0.085, issue_date = 1990-04-02, yield_to_maturity = 0.0859, convention = "treasury" }
+expected = { flat_price = 99.838183 }
+tolerance = { flat_price = { abs = 1e-6 } }
+note = "Coupons on the last day of March and September; the short first coupon is (181/183)(C/2)."
+
+[[cases]]
+id = "long_first_period"
+source = "cfr356b"
+locator = "Section II.C, example (8 1/2% note issued March 1, 1990, due May 15, 1995, at 8.53%)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1990-03-01, maturity = 1995-05-15, coupon_rate = 0.085, issue_date = 1990-03-01, first_period = "long", yield_to_maturity = 0.0853, convention = "treasury" }
+expected = { flat_price = 99.805118 }
+tolerance = { flat_price = { abs = 1e-6 } }
+
+[[cases]]
+id = "reopened_regular_period"
+source = "cfr356b"
+locator = "Section II.D, example (9 1/2% note accruing from November 15, 1985, settled November 29, at 9.54%)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1985-11-29, maturity = 1995-11-15, coupon_rate = 0.095, yield_to_maturity = 0.0954, convention = "treasury" }
+expected = { flat_price = 99.730918, accrued_interest = 0.367403 }
+tolerance = { flat_price = { abs = 1e-6 }, accrued_interest = { abs = 5e-7 } }
+note = "Treasury rounds A and P + A to six decimals before taking their difference, so P can differ from the unrounded value by a unit in the sixth decimal."
+
+[[cases]]
+id = "reopened_regular_part_of_long_first"
+source = "cfr356b"
+locator = "Section II.E, example (10 3/4% bond issued July 2, 1985, reopened November 4, at 10.47%), and section I.5, example (2)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1985-11-04, maturity = 2005-08-15, coupon_rate = 0.1075, issue_date = 1985-07-02, first_period = "long", yield_to_maturity = 0.1047, convention = "treasury" }
+expected = { flat_price = 102.214586, accrued_interest = 3.672798 }
+tolerance = { flat_price = { abs = 1e-6 }, accrued_interest = { abs = 5e-7 } }
+note = "Section I gives the same accrued interest as $36.72798 per $1,000."
+
+[[cases]]
+id = "reopened_short_first"
+source = "cfr356b"
+locator = "Section II.F, example (10 1/2% note issued May 16, 1983, reopened August 15, at 10.53%)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1983-08-15, maturity = 1991-05-15, coupon_rate = 0.105, issue_date = 1983-05-16, yield_to_maturity = 0.1053, convention = "treasury" }
+expected = { flat_price = 99.777074, accrued_interest = 2.596467 }
+tolerance = { flat_price = { abs = 1e-6 }, accrued_interest = { abs = 5e-7 } }
+
+[[cases]]
+id = "reopened_stub_of_long_first"
+source = "cfr356b"
+locator = "Section II.G, example (9 3/4% note issued October 15, 1988, reopened November 15, at 9.79%)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 1988-11-15, maturity = 1994-12-15, coupon_rate = 0.0975, issue_date = 1988-10-15, first_period = "long", yield_to_maturity = 0.0979, convention = "treasury" }
+expected = { flat_price = 99.738045, accrued_interest = 0.82582 }
+tolerance = { flat_price = { abs = 1e-6 }, accrued_interest = { abs = 5e-7 } }
+
+[[cases]]
+id = "accrued_one_half_year"
+source = "cfr356b"
+locator = "Section I.5, example (1) (6 3/4% note issued May 15, 2000, reopened August 15, 2000)"
+edge = false
+inputs = { calculation = "price_from_yield", settlement = 2000-08-15, maturity = 2005-05-15, coupon_rate = 0.0675, yield_to_maturity = 0.0675 }
+expected = { accrued_interest = 1.6875 }
+tolerance = { accrued_interest = { abs = 5e-7 } }
+note = "Published as $16.87500 per $1,000 of face value: 1.6875 per 100."
+
+[[cases]]
+id = "yield_from_published_price"
+source = "cfr356b"
+locator = "Section II.A, example: the price 99.057893 at a yield of 8.84%"
+edge = false
+inputs = { calculation = "yield_from_price", settlement = 1990-05-15, maturity = 2020-05-15, coupon_rate = 0.0875, price = 99.057893, convention = "treasury" }
+expected = { yield_to_maturity = 0.0884 }
+tolerance = { yield_to_maturity = { abs = 1e-8 } }
+note = "The price is rounded to six decimals, which moves the yield by under 1e-9."
+
+[[cases]]
+id = "par_bond_sixty_years"
+source = "par_bond"
+edge = true
+inputs = { calculation = "price_from_yield", settlement = 2026-02-15, maturity = 2086-02-15, coupon_rate = 0.05, yield_to_maturity = 0.05 }
+expected = { full_price = 100.0, flat_price = 100.0, accrued_interest = 0.0, payments = 120 }
+tolerance = { full_price = { abs = 1e-9 }, flat_price = { abs = 1e-9 } }
+note = "A maturity of 60 years, settled on a coupon date."
+
+[[cases]]
+id = "zero_coupon_negative_yield"
+source = "zero_coupon"
+edge = true
+inputs = { calculation = "price_from_yield", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = -0.005 }
+expected = { full_price = 105.13369125928598, flat_price = 105.13369125928598 }
+note = "A zero coupon at a negative yield: 100 / (1 - 0.0025)^20."
+
+[[cases]]
+id = "callable_at_par_yields_its_coupon"
+source = "par_bond"
+edge = false
+inputs = { calculation = "yield_to_worst", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.045, price = 100.0, call_dates = [2029-01-15, 2031-01-15], call_prices = [100.0, 100.0] }
+expected = { yield_to_worst = 0.045, yield_to_maturity = 0.045, full_price = 100.0 }
+tolerance = { yield_to_worst = { abs = 1e-10 }, yield_to_maturity = { abs = 1e-10 } }
+note = "Priced at par on a coupon date and callable at par, every yield is the coupon rate."

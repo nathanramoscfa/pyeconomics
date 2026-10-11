@@ -1,0 +1,56 @@
+# tests/golden/fixed_income/convexity.toml
+model = "fixed_income.convexity"
+
+[[sources]]
+key = "zero_coupon_convexity"
+kind = "identity"
+citation = "A zero-coupon bond n periods from maturity has P = F (1 + y/f)^-n, so P'' / P = n (n + 1) / (f^2 (1 + y/f)^2)."
+
+[[sources]]
+key = "zero_coupon_bump"
+kind = "identity"
+citation = "Off a flat curve z, a zero-coupon bond n periods out has effective convexity ((1 + (z - h)/f)^-n + (1 + (z + h)/f)^-n - 2 (1 + z/f)^-n) / ((1 + z/f)^-n h^2)."
+
+[[sources]]
+key = "zero_coupon_reprice"
+kind = "identity"
+citation = "For a zero-coupon bond, the repriced change is ((1 + (y + dy)/f) / (1 + y/f))^-n - 1, the estimate is -D_mod dy + C dy^2 / 2, and their difference is the approximation error."
+
+[[cases]]
+id = "zero_coupon_ten_years"
+source = "zero_coupon_convexity"
+edge = false
+inputs = { calculation = "analytical", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = 0.05 }
+expected = { convexity = 99.94051160023795, full_price = 61.02709428588309 }
+
+[[cases]]
+id = "zero_coupon_sixty_years"
+source = "zero_coupon_convexity"
+edge = true
+inputs = { calculation = "analytical", settlement = 2026-01-15, maturity = 2086-01-15, coupon_rate = 0.0, yield_to_maturity = 0.04 }
+expected = { convexity = 3489.042675893887 }
+note = "A maturity of 60 years."
+
+[[cases]]
+id = "zero_coupon_effective"
+source = "zero_coupon_bump"
+edge = false
+inputs = { calculation = "effective", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, curve_tenors = [10.0], curve_rates = [0.05], bump = 0.0001 }
+expected = { effective_convexity = 99.94052123624984 }
+tolerance = { effective_convexity = { abs = 1e-5 } }
+note = "A second difference loses about eight digits to cancellation at a bump of 0.0001."
+
+[[cases]]
+id = "zero_coupon_hundred_basis_points"
+source = "zero_coupon_reprice"
+edge = false
+inputs = { calculation = "price_change", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = 0.05, yield_change = 0.01 }
+expected = { modified_duration = 9.756097560975611, convexity = 99.94051160023795, duration_effect = -0.09756097560975611, convexity_effect = 0.004997025580011898, estimated_change = -0.09256395002974421, actual_change = -0.09273780660008724, approximation_error = -0.00017385657034302282 }
+
+[[cases]]
+id = "no_change_in_yield"
+source = "zero_coupon_reprice"
+edge = true
+inputs = { calculation = "price_change", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = 0.0, yield_change = 0.0 }
+expected = { duration_effect = 0.0, convexity_effect = 0.0, estimated_change = 0.0, actual_change = 0.0, approximation_error = 0.0, modified_duration = 10.0 }
+note = "A zero yield and no change."
