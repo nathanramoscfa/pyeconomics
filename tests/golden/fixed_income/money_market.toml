@@ -1,0 +1,135 @@
+# tests/golden/fixed_income/money_market.toml
+model = "fixed_income.money_market"
+
+[[sources]]
+key = "cfr356b"
+kind = "official"
+citation = "US Department of the Treasury. 31 CFR Part 356, Appendix B: Formulas and Tables. Electronic Code of Federal Regulations, as amended through 87 FR 40440 (July 7, 2022)."
+url = "https://www.ecfr.gov/current/title-31/subtitle-B/chapter-II/subchapter-B/part-356/appendix-Appendix%20B%20to%20Part%20356"
+
+[[sources]]
+key = "auction_rf6"
+kind = "official"
+citation = "US Department of the Treasury, Bureau of the Fiscal Service (2026). Treasury Auction Results: 182-Day Bill, CUSIP 912797RF6, auctioned January 5, 2026, issued January 8, 2026, maturing July 9, 2026."
+url = "https://www.treasurydirect.gov/instit/annceresult/press/preanre/2026/R_20260105_2.pdf"
+
+[[sources]]
+key = "auction_tm9"
+kind = "official"
+citation = "US Department of the Treasury, Bureau of the Fiscal Service (2026). Treasury Auction Results: 364-Day Bill, CUSIP 912797TM9, auctioned January 20, 2026, issued January 22, 2026, maturing January 21, 2027."
+url = "https://www.treasurydirect.gov/instit/annceresult/press/preanre/2026/R_20260120_4.pdf"
+
+[[sources]]
+key = "zero_discount"
+kind = "identity"
+citation = "At a discount rate of zero, P = F (1 - d t / 360) is the face value."
+
+[[sources]]
+key = "yield_definitions"
+kind = "identity"
+citation = "The money-market yield is (F - P) / P x 360 / t; the effective annual yield is (F / P)^(365 / t) - 1; the holding-period yield is (P1 - P0 + D) / P0."
+
+[[cases]]
+id = "price_from_discount_rate"
+source = "cfr356b"
+locator = "Section VI.A, example (bill issued November 24, 1989, due February 22, 1990, at 7.610%)"
+edge = false
+inputs = { calculation = "price_from_discount", discount_rate = 0.0761, days = 90 }
+expected = { price = 98.0975, discount = 1.9025 }
+tolerance = { price = { abs = 5e-7 }, discount = { abs = 5e-7 } }
+note = "Published as 98.097500 per 100."
+
+[[cases]]
+id = "discount_rate_from_price"
+source = "cfr356b"
+locator = "Section VI.C, example (26-week bill issued December 30, 1982, at 95.934567)"
+edge = false
+inputs = { calculation = "discount_from_price", price = 95.934567, days = 182 }
+expected = { discount_rate = 0.080415158 }
+tolerance = { discount_rate = { abs = 5e-10 } }
+
+[[cases]]
+id = "investment_rate_short_bill"
+source = "cfr356b"
+locator = "Section VI.D.1, example (cash management bill issued June 1, 1990, due June 21, 1990)"
+edge = false
+inputs = { calculation = "investment_rate", price = 99.559444, days = 20 }
+expected = { investment_rate = 0.08076 }
+tolerance = { investment_rate = { abs = 5e-6 } }
+note = "Published as 8.076%. Treasury rounds (100 - P) / P to .004425 before scaling, so its six-decimal .080756 differs from the unrounded .0807573 in the sixth decimal."
+
+[[cases]]
+id = "investment_rate_long_bill"
+source = "cfr356b"
+locator = "Section VI.D.2, example (52-week bill issued June 7, 1990, at 92.265000)"
+edge = false
+inputs = { calculation = "investment_rate", price = 92.265, days = 364 }
+expected = { investment_rate = 0.082373244 }
+tolerance = { investment_rate = { abs = 5e-10 } }
+
+[[cases]]
+id = "auction_26_week_price"
+source = "auction_rf6"
+locator = "High rate 3.475% and price 98.243194"
+edge = false
+inputs = { calculation = "price_from_discount", discount_rate = 0.03475, days = 182 }
+expected = { price = 98.243194 }
+tolerance = { price = { abs = 5e-7 } }
+
+[[cases]]
+id = "auction_26_week_investment_rate"
+source = "auction_rf6"
+locator = "Price 98.243194 and investment rate 3.586%"
+edge = false
+inputs = { calculation = "investment_rate", price = 98.243194, days = 182 }
+expected = { investment_rate = 0.03586 }
+tolerance = { investment_rate = { abs = 5e-6 } }
+note = "The year after the January 8, 2026 issue date holds no February 29, so y = 365."
+
+[[cases]]
+id = "auction_52_week_price"
+source = "auction_tm9"
+locator = "High rate 3.390% and price 96.572333"
+edge = false
+inputs = { calculation = "price_from_discount", discount_rate = 0.0339, days = 364 }
+expected = { price = 96.572333 }
+tolerance = { price = { abs = 5e-7 } }
+
+[[cases]]
+id = "auction_52_week_investment_rate"
+source = "auction_tm9"
+locator = "Price 96.572333 and investment rate 3.528%"
+edge = false
+inputs = { calculation = "investment_rate", price = 96.572333, days = 364 }
+expected = { investment_rate = 0.03528 }
+tolerance = { investment_rate = { abs = 5e-6 } }
+note = "More than half a year: the Treasury's quadratic formula, with y = 365."
+
+[[cases]]
+id = "zero_discount_rate"
+source = "zero_discount"
+edge = true
+inputs = { calculation = "price_from_discount", discount_rate = 0.0, days = 365 }
+expected = { price = 100.0, discount = 0.0 }
+
+[[cases]]
+id = "money_market_and_effective_yields"
+source = "yield_definitions"
+edge = false
+inputs = { calculation = "money_market_yield", price = 98.243194, days = 182 }
+expected = { money_market_yield = 0.03537141594888368 }
+
+[[cases]]
+id = "effective_annual_yield"
+source = "yield_definitions"
+edge = false
+inputs = { calculation = "effective_annual_yield", price = 98.243194, days = 182 }
+expected = { effective_annual_yield = 0.036185110095061424 }
+
+[[cases]]
+id = "holding_period_total_loss"
+source = "yield_definitions"
+edge = true
+inputs = { calculation = "holding_period_yield", purchase_price = 98.0, proceeds = 0.0 }
+expected = { holding_period_yield = -1.0 }
+note = "A total loss with no income."

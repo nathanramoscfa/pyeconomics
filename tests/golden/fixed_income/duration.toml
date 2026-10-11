@@ -1,0 +1,73 @@
+# tests/golden/fixed_income/duration.toml
+model = "fixed_income.duration"
+
+[[sources]]
+key = "hull2018"
+kind = "textbook"
+citation = "Hull, J. C. (2018). Options, Futures, and Other Derivatives, 10th ed. Pearson."
+isbn = "9780134472089"
+published_digits = 3
+
+[[sources]]
+key = "macaulay1938"
+kind = "identity"
+citation = "Macaulay (1938): duration is the present-value-weighted mean time to a bond's payments, so a zero-coupon bond's is its time to maturity; the modified duration is that over 1 + y/f."
+
+[[sources]]
+key = "zero_coupon_bump"
+kind = "identity"
+citation = "Off a flat curve z, a zero-coupon bond n periods out has effective duration ((1 + (z - h)/f)^-n - (1 + (z + h)/f)^-n) / (2 h (1 + z/f)^-n); a single key tenor's shift is the parallel shift."
+
+[[sources]]
+key = "zero_coupon_dv01"
+kind = "identity"
+citation = "DV01 = D_mod x P x 0.0001, with D_mod = (n/f) / (1 + y/f) and P = F (1 + y/f)^-n for a zero-coupon bond."
+
+[[cases]]
+id = "three_year_bond"
+source = "hull2018"
+locator = "Chapter 4, Table 4.6 (a 3-year 10% semiannual bond at a yield of 12% continuously compounded)"
+edge = false
+inputs = { calculation = "macaulay_modified", settlement = 2026-01-15, maturity = 2029-01-15, coupon_rate = 0.10, yield_to_maturity = 0.12367309309071928 }
+expected = { macaulay_duration = 2.653, full_price = 94.213 }
+tolerance = { macaulay_duration = { abs = 0.0005 }, full_price = { abs = 0.0005 } }
+note = "Hull quotes the yield as 12% continuously compounded; the input is its semiannual equivalent, 2(e^0.06 - 1). The present values, and so the price and the Macaulay duration, do not depend on how the yield is quoted."
+
+[[cases]]
+id = "zero_coupon_ten_years"
+source = "macaulay1938"
+edge = true
+inputs = { calculation = "macaulay_modified", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = 0.05 }
+expected = { macaulay_duration = 10.0, modified_duration = 9.756097560975611, full_price = 61.02709428588309 }
+note = "A zero coupon, settled on a coupon date."
+
+[[cases]]
+id = "zero_coupon_sixty_years"
+source = "macaulay1938"
+edge = true
+inputs = { calculation = "macaulay_modified", settlement = 2026-01-15, maturity = 2086-01-15, coupon_rate = 0.0, yield_to_maturity = 0.04 }
+expected = { macaulay_duration = 60.0, modified_duration = 58.8235294117647, full_price = 9.28922299479275 }
+note = "A maturity of 60 years."
+
+[[cases]]
+id = "zero_coupon_effective"
+source = "zero_coupon_bump"
+edge = false
+inputs = { calculation = "effective", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, curve_tenors = [10.0], curve_rates = [0.05], bump = 0.0001 }
+expected = { effective_duration = 9.756099348528783, full_price = 61.027094285883074 }
+tolerance = { effective_duration = { abs = 1e-9 } }
+
+[[cases]]
+id = "zero_coupon_single_key"
+source = "zero_coupon_bump"
+edge = false
+inputs = { calculation = "key_rate", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, curve_tenors = [10.0], curve_rates = [0.05], key_tenors = [5.0], bump = 0.0001 }
+expected = { key_rate_durations = [9.756099348528783], effective_duration = 9.756099348528783 }
+tolerance = { key_rate_durations = { abs = 1e-9 }, effective_duration = { abs = 1e-9 } }
+
+[[cases]]
+id = "zero_coupon_dv01"
+source = "zero_coupon_dv01"
+edge = false
+inputs = { calculation = "dv01", settlement = 2026-01-15, maturity = 2036-01-15, coupon_rate = 0.0, yield_to_maturity = 0.05 }
+expected = { dv01 = 0.05953862857159327, modified_duration = 9.756097560975611 }

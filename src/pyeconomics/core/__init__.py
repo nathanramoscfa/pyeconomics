@@ -11,7 +11,8 @@ conversion (:mod:`~pyeconomics.core.rates`), compounding
 (:mod:`~pyeconomics.core.tolerance`), seeded randomness
 (:mod:`~pyeconomics.core.random`), root finding
 (:mod:`~pyeconomics.core.numerics`), cash-flow discounting and IRR
-(:mod:`~pyeconomics.core.cashflows`), descriptive statistics
+(:mod:`~pyeconomics.core.cashflows`), zero curves with forward and par rates
+(:mod:`~pyeconomics.core.curves`), descriptive statistics
 (:mod:`~pyeconomics.core.descriptive`), and the error and warning taxonomy
 (:mod:`~pyeconomics.core.errors`, :mod:`~pyeconomics.core.warnings`). None of
 it does I/O: no network, file, clock or environment access.
@@ -59,6 +60,12 @@ from pyeconomics.core.compounding import (
     implied_rate,
 )
 from pyeconomics.core.context import collect_warnings, warn
+from pyeconomics.core.curves import (
+    curve_discount_factors,
+    forward_rate,
+    interpolate_rate,
+    par_rate,
+)
 from pyeconomics.core.dates import (
     actual_days,
     add_months,
@@ -310,6 +317,7 @@ __all__ = [
     "canonical_sha256",
     "collect_warnings",
     "convert_rate",
+    "curve_discount_factors",
     "decimal_to_basis_points",
     "decimal_to_percent",
     "default_bounds",
@@ -321,6 +329,7 @@ __all__ = [
     "find_root",
     "format_basis_points",
     "format_percent",
+    "forward_rate",
     "generate",
     "generator",
     "growing_annuity_factor",
@@ -329,11 +338,13 @@ __all__ = [
     "implied_rate",
     "input_schema",
     "internal_rate_of_return",
+    "interpolate_rate",
     "is_business_day",
     "is_end_of_month",
     "max_drawdown",
     "model",
     "output_schema",
+    "par_rate",
     "percent_to_decimal",
     "present_value",
     "present_value_factor",

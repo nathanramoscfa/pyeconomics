@@ -37,6 +37,32 @@ The 0.2.x history (0.1.0 to 0.2.6) is in the
     intervals.
   - `foundations.simulation`: seeded Monte Carlo of geometric Brownian motion,
     with antithetic variates, and the nonparametric bootstrap.
+- The fixed-income catalog models, registered through the `fixed_income` entry
+  point in the `pyeconomics.models` group, on the Step 2 date layer:
+  - `fixed_income.bond_pricing`: full and flat price and accrued interest from
+    a yield (street convention, or the Treasury's simple interest over the
+    first fraction of a period), with regular, short-first and long-first
+    coupon periods under ACT/ACT (ICMA), US 30/360 and 30E/360; the yield to
+    maturity from a flat or full price; the yield to a call; and the yield to
+    worst over a schedule of calls. It reproduces every price example in
+    31 CFR Part 356, Appendix B, section II.
+  - `fixed_income.money_market`: bank discount rate to and from price
+    (ACT/360), the money-market (CD-equivalent) yield, the Treasury investment
+    rate with its formula for bills of more than half a year, and the
+    effective annual and holding-period yields.
+  - `fixed_income.curve_bootstrap`: spot rates, discount factors and one-period
+    forwards bootstrapped from par yields, par yields and forwards from spot
+    rates, and the forward rate between two maturities.
+  - `fixed_income.duration`: Macaulay and modified duration, effective and
+    key-rate duration off a spot curve, and DV01.
+  - `fixed_income.convexity`: analytical and effective convexity and the
+    duration-and-convexity price-change estimate beside full repricing.
+  - `fixed_income.credit_spread`: expected loss, the credit triangle between
+    spread and hazard rate, survival probabilities and the approximate excess
+    return from a spread.
+- `pyeconomics.core.curves`: zero-rate interpolation (linear, flat beyond the
+  nodes), discount factors off a zero curve, forward rates and par rates, for
+  the fixed-income models and Step 9's swap valuation.
 - `pyeconomics.core.cashflows` (growth, annuity and perpetuity factors,
   present values summed without overflow, and the IRR) and
   `pyeconomics.core.descriptive` (corrected two-pass mean and variance,
