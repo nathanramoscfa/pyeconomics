@@ -4767,9 +4767,9 @@ New conversation per phase-boundary hygiene.
 
 ---
 
-## Step 8 — Launch Catalog: Fixed Income
+## Step 8 — Launch Catalog: Fixed Income ✅
 
-**Status:** Not started
+**Status:** Complete — PR #82 (2026-10-10)
 
 > **Goal:** Register the six fixed-income entries on Step 2's date layer.
 > Add `src/pyeconomics/models/fixed_income/` with
@@ -9165,7 +9165,7 @@ workflow above maps directly to the corresponding row below.
 | 5       | Verification harness             | Claude Sonnet 5.5 | Claude Code  | Effort High         | On       | New  | Complete — PR #78 |
 | 6       | Catalog: foundations             | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #79 |
 | 7       | Cards + docs preview             | GPT-6.1 Sol         | Codex        | Intelligence Medium | --       | New  | Complete — PR #80 |
-| 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
+| 8       | Catalog: fixed income            | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Complete — PR #82 |
 | 9       | Catalog: derivatives + intl      | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
 | 10      | Catalog: equity, corp., acct.    | GPT-6 Sol         | Codex        | Intelligence Medium | --       | New  | Not started |
 | 11      | Catalog: portfolio + performance | Claude Opus 5.5   | Claude Code  | Effort High         | On       | New  | Not started |
