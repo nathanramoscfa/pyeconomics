@@ -5600,6 +5600,25 @@ High. New conversation per phase-boundary hygiene.
       contract.check_model(model, max_examples=1500) on
       each new model and have an independent reviewer
       read the diff.
+    - Step 8 facts (2026-10-10): core/curves.py holds
+      interpolate_rate (linear in zero rates, flat beyond
+      the nodes), curve_discount_factors, forward_rate (its
+      frequency is keyword-only) and par_rate, (1 - d_n) /
+      sum(alpha_i d_i), which is also a par swap rate: reuse
+      them for swap valuation. A date field needs both ge
+      and le (validate()'s field-bounds rule). A numeric
+      Literal passes validate() but fails the schema test
+      (issue #81): use a unit-typed field with bounds.
+      QuantLib's dates run from 1901 to 2199, and its bond
+      functions time the first payment as the period less
+      the part accrued, which differs from a direct count
+      under 30/360. When inputs must agree across fields,
+      the tests/strategies.py _accepts(cls) filter keeps a
+      composite draw valid; tests/fixed_income_draws.py
+      builds the same bond in QuantLib. A DomainError branch
+      no valid input reaches is dead code: size the bound
+      instead (a bond priced at -10% for a century stays
+      below 1e15).
 
     Files to read (every file before drafting):
     - This roadmap's Overview (model contract, catalog
